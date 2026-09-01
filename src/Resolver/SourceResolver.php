@@ -132,12 +132,6 @@ final class SourceResolver {
 		$survivors = [];
 
 		foreach ( $candidates as $source ) {
-			// 3. Slot uyumu
-			if ( $source->type !== $slot ) {
-				$evaluated[] = ( new Candidate( $source, 0, 'none', null, 0, [] ) )->reject( Candidate::REJECT_SLOT );
-				continue;
-			}
-
 			// 1. Katı uygunluk
 			if ( ! $source->is_eligible() ) {
 				$evaluated[] = ( new Candidate( $source, 0, 'none', null, 0, [] ) )
@@ -153,6 +147,14 @@ final class SourceResolver {
 			if ( $best['proximity'] < $config->min_topic_proximity ) {
 				$evaluated[] = ( new Candidate( $source, $best['proximity'], $rung, $best['uid'], 0, [] ) )
 					->reject( Candidate::REJECT_PROXIMITY );
+				continue;
+			}
+
+			// 3. Slot uyumu. Bu kontrol, dondurulmuş sıra gereği yakınlık
+			// tabanından sonra gelir; böylece tanı izi gerçek karar sırasını
+			// gösterir.
+			if ( $source->type !== $slot ) {
+				$evaluated[] = ( new Candidate( $source, $best['proximity'], $rung, $best['uid'], 0, [] ) )->reject( Candidate::REJECT_SLOT );
 				continue;
 			}
 

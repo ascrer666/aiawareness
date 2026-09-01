@@ -3,7 +3,7 @@ Contributors: drleylaarvas
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 8.0
-Stable tag: 0.1.0-M1
+Stable tag: 0.2.0-M2
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,14 +12,15 @@ küratörlü kaynak kütüphanesi ve tıbbi inceleme kayıtları.
 
 == Description ==
 
-Bu eklenti bir "yazar kutusu" değildir. Sağlık içeriklerinde içeriğin
-arkasındaki tıbbi uzmanı, içeriğin hangi konuya ait olduğunu, ne zaman
-gerçekten incelendiğini ve hangi doğrulanabilir kaynaklara dayandığını
+This plugin extends the traditional WordPress author-box concept into a
+medical content responsibility and review system. Sağlık içeriklerinde
+içeriğin arkasındaki tıbbi uzmanı, içeriğin hangi konuya ait olduğunu, ne
+zaman gerçekten incelendiğini ve hangi doğrulanabilir kaynaklara dayandığını
 yönetir.
 
 Tasarım ilkesi: yanlış bir güven sinyali üretmektense hiçbir sinyal üretme.
 
-= Bu sürümde (M1 — depolama iskeleti) =
+= Bu sürümde (M2 — çözümleme katmanı) =
 
 * Uzman içerik türü (dla_expert), herkese açık değil
 * Tıbbi konu taksonomisi (dla_medical_topic), hiyerarşik, herkese açık değil
@@ -29,11 +30,23 @@ Tasarım ilkesi: yanlış bir güven sinyali üretmektense hiçbir sinyal üretm
 * Yetenekler ve kullanıcı bazlı tıbbi inceleme yetkisi
 * Adlandırılmış inceleme politikaları
 * Bağlantı politikası doğrulaması (kanonik hedef, yasak desenler)
+* Polylang çeviri grubu kimlik senkronizasyonu ve idempotent onarım
+* Domain nesneleri, WordPress repository katmanı ve deterministik kaynak resolver'ı
+* Skorlama, top-tier çeşitlilik bandı, rendezvous hashing ve sürüm damgalı seçim cache'i
+* Salt-okunur resolver açıklama paneli
 
 = Bu sürümde YOK (bilinçli) =
 
-* Kaynak çözümleyici ve çeşitlilik mekanizması — M2
-* Ön yüz render, shortcode, otomatik enjeksiyon — M4
+* Ön yüz render, shortcode, otomatik enjeksiyon — M4: uzman, uzmanlık alanı,
+  profil bağlantısı, inceleme bilgisi, isteğe bağlı uzman yorumu ve seçilmiş
+  kaynakları içeren, premium author-box kalitesinde Medical Author / Reviewer
+  Trust Box. Birincil kullanım, global Avada Content Layout'da Post Content
+  altına bir kez eklenen `[dla_medical_trust]` shortcode'udur; bu shortcode
+  geçerli tekil sayfayı çözümler. Otomatik `the_content` enjeksiyonu isteğe
+  bağlıdır ve varsayılan olarak kapalıdır. Avada yalnızca yerleşim tercihidir;
+  render katmanı tüm uyumlu WordPress temalarında çalışır. Varsayılan görünüm
+  premium uzman kartıdır; `[dla_medical_trust display="compact"]` aynı
+  çözülmüş verinin metin odaklı compact görünümünü seçer.
 * Schema veri kontratı — M6
 * JSON-LD üretimi — hiçbir zaman; bu eklentinin işi değildir
 * PubMed entegrasyonu, denetim panosu, kaynak sağlık kontrolü — Phase 2
@@ -58,6 +71,12 @@ alanında idari bilgi olarak saklanır ve sıralamayı etkilemez.
 Varsayılan olarak korunur. Silme, ayarlardan açıkça istenmedikçe yapılmaz.
 
 == Changelog ==
+
+= 0.2.0-M2 =
+* Polylang kimlik senkronizasyonu ve idempotent onarım.
+* Deterministik kaynak çözümleme: konu yakınlığı, skor, top-tier bandı ve rendezvous hashing.
+* Sürüm damgalı seçim cache'i ve salt-okunur çözümleme açıklama paneli.
+* Saf resolver testleri ile izole WordPress entegrasyon koşumu.
 
 = 0.1.0-M1 =
 * İlk sürüm: depolama iskeleti.

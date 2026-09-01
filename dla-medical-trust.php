@@ -2,8 +2,8 @@
 /**
  * Plugin Name:       DLA Medical Trust
  * Plugin URI:        https://www.drleylaarvas.com/
- * Description:       Tıbbi içerik sorumluluk katmanı — uzman, konu, küratörlü kaynak kütüphanesi ve tıbbi inceleme kayıtları. M1: depolama iskeleti.
- * Version:           0.1.0-M1
+ * Description:       Tıbbi içerik sorumluluk katmanı — uzman, konu, küratörlü kaynak kütüphanesi, tıbbi inceleme kayıtları ve deterministik kaynak çözümlemesi.
+ * Version:           0.2.0-M2
  * Requires at least: 6.0
  * Requires PHP:      8.0
  * Author:            Medical Content Trust
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-const VERSION     = '0.1.0-M1';
+const VERSION     = '0.2.0-M2';
 const DB_VERSION  = 1;
 const TEXT_DOMAIN = 'dla-medical-trust';
 
