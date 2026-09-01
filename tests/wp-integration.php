@@ -104,8 +104,8 @@ if ( ! function_exists( 'pll_default_language' ) ) {
 	}
 
 	function pll_get_term_language( int $term_id, string $field = 'slug' ): string {
-		unset( $term_id, $field );
-		return 'tr';
+		unset( $field );
+		return $GLOBALS['dla_mt_test_term_languages'][ $term_id ] ?? 'tr';
 	}
 }
 
@@ -170,6 +170,7 @@ $check( 'source type terms cannot be edited in UI', 'do_not_allow' === get_taxon
 
 /* Polylang group normalization + idempotent repair operation. */
 $GLOBALS['dla_mt_test_term_translations'] = [ $topic_tr_id => [ 'tr' => $topic_tr_id, 'en' => $topic_en_id ], $topic_en_id => [ 'tr' => $topic_tr_id, 'en' => $topic_en_id ] ];
+$GLOBALS['dla_mt_test_term_languages']    = [ $topic_tr_id => 'tr', $topic_en_id => 'en' ];
 update_term_meta( $topic_en_id, \DLA\MedicalTrust\Meta\MetaRegistry::TOPIC_UID, 'top_bbbbbbbbbbbb' );
 $sync = new \DLA\MedicalTrust\I18n\IdentitySync();
 $first_sync = $sync->normalize_term_group( $topic_en_id );
@@ -465,6 +466,70 @@ $GLOBALS['dla_mt_test_post_translations'][ $m5_translation ] = [ 'tr' => $m5_pag
 update_post_meta( $m5_translation, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_COMMENTARY, '<p>English-only commentary.</p>' );
 $check( 'M5 Polylang page commentary remains language-specific', '<p>English-only commentary.</p>' === get_post_meta( $m5_translation, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_COMMENTARY, true ) && get_post_meta( $m5_page, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_COMMENTARY, true ) !== get_post_meta( $m5_translation, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_COMMENTARY, true ) );
 $_POST = [];
+
+/* M6 - canonical read-only contract. It consumes the same M2/M3 facts as M4. */
+wp_set_current_user( $admin_id );
+\DLA\MedicalTrust\Settings\Settings::update(
+	[
+		'organization' => [ 'name' => 'DLA Editorial Team', 'url' => 'https://example.test/about', 'logo_id' => $image_id ],
+	]
+);
+update_post_meta( $expert_tr, \DLA\MedicalTrust\Meta\MetaRegistry::EXPERT_CREDENTIALS, [ 'MD', 'FEBOPRAS' ] );
+update_post_meta( $expert_tr, \DLA\MedicalTrust\Meta\MetaRegistry::EXPERT_SAMEAS, [ 'https://example.test/experts/test-doctor' ] );
+update_post_meta( $academic_source, \DLA\MedicalTrust\Meta\MetaRegistry::SOURCE_PMID, '12345678' );
+update_post_meta( $academic_source, \DLA\MedicalTrust\Meta\MetaRegistry::SOURCE_PMC_ID, 'PMC1234567' );
+update_post_meta( $academic_source, \DLA\MedicalTrust\Meta\MetaRegistry::SOURCE_PEER_REVIEWED, true );
+
+$m6_page = wp_insert_post( [ 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'M6 Contract Page', 'post_content' => '<p>Current contract facts.</p>' ] );
+wp_set_object_terms( $m6_page, [ $topic_tr_id ], \DLA\MedicalTrust\Taxonomies\MedicalTopicTaxonomy::SLUG );
+update_post_meta( $m6_page, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_GROUP_UID, 'grp_abcdef123456' );
+update_post_meta( $m6_page, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_PRIMARY_TOPIC_UID, $topic_uid );
+update_post_meta( $m6_page, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_AUTHOR_MODE, 'expert' );
+update_post_meta( $m6_page, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_EXPERT_ID, $expert_tr );
+update_post_meta( $m6_page, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_COMMENTARY, '<p>Yalnizca bu sayfanin uzman yorumu.</p>' );
+$m6_translation = wp_insert_post( [ 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'M6 Contract Page EN' ] );
+$GLOBALS['dla_mt_test_post_translations'][ $m6_page ] = [ 'tr' => $m6_page, 'en' => $m6_translation ];
+$GLOBALS['dla_mt_test_post_translations'][ $m6_translation ] = [ 'tr' => $m6_page, 'en' => $m6_translation ];
+update_post_meta( $m6_translation, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_COMMENTARY, '<p>English commentary must not leak.</p>' );
+wp_set_current_user( (int) $reviewer_id );
+$m6_record = $review_service->record( new \DLA\MedicalTrust\Review\ReviewRecordRequest( $m6_page, $expert_tr, gmdate( 'Y-m-d' ), 'M6 contract approval' ) );
+$m6_contract = dla_medical_trust_get_contract( $m6_page );
+$m6_m4_data = ( new \DLA\MedicalTrust\Repository\TrustDataRepository() )->for_post( $m6_page );
+
+$check( 'M6 public contract API is registered and versioned independently', function_exists( 'dla_medical_trust_get_contract' ) && is_array( $m6_contract ) && 'dla-medical-trust/v1' === $m6_contract['contract_version'] );
+$check( 'M6 review fixture is created through ReviewService', $m6_record->success );
+$check( 'M6 content identifies the actual post, URL, type, language and group UID', $m6_page === $m6_contract['content']['post_id'] && 'page' === $m6_contract['content']['content_type'] && 'tr' === $m6_contract['content']['language'] && 'grp_abcdef123456' === $m6_contract['content']['group_uid'] && str_contains( (string) $m6_contract['content']['canonical_url'], '?page_id=' . $m6_page ) );
+$check( 'M6 organization facts come only from configured settings', 'DLA Editorial Team' === $m6_contract['organization']['name'] && 'https://example.test/about' === $m6_contract['organization']['url'] && $image_id === $m6_contract['organization']['logo_id'] );
+$check( 'M6 expert authorship is distinct from organization authorship', 'expert' === $m6_contract['authorship']['mode'] && null === $m6_contract['authorship']['organization'] && $expert_uid === $m6_contract['authorship']['expert']['entity_uid'] );
+$check( 'M6 reviewer contains expert identity only, never the recording WordPress user', $expert_uid === $m6_contract['reviewer']['entity_uid'] && ! array_key_exists( 'recorded_by', $m6_contract['reviewer'] ) && ! array_key_exists( 'user_id', $m6_contract['reviewer'] ) );
+$check( 'M6 reviewer exports the approved expert profile facts', 'Test Doctor TR' === $m6_contract['reviewer']['name'] && 'Op. Dr.' === $m6_contract['reviewer']['honorific'] && 2 === count( $m6_contract['reviewer']['credentials'] ) && 'https://example.test/experts/test-doctor' === $m6_contract['reviewer']['same_as'][0] );
+$check( 'M6 valid current review exposes reviewer, date and applicability', true === $m6_contract['medical_review']['applicable'] && 'reviewed' === $m6_contract['medical_review']['status'] && 'valid' === $m6_contract['medical_review']['validity'] && gmdate( 'Y-m-d' ) === $m6_contract['medical_review']['review_date'] && null !== $m6_contract['medical_review']['freshness'] );
+$check( 'M6 and M4 use the same valid-review truth', $m6_m4_data instanceof \DLA\MedicalTrust\Domain\TrustData && $m6_m4_data->has_valid_review() === $m6_contract['medical_review']['applicable'] && $m6_m4_data->review_date === $m6_contract['medical_review']['review_date'] );
+$check( 'M6 topic exports UID, display label and schema hint without term IDs', $topic_uid === $m6_contract['topics']['primary']['uid'] && 'Rinoplasti' === $m6_contract['topics']['primary']['label'] && ! array_key_exists( 'term_id', $m6_contract['topics']['primary'] ) );
+$check( 'M6 commentary is page-language-specific and does not fall back to a translation', str_contains( (string) $m6_contract['expert_commentary']['content'], 'Yalnizca') && ! str_contains( (string) $m6_contract['expert_commentary']['content'], 'English commentary' ) );
+$check( 'M6 sources contain only final selected eligible facts and canonical identifiers', ! empty( $m6_contract['sources'] ) && ! array_key_exists( 'id', $m6_contract['sources'][0] ) && ! array_key_exists( 'discovered_via', $m6_contract['sources'][0] ) && array_key_exists( 'identifiers', $m6_contract['sources'][0] ) );
+$check( 'M6 contract does not expose internal signoff, cache, score, resolver or review-log data', ! preg_match( '/recorded_by|signoff|resolved_sources|review_log|score|priority|cache|discovered_via/i', (string) wp_json_encode( $m6_contract ) ) );
+$check( 'M6 contract has no JSON-LD payload or script emission', ! str_contains( (string) wp_json_encode( $m6_contract ), 'application/ld+json' ) && ! str_contains( $component->render_for_post( $m6_page ), 'application/ld+json' ) );
+
+update_post_meta( $m6_page, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_DISPLAY_FLAGS, [ 'show_commentary' => false, 'show_sources' => false ] );
+$hidden_contract = dla_medical_trust_get_contract( $m6_page );
+$hidden_m4_data = ( new \DLA\MedicalTrust\Repository\TrustDataRepository() )->for_post( $m6_page );
+$check( 'M6 presentation flags do not erase canonical commentary facts', null !== $hidden_contract['expert_commentary']['content'] && false === $hidden_contract['visibility']['commentary_presentation_enabled'] && $hidden_m4_data instanceof \DLA\MedicalTrust\Domain\TrustData && '' === $hidden_m4_data->commentary );
+$check( 'M6 presentation flags do not erase canonical selected source facts', ! empty( $hidden_contract['sources'] ) && false === $hidden_contract['visibility']['sources_presentation_enabled'] && $hidden_m4_data instanceof \DLA\MedicalTrust\Domain\TrustData && empty( $hidden_m4_data->sources ) );
+
+$superseded_contract = dla_medical_trust_get_contract( $m5_page );
+$check( 'M6 superseded review never exposes a reviewer or applying date', is_array( $superseded_contract ) && 'superseded' === $superseded_contract['medical_review']['validity'] && false === $superseded_contract['medical_review']['applicable'] && null === $superseded_contract['reviewer'] && null === $superseded_contract['medical_review']['review_date'] );
+$m6_unreviewed = wp_insert_post( [ 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'M6 Unreviewed Page' ] );
+wp_set_object_terms( $m6_unreviewed, [ $topic_tr_id ], \DLA\MedicalTrust\Taxonomies\MedicalTopicTaxonomy::SLUG );
+update_post_meta( $m6_unreviewed, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_PRIMARY_TOPIC_UID, $topic_uid );
+wp_update_post( [ 'ID' => $m6_unreviewed, 'post_author' => $reviewer_id ] );
+$unreviewed_contract = dla_medical_trust_get_contract( $m6_unreviewed );
+$check( 'M6 unreviewed content exposes state but never invents reviewer or date', is_array( $unreviewed_contract ) && 'none' === $unreviewed_contract['medical_review']['status'] && false === $unreviewed_contract['medical_review']['applicable'] && null === $unreviewed_contract['reviewer'] && null === $unreviewed_contract['medical_review']['review_date'] );
+$check( 'M6 never promotes the WordPress post author to a medical expert', is_array( $unreviewed_contract ) && 'organization' === $unreviewed_contract['authorship']['mode'] && null === $unreviewed_contract['authorship']['expert'] );
+\DLA\MedicalTrust\Settings\Settings::update( [ 'organization' => [ 'name' => '', 'url' => '', 'logo_id' => 0 ] ] );
+$no_org_contract = dla_medical_trust_get_contract( $m6_unreviewed );
+$check( 'M6 does not invent organization facts when settings are empty', is_array( $no_org_contract ) && null === $no_org_contract['organization'] && null === $no_org_contract['authorship']['organization'] );
+$check( 'M6 safely returns null outside medical topic scope', null === dla_medical_trust_get_contract( $non_medical_page ) );
 
 echo sprintf( 'WordPress integration: %d passed, %d failed%s', $pass, count( $failures ), PHP_EOL );
 if ( ! empty( $failures ) ) {

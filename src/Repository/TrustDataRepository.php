@@ -14,6 +14,7 @@ use DLA\MedicalTrust\Domain\Enum\AuthorMode;
 use DLA\MedicalTrust\Domain\Enum\ReviewStatus;
 use DLA\MedicalTrust\Domain\Enum\ReviewValidity;
 use DLA\MedicalTrust\Domain\Enum\SourceType;
+use DLA\MedicalTrust\Domain\ReviewVisibility;
 use DLA\MedicalTrust\Domain\TrustData;
 use DLA\MedicalTrust\Meta\MetaRegistry;
 use DLA\MedicalTrust\PostTypes\ExpertPostType;
@@ -63,7 +64,7 @@ final class TrustDataRepository {
 		$review_date = $valid_review ? MetaRegistry::sanitize_past_date( get_post_meta( $post_id, MetaRegistry::PAGE_REVIEW_DATE, true ) ) : '';
 
 		// A review without a valid expert or valid date must not be displayed as a review.
-		if ( null === $reviewer || '' === $review_date ) {
+		if ( ! ReviewVisibility::is_applicable( $status, $validity, $reviewer, $review_date ) ) {
 			$reviewer    = null;
 			$review_date = '';
 		}

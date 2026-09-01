@@ -3,8 +3,8 @@
  * Tek giriş noktası — bileşenleri kaydeder, başka iş yapmaz.
  *
  * M1 + M2 + M3 + M4 kapsamı: depolama, çözümleme, korumalı inceleme çekirdeği
- * ve tema bağımsız Trust Box render'ı. İnceleme iş akışı arayüzü, schema kontratı ve Phase 2
- * özellikleri bilinçli olarak YOKTUR.
+ * ve tema bağımsız Trust Box render'ı. M6, aynı kanonik gerçekleri salt-okunur
+ * veri kontratı olarak verir; JSON-LD ve ikinci bir schema motoru bilinçli olarak YOKTUR.
  *
  * @package DLA\MedicalTrust
  */
@@ -69,6 +69,7 @@ final class Plugin {
 		( new ReviewMetaGuard() )->register();
 		( new TrustComponent() )->register();
 		require_once DLA_MT_DIR . 'src/Integration/template-tags.php';
+		require_once DLA_MT_DIR . 'src/Contract/template-tags.php';
 
 		// --- Kütüphane sürüm sayacı ---
 		// YALNIZCA cache geçersiz kılma sinyali. Seçime GİRMEZ.

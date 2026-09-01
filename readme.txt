@@ -3,7 +3,7 @@ Contributors: drleylaarvas
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 8.0
-Stable tag: 0.5.0-M5
+Stable tag: 0.6.0-M6
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -20,7 +20,7 @@ yönetir.
 
 Tasarım ilkesi: yanlış bir güven sinyali üretmektense hiçbir sinyal üretme.
 
-= Bu sürümde (M5 — Medical Content Admin UX ve editoryal workflow) =
+= Bu sürümde (M6 — Read-only Medical Trust Contract) =
 
 * Uzman içerik türü (dla_expert), herkese açık değil
 * Tıbbi konu taksonomisi (dla_medical_topic), hiyerarşik, herkese açık değil
@@ -53,10 +53,11 @@ Tasarım ilkesi: yanlış bir güven sinyali üretmektense hiçbir sinyal üretm
 * ReviewService'i bypass etmeyen tarihli inceleme action'ı, doğrudan kullanıcı yetkisi ve
   bilinçli içerik-değişikliği sınıflandırması
 * Hazırlık uyarıları ile içerik listesi Medical Topic / Reviewer / Review State / Source Coverage sütunları
+* Schema veya başka entegrasyonlar için salt-okunur, sürümlü `dla_medical_trust_get_contract()` API'si;
+  M4 ile aynı kanonik review/source gerçeklerini verir, JSON-LD üretmez
 
 = Bu sürümde YOK (bilinçli) =
 
-* Schema veri kontratı — M6
 * JSON-LD üretimi — hiçbir zaman; bu eklentinin işi değildir
 * PubMed entegrasyonu, denetim panosu, kaynak sağlık kontrolü — Phase 2
 * Herhangi bir LLM / yapay zekâ özetleme özelliği — kapsam dışı
@@ -80,6 +81,11 @@ alanında idari bilgi olarak saklanır ve sıralamayı etkilemez.
 Varsayılan olarak korunur. Silme, ayarlardan açıkça istenmedikçe yapılmaz.
 
 == Changelog ==
+
+= 0.6.0-M6 =
+* `dla-medical-trust/v1` read-only trust data contract added for downstream schema consumers.
+* Contract reuses M2 final source resolution and M4 review applicability; presentation flags do not erase canonical facts.
+* No JSON-LD or second schema engine was added.
 
 = 0.5.0-M5 =
 * Medical Content paneli, kaynak override doğrulaması ve sayfaya özgü commentary yönetimi.
