@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<ruleset name="DLA Medical Trust">
+	<description>WordPress-Extra + PHP 8.0 uyumluluk. Escape edilmemiş çıktı CI'da bloklanır.</description>
+
+	<file>.</file>
+
+	<exclude-pattern>/vendor/*</exclude-pattern>
+	<exclude-pattern>/node_modules/*</exclude-pattern>
+
+	<arg name="extensions" value="php"/>
+	<arg name="colors"/>
+	<arg value="ps"/>
+
+	<config name="minimum_supported_wp_version" value="6.0"/>
+	<config name="testVersion" value="8.0-"/>
+
+	<rule ref="WordPress-Extra"/>
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="dla-medical-trust"/>
+			</property>
+		</properties>
+	</rule>
+
+	<rule ref="PHPCompatibilityWP"/>
+
+	<!-- Escape edilmemiş çıktı hata sayılır, uyarı değil (v0.1 NFR-06). -->
+	<rule ref="WordPress.Security.EscapeOutput">
+		<type>error</type>
+	</rule>
+
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="dla_mt"/>
+				<element value="DLA\MedicalTrust"/>
+			</property>
+		</properties>
+	</rule>
+
+	<!-- Test önyüklemesi kasıtlı olarak çekirdek fonksiyon taklidi içerir. -->
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<exclude-pattern>/tests/bootstrap.php</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.WP.AlternativeFunctions">
+		<exclude-pattern>/tests/*</exclude-pattern>
+	</rule>
+</ruleset>
