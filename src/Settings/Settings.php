@@ -44,6 +44,8 @@ final class Settings {
 			'max_tier_size'             => 6,
 			'require_signoff_reference' => true,
 			'eligible_post_types'       => [ 'page', 'post' ],
+			'automatic_injection'       => false,
+			'injection_position'        => 'after',
 			'retain_data_on_uninstall'  => true,
 		];
 	}
@@ -184,6 +186,14 @@ final class Settings {
 			$out['eligible_post_types'] = array_values( array_unique( $clean ) );
 		}
 
+		if ( array_key_exists( 'automatic_injection', $input ) ) {
+			$out['automatic_injection'] = (bool) $input['automatic_injection'];
+		}
+
+		if ( array_key_exists( 'injection_position', $input ) ) {
+			$out['injection_position'] = 'before' === $input['injection_position'] ? 'before' : 'after';
+		}
+
 		return $out;
 	}
 
@@ -214,6 +224,14 @@ final class Settings {
 		$types = self::get( 'eligible_post_types', [] );
 
 		return is_array( $types ) ? array_values( array_filter( array_map( 'strval', $types ) ) ) : [];
+	}
+
+	public static function automatic_injection_enabled(): bool {
+		return (bool) self::get( 'automatic_injection', false );
+	}
+
+	public static function injection_position(): string {
+		return 'before' === self::get( 'injection_position', 'after' ) ? 'before' : 'after';
 	}
 
 	/**

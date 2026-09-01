@@ -2,8 +2,8 @@
 /**
  * Tek giriş noktası — bileşenleri kaydeder, başka iş yapmaz.
  *
- * M1 + M2 + M3 kapsamı: depolama iskeleti, dil kimliği, çözümleyici, cache
- * ve korumalı tıbbi inceleme çekirdeği. Ön yüz render, inceleme iş akışı arayüzü, schema kontratı ve Phase 2
+ * M1 + M2 + M3 + M4 kapsamı: depolama, çözümleme, korumalı inceleme çekirdeği
+ * ve tema bağımsız Trust Box render'ı. İnceleme iş akışı arayüzü, schema kontratı ve Phase 2
  * özellikleri bilinçli olarak YOKTUR.
  *
  * @package DLA\MedicalTrust
@@ -21,6 +21,7 @@ use DLA\MedicalTrust\Admin\TopicTermFields;
 use DLA\MedicalTrust\Admin\UserProfileFields;
 use DLA\MedicalTrust\I18n\IdentitySync;
 use DLA\MedicalTrust\Identity\UidGenerator;
+use DLA\MedicalTrust\Integration\TrustComponent;
 use DLA\MedicalTrust\Meta\MetaRegistry;
 use DLA\MedicalTrust\PostTypes\ExpertPostType;
 use DLA\MedicalTrust\PostTypes\SourcePostType;
@@ -62,6 +63,8 @@ final class Plugin {
 		);
 		( new IdentitySync() )->register();
 		( new ReviewMetaGuard() )->register();
+		( new TrustComponent() )->register();
+		require_once DLA_MT_DIR . 'src/Integration/template-tags.php';
 
 		// --- Kütüphane sürüm sayacı ---
 		// YALNIZCA cache geçersiz kılma sinyali. Seçime GİRMEZ.

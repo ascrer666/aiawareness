@@ -3,7 +3,7 @@ Contributors: drleylaarvas
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 8.0
-Stable tag: 0.3.0-M3
+Stable tag: 0.4.0-M4
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -20,7 +20,7 @@ yönetir.
 
 Tasarım ilkesi: yanlış bir güven sinyali üretmektense hiçbir sinyal üretme.
 
-= Bu sürümde (M3 — tıbbi inceleme alanı ve iş akışı çekirdeği) =
+= Bu sürümde (M4 — Medical Trust Component ve render) =
 
 * Uzman içerik türü (dla_expert), herkese açık değil
 * Tıbbi konu taksonomisi (dla_medical_topic), hiyerarşik, herkese açık değil
@@ -39,19 +39,18 @@ Tasarım ilkesi: yanlış bir güven sinyali üretmektense hiçbir sinyal üretm
 * Append-only, son 25 olayla sınırlı inceleme geçmişi; supersede olayları önceki kayda bağlanır
 * Tıbbi konu politikasından çalışma anında türetilen current/due freshness; cron veya kalıcı freshness alanı yoktur
 * Açık değişiklik sınıflandırma API'si: minor_edit geçerliliği korur, medical_content_update kaydı supersede eder
+* Premium, semantik Medical Trust Box: `[dla_medical_trust]`; metin odaklı aynı-fact varyantı:
+  `[dla_medical_trust display="compact"]`
+* Global Avada Content Layout içindeki shortcode, layout postu yerine queried tekil tıbbi içeriği çözümler;
+  klasik ve block theme kullanımında da aynı sunucu tarafı HTML'yi verir
+* Tema geliştiricileri için `dla_medical_trust()` ve `dla_medical_trust_get_html()` template tag'leri;
+  tema override yolu: `yourtheme/dla-medical-trust/trust-block.php`
+* Varsayılan kapalı, ayarlardan açılabilen `the_content` enjeksiyonu; çift render koruması
+* JS'siz, responsive ve `dla-mt-*` kapsamlı CSS; `--dla-mt-accent`, `--dla-mt-border`,
+  `--dla-mt-radius`, `--dla-mt-surface` tasarım token'ları
 
 = Bu sürümde YOK (bilinçli) =
 
-* Ön yüz render, shortcode, otomatik enjeksiyon — M4: uzman, uzmanlık alanı,
-  profil bağlantısı, inceleme bilgisi, isteğe bağlı uzman yorumu ve seçilmiş
-  kaynakları içeren, premium author-box kalitesinde Medical Author / Reviewer
-  Trust Box. Birincil kullanım, global Avada Content Layout'da Post Content
-  altına bir kez eklenen `[dla_medical_trust]` shortcode'udur; bu shortcode
-  geçerli tekil sayfayı çözümler. Otomatik `the_content` enjeksiyonu isteğe
-  bağlıdır ve varsayılan olarak kapalıdır. Avada yalnızca yerleşim tercihidir;
-  render katmanı tüm uyumlu WordPress temalarında çalışır. Varsayılan görünüm
-  premium uzman kartıdır; `[dla_medical_trust display="compact"]` aynı
-  çözülmüş verinin metin odaklı compact görünümünü seçer.
 * Schema veri kontratı — M6
 * JSON-LD üretimi — hiçbir zaman; bu eklentinin işi değildir
 * PubMed entegrasyonu, denetim panosu, kaynak sağlık kontrolü — Phase 2
@@ -76,6 +75,11 @@ alanında idari bilgi olarak saklanır ve sıralamayı etkilemez.
 Varsayılan olarak korunur. Silme, ayarlardan açıkça istenmedikçe yapılmaz.
 
 == Changelog ==
+
+= 0.4.0-M4 =
+* Premium ve compact Medical Trust Box, shortcode, template tag ve tema override desteği.
+* Avada Global Layout queried-post çözümü, varsayılan kapalı otomatik enjeksiyon ve çift-render koruması.
+* JS'siz responsive scoped CSS; gerçek WordPress klasik, block ve Avada bağlam testleri.
 
 = 0.3.0-M3 =
 * Medical review domain: deterministic content hash and runtime freshness evaluator.

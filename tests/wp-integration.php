@@ -117,7 +117,7 @@ wp_install( 'DLA Medical Trust M2 Tests', 'm2admin', 'm2@example.test', true, ''
 define( 'DLA_MT_FILE', dirname( __DIR__ ) . '/dla-medical-trust.php' );
 define( 'DLA_MT_DIR', dirname( __DIR__ ) . '/' );
 define( 'DLA_MT_URL', 'http://example.test/wp-content/plugins/dla-medical-trust/' );
-define( 'DLA\MedicalTrust\VERSION', '0.1.0-M2' );
+define( 'DLA\MedicalTrust\VERSION', '0.4.0-M4' );
 define( 'DLA\MedicalTrust\DB_VERSION', 1 );
 define( 'DLA\MedicalTrust\TEXT_DOMAIN', 'dla-medical-trust' );
 
@@ -270,6 +270,159 @@ $due_request = new \DLA\MedicalTrust\Review\ReviewRecordRequest( $page_id, $expe
 $review_service->record( $due_request );
 $freshness = $review_service->freshness_for_post( $page_id, new DateTimeImmutable( '2026-09-01', new DateTimeZone( 'UTC' ) ) );
 $check( 'due review remains valid and retains its historical date', 'due' === $freshness && 'valid' === get_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_REVIEW_VALIDITY, true ) && '2024-08-31' === get_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_REVIEW_DATE, true ) );
+
+/* M4 — front-end data fixture, presentation variants and query-context integration. */
+$profile_id = wp_insert_post( [ 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Dr. Leyla Arvas' ] );
+$image_id   = wp_insert_attachment( [ 'post_mime_type' => 'image/jpeg', 'post_status' => 'inherit', 'post_title' => 'Doctor portrait', 'guid' => 'http://example.test/doctor.jpg' ] );
+update_post_meta( $image_id, '_wp_attachment_metadata', [ 'width' => 600, 'height' => 600, 'file' => '2026/09/doctor.jpg', 'sizes' => [] ] );
+set_post_thumbnail( $expert_tr, $image_id );
+update_post_meta( $expert_tr, '_thumbnail_id', $image_id ); // The isolated fixture has no physical uploads directory.
+update_post_meta( $expert_tr, \DLA\MedicalTrust\Meta\MetaRegistry::EXPERT_HONORIFIC, 'Op. Dr.' );
+update_post_meta( $expert_tr, \DLA\MedicalTrust\Meta\MetaRegistry::EXPERT_JOB_TITLE, 'Plastik, Rekonstrüktif ve Estetik Cerrahi Uzmanı' );
+update_post_meta( $expert_tr, \DLA\MedicalTrust\Meta\MetaRegistry::EXPERT_PROFILE_PAGE, $profile_id );
+update_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_AUTHOR_MODE, 'expert' );
+update_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_EXPERT_ID, $expert_tr );
+update_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_COMMENTARY, '<p>Uzman <strong>değerlendirmesi</strong>.</p>' );
+
+$make_source = static function ( string $slot, string $title, string $doi ) use ( $topic_tr_id ): int {
+	$id = wp_insert_post( [ 'post_type' => 'dla_source', 'post_status' => 'publish', 'post_title' => $title ] );
+	wp_set_object_terms( $id, [ $slot ], \DLA\MedicalTrust\Taxonomies\SourceTypeTaxonomy::SLUG );
+	wp_set_object_terms( $id, [ $topic_tr_id ], \DLA\MedicalTrust\Taxonomies\MedicalTopicTaxonomy::SLUG );
+	update_post_meta( $id, \DLA\MedicalTrust\Meta\MetaRegistry::SOURCE_UID, 'src_' . str_pad( dechex( $id ), 12, '0', STR_PAD_LEFT ) );
+	update_post_meta( $id, \DLA\MedicalTrust\Meta\MetaRegistry::SOURCE_DOI, $doi );
+	update_post_meta( $id, \DLA\MedicalTrust\Meta\MetaRegistry::SOURCE_PUBLICATION_TYPE, 'systematic_review' );
+	update_post_meta( $id, \DLA\MedicalTrust\Meta\MetaRegistry::SOURCE_PUB_YEAR, 2025 );
+	update_post_meta( $id, \DLA\MedicalTrust\Meta\MetaRegistry::SOURCE_PUBLISHER, 'Medical Journal' );
+	return $id;
+};
+$academic_source  = $make_source( 'academic', 'Academic Evidence', '10.1000/m4-academic' );
+$authority_source = $make_source( 'authority', 'Professional Guidance', '10.1000/m4-authority' );
+update_post_meta( $source_id, \DLA\MedicalTrust\Meta\MetaRegistry::SOURCE_UID, 'src_' . str_pad( dechex( $source_id ), 12, '0', STR_PAD_LEFT ) );
+
+$with_main_query = static function ( int $post_id, callable $callback ) {
+	global $wp_query, $wp_the_query, $post;
+	$previous_query = $wp_query;
+	$previous_the   = $wp_the_query;
+	$previous_post  = $post;
+	$query          = new WP_Query( [ 'page_id' => $post_id, 'post_status' => 'publish' ] );
+	$wp_query       = $query;
+	$wp_the_query   = $query;
+	$query->the_post();
+	try {
+		return $callback();
+	} finally {
+		wp_reset_postdata();
+		$wp_query     = $previous_query;
+		$wp_the_query = $previous_the;
+		$post         = $previous_post;
+	}
+};
+
+$image_downsize = static function ( $downsize, int $attachment_id, $size ) use ( $image_id ) {
+	unset( $size );
+	return $image_id === $attachment_id ? [ 'http://example.test/doctor.jpg', 600, 600, true ] : $downsize;
+};
+add_filter( 'image_downsize', $image_downsize, 10, 3 );
+$component    = new \DLA\MedicalTrust\Integration\TrustComponent();
+$default_html = $component->render_for_post( $page_id );
+$compact_html = $component->render_for_post( $page_id, [ 'display' => 'compact' ] );
+$check( 'M4 default premium render has full fixture', str_contains( $default_html, 'dla-mt--default' ) && str_contains( $default_html, 'Op. Dr. Test Doctor TR' ) && str_contains( $default_html, 'Uzman değerlendirmesi' ) && str_contains( $default_html, 'Academic Evidence' ) );
+$check( 'M4 compact render uses the same fixture', str_contains( $compact_html, 'dla-mt--compact' ) && ! str_contains( $compact_html, 'dla-mt__portrait' ) );
+$check( 'M4 default and compact retain trust-fact parity', str_contains( $default_html, 'datetime="2024-08-31"' ) && str_contains( $compact_html, 'datetime="2024-08-31"' ) && str_contains( $default_html, '10.1000/m4-academic' ) && str_contains( $compact_html, '10.1000/m4-academic' ) );
+$check( 'M4 due valid review still displays historical date', str_contains( $default_html, 'Tıbbi inceleme tarihi:' ) && str_contains( $default_html, 'datetime="2024-08-31"' ) );
+$check( 'M4 expert author-reviewer wording is truthful', str_contains( $default_html, 'İçeriği hazırlayan ve tıbbi olarak inceleyen:' ) );
+$check( 'M4 canonical citation URL is used with safe link relation', str_contains( $default_html, 'https://doi.org/10.1000/m4-academic' ) && str_contains( $default_html, 'rel="noopener"' ) && ! str_contains( $default_html, 'discovered_via' ) );
+$check( 'M4 WordPress image API creates a responsive portrait', str_contains( $default_html, 'dla-mt__portrait-image' ) && str_contains( $default_html, 'src=' ) );
+remove_filter( 'image_downsize', $image_downsize, 10 );
+
+update_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_AUTHOR_MODE, 'organization' );
+$editorial_html = $component->render_for_post( $page_id );
+$check( 'M4 editorial-team reviewer wording does not imply authorship', str_contains( $editorial_html, 'Tıbbi olarak inceleyen:' ) && ! str_contains( $editorial_html, 'İçeriği hazırlayan ve tıbbi olarak inceleyen:' ) );
+update_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_AUTHOR_MODE, 'expert' );
+$profile_url = (string) get_permalink( $profile_id );
+update_post_meta( $expert_tr, \DLA\MedicalTrust\Meta\MetaRegistry::EXPERT_PROFILE_PAGE, 0 );
+$no_profile_html = $component->render_for_post( $page_id );
+$check( 'M4 missing profile page leaves expert name without a broken link', str_contains( $no_profile_html, 'Op. Dr. Test Doctor TR' ) && ! str_contains( $no_profile_html, $profile_url ) && ! str_contains( $no_profile_html, '>Hakkında<' ) );
+update_post_meta( $expert_tr, \DLA\MedicalTrust\Meta\MetaRegistry::EXPERT_PROFILE_PAGE, $profile_id );
+
+update_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_RESOLVED_SOURCES, [ 'v' => \DLA\MedicalTrust\Settings\Settings::library_version(), 'slots' => [ 'academic' => $academic_source, 'authority' => 0, 'publication' => 0 ] ] );
+$partial_html = $component->render_for_post( $page_id );
+$check( 'M4 partial source set renders only the qualified resolved source', str_contains( $partial_html, 'Academic Evidence' ) && ! str_contains( $partial_html, 'Professional Guidance' ) && ! str_contains( $partial_html, 'Medical Source' ) );
+delete_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_RESOLVED_SOURCES );
+
+update_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_COMMENTARY, '' );
+$check( 'M4 missing commentary omits only commentary', ! str_contains( $component->render_for_post( $page_id ), 'Uzman değerlendirmesi' ) && str_contains( $component->render_for_post( $page_id ), 'Academic Evidence' ) );
+update_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_COMMENTARY, '<p>Uzman <strong>değerlendirmesi</strong>.</p>' );
+delete_post_thumbnail( $expert_tr );
+$check( 'M4 missing image gracefully omits portrait without hiding facts', ! str_contains( $component->render_for_post( $page_id ), 'dla-mt__portrait' ) && str_contains( $component->render_for_post( $page_id ), 'Op. Dr. Test Doctor TR' ) );
+set_post_thumbnail( $expert_tr, $image_id );
+
+$original_content = (string) get_post_field( 'post_content', $page_id );
+wp_update_post( [ 'ID' => $page_id, 'post_content' => '<p>Superseded review test.</p>' ] );
+$review_service->classify_content_change( $page_id, 'medical_content_update' );
+$superseded_html = $component->render_for_post( $page_id );
+$check( 'M4 superseded review hides old reviewer attribution and date', ! str_contains( $superseded_html, 'Tıbbi inceleme tarihi:' ) && ! str_contains( $superseded_html, 'Tıbbi olarak inceleyen:' ) );
+wp_update_post( [ 'ID' => $page_id, 'post_content' => $original_content ] );
+$review_service->record( new \DLA\MedicalTrust\Review\ReviewRecordRequest( $page_id, $expert_tr, '2024-08-31', 'M4 restore approval' ) );
+
+$no_sources_term = wp_insert_term( 'No Sources Topic', \DLA\MedicalTrust\Taxonomies\MedicalTopicTaxonomy::SLUG );
+$no_sources_topic_id = (int) $no_sources_term['term_id'];
+$no_sources_page = wp_insert_post( [ 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'No Sources Medical Page', 'post_content' => 'Medical context without eligible sources.' ] );
+wp_set_object_terms( $no_sources_page, [ $no_sources_topic_id ], \DLA\MedicalTrust\Taxonomies\MedicalTopicTaxonomy::SLUG );
+update_post_meta( $no_sources_page, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_PRIMARY_TOPIC_UID, (string) get_term_meta( $no_sources_topic_id, \DLA\MedicalTrust\Meta\MetaRegistry::TOPIC_UID, true ) );
+$review_service->record( new \DLA\MedicalTrust\Review\ReviewRecordRequest( $no_sources_page, $expert_tr, '2026-08-01', 'M4 no-source approval' ) );
+$no_sources_html = $component->render_for_post( $no_sources_page );
+$check( 'M4 no qualified sources omits only source section', ! str_contains( $no_sources_html, 'Seçilmiş tıbbi kaynaklar' ) && str_contains( $no_sources_html, 'Tıbbi inceleme tarihi:' ) );
+
+update_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_COMMENTARY, '<script>alert(1)</script><p>Safe <strong>commentary</strong></p>' );
+wp_update_post( [ 'ID' => $academic_source, 'post_title' => '<img src=x onerror=alert(1)>Academic Evidence' ] );
+$xss_html = $component->render_for_post( $page_id );
+$check( 'M4 expert commentary and source output are escaped', ! str_contains( $xss_html, '<script' ) && ! str_contains( $xss_html, '<img src=x onerror=' ) && str_contains( $xss_html, '&lt;img src=x onerror=alert(1)&gt;' ) && str_contains( $xss_html, 'Safe' ) );
+update_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_COMMENTARY, '<p>Uzman <strong>değerlendirmesi</strong>.</p>' );
+wp_update_post( [ 'ID' => $academic_source, 'post_title' => 'Academic Evidence' ] );
+
+$classic_html = dla_medical_trust_get_html( [], $page_id );
+$block_html   = $with_main_query( $page_id, static fn(): string => apply_filters( 'the_content', '<!-- wp:shortcode -->[dla_medical_trust display="compact"]<!-- /wp:shortcode -->' ) );
+$check( 'M4 classic theme template tag renders', str_contains( $classic_html, 'dla-mt--default' ) );
+$check( 'M4 block-theme shortcode block renders', str_contains( $block_html, 'dla-mt' ) );
+
+if ( ! post_type_exists( 'avada_layout' ) ) { register_post_type( 'avada_layout', [ 'public' => false ] ); }
+$layout_id = wp_insert_post( [ 'post_type' => 'avada_layout', 'post_status' => 'publish', 'post_title' => 'Global Content Layout', 'post_content' => '[dla_medical_trust]' ] );
+$avada_html = $with_main_query( $page_id, static function () use ( $layout_id, $component ): string {
+	global $post;
+	$post = get_post( $layout_id ); // Simulates Avada rendering its layout post while the main query stays medical content.
+	return $component->shortcode();
+} );
+$check( 'M4 Avada global layout shortcode resolves queried medical post not layout post', str_contains( $avada_html, 'data-dla-mt-post="' . $page_id . '"' ) && ! str_contains( $avada_html, 'data-dla-mt-post="' . $layout_id . '"' ) );
+
+\DLA\MedicalTrust\Settings\Settings::update( [ 'automatic_injection' => true, 'injection_position' => 'after' ] );
+$duplicate_component = new \DLA\MedicalTrust\Integration\TrustComponent();
+$duplicate_result = $with_main_query( $page_id, static function () use ( $duplicate_component ): string {
+	$shortcode = $duplicate_component->shortcode();
+	return $shortcode . $duplicate_component->inject( '<p>Original content</p>' );
+} );
+$check( 'M4 shortcode plus optional injection produces one component', 1 === substr_count( $duplicate_result, 'data-dla-mt-post=' ) );
+\DLA\MedicalTrust\Settings\Settings::update( [ 'automatic_injection' => false ] );
+$check( 'M4 automatic injection remains disabled by default setting', ! \DLA\MedicalTrust\Settings\Settings::automatic_injection_enabled() );
+
+$non_medical_page = wp_insert_post( [ 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Ordinary Page' ] );
+$non_medical_html = $with_main_query( $non_medical_page, static fn(): string => ( new \DLA\MedicalTrust\Integration\TrustComponent() )->shortcode() );
+$fallback_html = $with_main_query( $page_id, static fn(): string => ( new \DLA\MedicalTrust\Integration\TrustComponent() )->shortcode( [ 'display' => 'unknown' ] ) );
+$check( 'M4 shortcode fails safely for a non-medical page', '' === $non_medical_html );
+$check( 'M4 unsupported display falls back to documented default', str_contains( $fallback_html, 'dla-mt--default' ) );
+$check( 'M4 excerpt cleanup removes only its own shortcode', '[gallery ids="1"]' === $component->strip_from_excerpt( '[gallery ids="1"][dla_medical_trust]' ) );
+
+delete_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_RESOLVED_SOURCES );
+\DLA\MedicalTrust\Repository\TopicRepository::flush_memo();
+global $wpdb;
+$queries_before = (int) $wpdb->num_queries;
+$component->render_for_post( $page_id );
+$cold_queries = (int) $wpdb->num_queries - $queries_before;
+$queries_before = (int) $wpdb->num_queries;
+$component->render_for_post( $page_id );
+$warm_queries = (int) $wpdb->num_queries - $queries_before;
+$check( 'M4 warm source cache does not cost more queries than cold resolution', $warm_queries <= $cold_queries );
+echo sprintf( 'M4 query profile: cold=%d warm=%d%s', $cold_queries, $warm_queries, PHP_EOL );
 
 echo sprintf( 'WordPress integration: %d passed, %d failed%s', $pass, count( $failures ), PHP_EOL );
 if ( ! empty( $failures ) ) {

@@ -183,6 +183,25 @@ final class SettingsPage {
 		);
 
 		Field::checkbox(
+			'automatic_injection',
+			__( 'Otomatik Trust Box yerleştirme', 'dla-medical-trust' ),
+			(bool) ( $settings['automatic_injection'] ?? false ),
+			__( 'Uygun tıbbi içeriğin the_content çıktısına Trust Box ekle', 'dla-medical-trust' ),
+			__( 'Varsayılan kapalıdır. Avada Global Layout içinde shortcode kullanılıyorsa kapalı bırakın; böylece çift kutu oluşmaz.', 'dla-medical-trust' )
+		);
+
+		Field::select(
+			'injection_position',
+			__( 'Otomatik yerleştirme konumu', 'dla-medical-trust' ),
+			(string) ( $settings['injection_position'] ?? 'after' ),
+			[
+				'after'  => __( 'İçerikten sonra', 'dla-medical-trust' ),
+				'before' => __( 'İçerikten önce', 'dla-medical-trust' ),
+			],
+			__( 'Yalnızca otomatik yerleştirme açık olduğunda kullanılır.', 'dla-medical-trust' )
+		);
+
+		Field::checkbox(
 			'retain_data_on_uninstall',
 			__( 'Kaldırma davranışı', 'dla-medical-trust' ),
 			(bool) $settings['retain_data_on_uninstall'],
@@ -311,6 +330,8 @@ final class SettingsPage {
 				'max_tier_size'             => $_POST['max_tier_size'] ?? 6,
 				'eligible_post_types'       => (array) ( $_POST['eligible_post_types'] ?? [] ),
 				'require_signoff_reference' => isset( $_POST['require_signoff_reference'] ),
+				'automatic_injection'       => isset( $_POST['automatic_injection'] ),
+				'injection_position'        => wp_unslash( $_POST['injection_position'] ?? 'after' ),
 				'retain_data_on_uninstall'  => isset( $_POST['retain_data_on_uninstall'] ),
 			]
 		);
