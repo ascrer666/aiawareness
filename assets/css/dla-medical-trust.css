@@ -30,8 +30,8 @@
 .dla-mt__eyebrow, .dla-mt__about, .dla-mt__freshness, .dla-mt__citation-meta { color: var(--dla-mt-muted); font-size: .875rem; }
 .dla-mt__eyebrow { margin: 0 0 .2rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
 .dla-mt__name { margin: 0; font-size: 1.2rem; font-weight: 750; line-height: 1.3; }
-.dla-mt__profile-link, .dla-mt__about a, .dla-mt__source a { color: var(--dla-mt-accent); text-decoration-thickness: .08em; text-underline-offset: .15em; }
-.dla-mt__specialty { margin: .25rem 0 0; color: var(--dla-mt-muted); }
+.dla-mt__profile-link, .dla-mt__about a, .dla-mt__source a { color: var(--dla-mt-accent); text-decoration-thickness: .08em; text-underline-offset: .15em; overflow-wrap: anywhere; }
+.dla-mt__specialty { margin: .25rem 0 0; color: var(--dla-mt-muted); overflow-wrap: anywhere; }
 .dla-mt__about { margin: .45rem 0 0; }
 .dla-mt__attribution { padding: .875rem 1rem; background: rgb(255 255 255 / 66%); border-radius: calc(var(--dla-mt-radius) - 6px); }
 .dla-mt__attribution p, .dla-mt__footer p { margin: 0; }

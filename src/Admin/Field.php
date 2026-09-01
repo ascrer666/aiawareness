@@ -79,8 +79,8 @@ final class Field {
 			'<input type="number" class="small-text" id="%1$s" name="%1$s" value="%2$s" min="%3$d" max="%4$d" step="1">',
 			esc_attr( $id ),
 			esc_attr( (string) $value ),
-			$min,
-			$max
+			esc_attr( (string) $min ),
+			esc_attr( (string) $max )
 		);
 		self::close_row( $description );
 	}
@@ -90,7 +90,7 @@ final class Field {
 		printf(
 			'<textarea class="large-text" id="%1$s" name="%1$s" rows="%2$d">%3$s</textarea>',
 			esc_attr( $id ),
-			$rows,
+			esc_attr( (string) $rows ),
 			esc_textarea( $value )
 		);
 		self::close_row( $description );

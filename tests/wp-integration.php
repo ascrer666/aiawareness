@@ -526,10 +526,26 @@ wp_update_post( [ 'ID' => $m6_unreviewed, 'post_author' => $reviewer_id ] );
 $unreviewed_contract = dla_medical_trust_get_contract( $m6_unreviewed );
 $check( 'M6 unreviewed content exposes state but never invents reviewer or date', is_array( $unreviewed_contract ) && 'none' === $unreviewed_contract['medical_review']['status'] && false === $unreviewed_contract['medical_review']['applicable'] && null === $unreviewed_contract['reviewer'] && null === $unreviewed_contract['medical_review']['review_date'] );
 $check( 'M6 never promotes the WordPress post author to a medical expert', is_array( $unreviewed_contract ) && 'organization' === $unreviewed_contract['authorship']['mode'] && null === $unreviewed_contract['authorship']['expert'] );
+$check( 'M6 organization authorship uses configured organization facts only', is_array( $unreviewed_contract ) && 'DLA Editorial Team' === $unreviewed_contract['authorship']['organization']['name'] );
+$due_contract = dla_medical_trust_get_contract( $page_id );
+$check( 'M6 due and valid review remains applicable in the public contract', is_array( $due_contract ) && 'due' === $due_contract['medical_review']['freshness'] && true === $due_contract['medical_review']['applicable'] );
+$manual_contract = dla_medical_trust_get_contract( $m5_page );
+$check( 'M6 manual source override exposes the M2-selected final source only', is_array( $manual_contract ) && ! empty( $manual_contract['sources'] ) && (string) get_post_meta( $academic_source, \DLA\MedicalTrust\Meta\MetaRegistry::SOURCE_UID, true ) === $manual_contract['sources'][0]['source_uid'] );
 \DLA\MedicalTrust\Settings\Settings::update( [ 'organization' => [ 'name' => '', 'url' => '', 'logo_id' => 0 ] ] );
 $no_org_contract = dla_medical_trust_get_contract( $m6_unreviewed );
 $check( 'M6 does not invent organization facts when settings are empty', is_array( $no_org_contract ) && null === $no_org_contract['organization'] && null === $no_org_contract['authorship']['organization'] );
 $check( 'M6 safely returns null outside medical topic scope', null === dla_medical_trust_get_contract( $non_medical_page ) );
+
+/* RC1 lifecycle and upgrade safety: reactivation must preserve pre-existing M4/M5-style data. */
+$library_before_reactivation = \DLA\MedicalTrust\Settings\Settings::library_version();
+$source_uid_before_reactivation = (string) get_post_meta( $academic_source, \DLA\MedicalTrust\Meta\MetaRegistry::SOURCE_UID, true );
+\DLA\MedicalTrust\Activation::deactivate();
+\DLA\MedicalTrust\Activation::activate();
+$source_type_terms = get_terms( [ 'taxonomy' => \DLA\MedicalTrust\Taxonomies\SourceTypeTaxonomy::SLUG, 'hide_empty' => false ] );
+$source_type_slugs = is_array( $source_type_terms ) ? wp_list_pluck( $source_type_terms, 'slug' ) : [];
+sort( $source_type_slugs );
+$check( 'RC1 deactivate/reactivate preserves library version and existing expert/topic/source identifiers', $library_before_reactivation === \DLA\MedicalTrust\Settings\Settings::library_version() && $expert_uid === (string) get_post_meta( $expert_tr, \DLA\MedicalTrust\Meta\MetaRegistry::EXPERT_ENTITY_UID, true ) && $topic_uid === (string) get_term_meta( $topic_tr_id, \DLA\MedicalTrust\Meta\MetaRegistry::TOPIC_UID, true ) && $source_uid_before_reactivation === (string) get_post_meta( $academic_source, \DLA\MedicalTrust\Meta\MetaRegistry::SOURCE_UID, true ) );
+$check( 'RC1 reactivation adds no duplicate controlled source-type terms or data loss', [ 'academic', 'authority', 'publication' ] === $source_type_slugs && get_post( $m5_page ) instanceof \WP_Post && get_post( $academic_source ) instanceof \WP_Post );
 
 echo sprintf( 'WordPress integration: %d passed, %d failed%s', $pass, count( $failures ), PHP_EOL );
 if ( ! empty( $failures ) ) {

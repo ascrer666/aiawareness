@@ -247,7 +247,7 @@ final class ResolverExplanationPanel {
 			(int) $candidate->score,
 			$candidate->in_tier ? esc_html__( 'evet', 'dla-medical-trust' ) : '—',
 			null !== $candidate->rendezvous_weight ? esc_html( (string) $candidate->rendezvous_weight ) : '—',
-			$outcome
+			esc_html( $outcome )
 		);
 	}
 

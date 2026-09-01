@@ -3,7 +3,7 @@ Contributors: drleylaarvas
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 8.0
-Stable tag: 0.6.0-M6
+Stable tag: 0.6.0-rc1
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -20,7 +20,7 @@ yönetir.
 
 Tasarım ilkesi: yanlış bir güven sinyali üretmektense hiçbir sinyal üretme.
 
-= Bu sürümde (M6 — Read-only Medical Trust Contract) =
+= Bu sürümde (0.6.0-rc1 — Release Candidate) =
 
 * Uzman içerik türü (dla_expert), herkese açık değil
 * Tıbbi konu taksonomisi (dla_medical_topic), hiyerarşik, herkese açık değil
@@ -62,6 +62,38 @@ Tasarım ilkesi: yanlış bir güven sinyali üretmektense hiçbir sinyal üretm
 * PubMed entegrasyonu, denetim panosu, kaynak sağlık kontrolü — Phase 2
 * Herhangi bir LLM / yapay zekâ özetleme özelliği — kapsam dışı
 
+== Installation ==
+
+1. `dla-medical-trust.zip` dosyasını WordPress yönetim panelinden yükleyin ve etkinleştirin.
+2. **DLA Experts > Ayarlar** altında kapsam dahilindeki içerik türlerini, organizasyon bilgilerini ve review politikalarını doğrulayın.
+3. Uzman, konu ve yayımlanmış kaynak kayıtlarını oluşturun. Kaynak URL'leri bağlantı politikasını geçmelidir.
+4. İçerik düzenleme ekranındaki **Tıbbi İçerik Bilgileri** panelinde yazar modu ve birincil tıbbi konuyu açıkça seçin.
+5. Tıbbi inceleme kaydını yalnızca gerçek onaya erişen ve kullanıcı profiline doğrudan review yetkisi verilmiş kişi kaydetsin.
+
+== Frontend kullanım ==
+
+Varsayılan premium bileşen:
+
+`[dla_medical_trust]`
+
+Metin odaklı varyant:
+
+`[dla_medical_trust display="compact"]`
+
+Avada için önerilen yerleşim, Global Content Layout içinde **Post Content** öğesinin hemen altına shortcode'u bir kez koymaktır. Shortcode, layout postunu değil queried tekil içeriği çözer. Otomatik `the_content` enjeksiyonu varsayılan olarak kapalıdır; Avada layout shortcode'u kullanılıyorsa kapalı bırakılmalıdır.
+
+Klasik tema şablonları için `dla_medical_trust()` veya HTML döndüren `dla_medical_trust_get_html()` kullanılabilir. Bir tema sadece sunumu değiştirmek isterse şablonu `yourtheme/dla-medical-trust/trust-block.php` yolunda override edebilir.
+
+== Editoryal ve dil davranışı ==
+
+Sayfa paneli yazar modunu, açık birincil konuyu, sayfaya özgü uzman yorumunu, görünürlük tercihlerini ve güvenli slot-bazlı kaynak override'larını yönetir. Reviewer, tarihli review kaydının parçasıdır; WordPress rolü tek başına yeterli değildir. `dla_review_medical_content` yetkisi kullanıcıya doğrudan verilmelidir.
+
+Polylang isteğe bağlıdır. Etkin olduğunda çevrilmiş Expert ve Topic kayıtları aynı kalıcı UID'yi paylaşır; sayfa commentary'si dile özeldir ve başka dilden fallback yapılmaz. Review ve source gerçekleri, her çevrilmiş sayfanın kendi kaydından çözülür.
+
+== Contract API ==
+
+Schema veya diğer entegrasyonlar kanonik gerçekleri `dla_medical_trust_get_contract(?int $post_id = null)` ile okuyabilir. API'nin sözleşme sürümü `dla-medical-trust/v1`'dir; ayrıntılı alan sözleşmesi için `docs/trust-contract-v1.md` belgesine bakın. Eklenti JSON-LD üretmez, ikinci bir schema motoru değildir ve AI görünürlüğü veya sıralama garantisi vermez.
+
 == Frequently Asked Questions ==
 
 = Neden inceleme yetkisi Administrator'de bile yok? =
@@ -81,6 +113,11 @@ alanında idari bilgi olarak saklanır ve sıralamayı etkilemez.
 Varsayılan olarak korunur. Silme, ayarlardan açıkça istenmedikçe yapılmaz.
 
 == Changelog ==
+
+= 0.6.0-rc1 =
+* M1–M6 regression, lifecycle, contract, security, frontend and packaging hardening pass.
+* Read-only real-Polylang adapter smoke check and staging-oriented installation documentation.
+* No new product feature or schema engine added.
 
 = 0.6.0-M6 =
 * `dla-medical-trust/v1` read-only trust data contract added for downstream schema consumers.

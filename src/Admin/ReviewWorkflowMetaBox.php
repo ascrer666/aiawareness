@@ -78,7 +78,7 @@ final class ReviewWorkflowMetaBox {
 
 	private function expert_select( int $selected ): void {
 		echo '<p><label>' . esc_html__( 'Tıbbi olarak inceleyen uzman', 'dla-medical-trust' ) . '<br><select name="dla_mt_reviewer_expert" style="width:100%"><option value="">' . esc_html__( '— uzman seçin —', 'dla-medical-trust' ) . '</option>';
-		foreach ( get_posts( [ 'post_type' => ExpertPostType::SLUG, 'post_status' => 'publish', 'numberposts' => 200, 'orderby' => 'title' ] ) as $expert ) { printf( '<option value="%1$d"%2$s>%3$s</option>', $expert->ID, selected( $selected, $expert->ID, false ), esc_html( $expert->post_title ) ); }
+		foreach ( get_posts( [ 'post_type' => ExpertPostType::SLUG, 'post_status' => 'publish', 'numberposts' => 200, 'orderby' => 'title' ] ) as $expert ) { printf( '<option value="%1$d"%2$s>%3$s</option>', absint( $expert->ID ), selected( $selected, $expert->ID, false ), esc_html( $expert->post_title ) ); }
 		echo '</select></label></p>';
 	}
 

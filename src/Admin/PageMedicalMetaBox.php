@@ -60,8 +60,11 @@ final class PageMedicalMetaBox {
 
 	public function save( int $post_id, \WP_Post $post ): void {
 		unset( $post );
-		if ( ! Field::can_save( self::NONCE_NAME, self::NONCE_ACTION, Capabilities::EDIT_META ) ) { return; }
-		// phpcs:disable WordPress.Security.NonceVerification.Missing -- nonce above.
+		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) { return; }
+		if ( ! isset( $_POST[ self::NONCE_NAME ] ) || ! current_user_can( Capabilities::EDIT_META ) ) { return; }
+		$nonce = sanitize_text_field( wp_unslash( (string) $_POST[ self::NONCE_NAME ] ) );
+		if ( ! wp_verify_nonce( $nonce, self::NONCE_ACTION ) ) { return; }
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- nonce verified above.
 		$mode = AuthorMode::coerce( wp_unslash( $_POST['dla_mt_author_mode'] ?? '' ) ) ?? AuthorMode::ORGANIZATION;
 		update_post_meta( $post_id, MetaRegistry::PAGE_AUTHOR_MODE, $mode );
 		$author = $this->expert_id( $_POST['dla_mt_author_expert'] ?? 0 );
@@ -111,8 +114,8 @@ final class PageMedicalMetaBox {
 	}
 
 	private function save_topics( int $post_id ): void {
-		$primary_id = absint( $_POST['dla_mt_primary_topic'] ?? 0 );
-		$secondary = array_map( 'absint', (array) ( $_POST['dla_mt_secondary_topics'] ?? [] ) );
+		$primary_id = absint( $_POST['dla_mt_primary_topic'] ?? 0 ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- save() verifies this request nonce before this private helper is reached.
+		$secondary = array_map( 'absint', (array) ( $_POST['dla_mt_secondary_topics'] ?? [] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- save() verifies this request nonce before this private helper is reached.
 		$terms = array_values( array_unique( array_filter( array_merge( [ $primary_id ], $secondary ) ) ) );
 		if ( empty( $terms ) ) { wp_set_object_terms( $post_id, [], MedicalTopicTaxonomy::SLUG ); delete_post_meta( $post_id, MetaRegistry::PAGE_PRIMARY_TOPIC_UID ); return; }
 		wp_set_object_terms( $post_id, $terms, MedicalTopicTaxonomy::SLUG, false );
@@ -121,9 +124,9 @@ final class PageMedicalMetaBox {
 	}
 
 	private function save_overrides( int $post_id ): void {
-		if ( 'manual' !== ( $_POST['dla_mt_source_mode'] ?? '' ) ) { delete_post_meta( $post_id, MetaRegistry::PAGE_SOURCE_OVERRIDES ); return; }
+		if ( 'manual' !== ( $_POST['dla_mt_source_mode'] ?? '' ) ) { delete_post_meta( $post_id, MetaRegistry::PAGE_SOURCE_OVERRIDES ); return; } // phpcs:ignore WordPress.Security.NonceVerification.Missing -- save() verifies this request nonce before this private helper is reached.
 		$graph = ( new TopicRepository() )->graph(); $sources = new SourceRepository(); $out = [];
-		foreach ( SourceType::values() as $slot ) { $id = absint( $_POST['dla_mt_override_' . $slot] ?? 0 ); $source = $id > 0 && 'publish' === $sources->status_of( $id ) ? $sources->find( $id, $graph ) : null; if ( null !== $source && $slot === $source->type && $source->is_eligible() ) { $out[$slot] = $id; } }
+		foreach ( SourceType::values() as $slot ) { $id = absint( $_POST['dla_mt_override_' . $slot] ?? 0 ); $source = $id > 0 && 'publish' === $sources->status_of( $id ) ? $sources->find( $id, $graph ) : null; if ( null !== $source && $slot === $source->type && $source->is_eligible() ) { $out[$slot] = $id; } } // phpcs:ignore WordPress.Security.NonceVerification.Missing -- save() verifies this request nonce before this private helper is reached.
 		update_post_meta( $post_id, MetaRegistry::PAGE_SOURCE_OVERRIDES, $out );
 	}
 
