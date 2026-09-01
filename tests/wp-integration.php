@@ -202,11 +202,11 @@ $review_auth = $registered_page[ \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_REVIE
 $check( 'registered meta sanitizer rejects bad UID', '' === $sanitize( 'not-a-uid' ) );
 $check( 'administrator has no implicit review write authority', false === $review_auth() );
 wp_set_current_user( (int) $reviewer_id );
-$check( 'direct reviewer can write review metadata', true === $review_auth() );
+$check( 'review meta has no direct auth callback path', false === $review_auth() );
 wp_set_current_user( $admin_id );
 
 /* Repository query and resolver bridge use real WP posts, terms and meta. */
-$page_id = wp_insert_post( [ 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Medical Page' ] );
+$page_id = wp_insert_post( [ 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Medical Page', 'post_content' => '<p>Reviewed medical content.</p>' ] );
 wp_set_object_terms( $page_id, [ $topic_tr_id ], \DLA\MedicalTrust\Taxonomies\MedicalTopicTaxonomy::SLUG );
 update_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_PRIMARY_TOPIC_UID, $topic_uid );
 $source_id = wp_insert_post( [ 'post_type' => 'dla_source', 'post_status' => 'publish', 'post_title' => 'Medical Source' ] );
@@ -227,6 +227,49 @@ $cached_ids = $cache->get( $page_id );
 $check( 'selection cache stores the resolved slot IDs', $source_id === $cached_ids['publication'] && null !== $cache->peek( $page_id ) );
 \DLA\MedicalTrust\Settings\Settings::bump_library_version();
 $check( 'library version invalidates cache without changing selection seed', null === $cache->peek( $page_id ) && $source_id === $cache->get( $page_id )['publication'] );
+
+/* M3 — real review writes, append-only history and declared changes. */
+$review_service = new \DLA\MedicalTrust\Review\ReviewService();
+$review_date    = gmdate( 'Y-m-d' );
+$request        = new \DLA\MedicalTrust\Review\ReviewRecordRequest( $page_id, $expert_tr, $review_date, 'signed test approval' );
+$recorded_event = null;
+add_action( 'dla_mt/v1/review_recorded', static function ( int $post_id, array $event ) use ( &$recorded_event ): void { $recorded_event = [ $post_id, $event ]; }, 10, 2 );
+$direct_date_write = update_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_REVIEW_DATE, '2000-01-01' );
+$check( 'ordinary direct meta write cannot set review date', false === $direct_date_write && '' === (string) get_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_REVIEW_DATE, true ) );
+$check( 'unauthorized administrator cannot record review', ! $review_service->record( $request )->success );
+wp_set_current_user( (int) $reviewer_id );
+$record = $review_service->record( $request );
+$stored_hash = (string) get_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_CONTENT_HASH, true );
+$check( 'directly authorized user records review', $record->success );
+$check( 'successful review stores reviewed and valid', 'reviewed' === get_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_REVIEW_STATUS, true ) && 'valid' === get_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_REVIEW_VALIDITY, true ) );
+$check( 'reviewer expert and recording WP user stay distinct', $expert_tr === (int) get_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_REVIEWER_EXPERT_ID, true ) && $reviewer_id === (int) get_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_RECORDED_BY_USER, true ) );
+$check( 'successful review stores current content hash', $stored_hash === \DLA\MedicalTrust\Review\ContentHasher::hash( 'Medical Page', '<p>Reviewed medical content.</p>' ) );
+$check( 'review action exposes only internal identifiers', is_array( $recorded_event ) && $page_id === $recorded_event[0] && $expert_tr === $recorded_event[1]['reviewer_expert_id'] && $reviewer_id === $recorded_event[1]['recorded_by_user_id'] );
+$future = new \DLA\MedicalTrust\Review\ReviewRecordRequest( $page_id, $expert_tr, gmdate( 'Y-m-d', strtotime( '+1 day' ) ), 'signed test approval' );
+$check( 'future review date is rejected', ! $review_service->record( $future )->success );
+$no_topic = wp_insert_post( [ 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'No Topic' ] );
+$check( 'review without topic is rejected', ! $review_service->record( new \DLA\MedicalTrust\Review\ReviewRecordRequest( $no_topic, $expert_tr, $review_date, 'signed test approval' ) )->success );
+$check( 'review without reviewer is rejected', ! $review_service->record( new \DLA\MedicalTrust\Review\ReviewRecordRequest( $page_id, 0, $review_date, 'signed test approval' ) )->success );
+$check( 'required signoff is enforced', ! $review_service->record( new \DLA\MedicalTrust\Review\ReviewRecordRequest( $page_id, $expert_tr, $review_date ) )->success );
+
+wp_update_post( [ 'ID' => $page_id, 'post_content' => '<p>Reviewed medical content.</p>' ] );
+$check( 'unchanged content preserves state', $review_service->classify_content_change( $page_id, null )->success && 'valid' === get_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_REVIEW_VALIDITY, true ) );
+wp_update_post( [ 'ID' => $page_id, 'post_content' => '<p>Reviewed medical content, punctuation only.</p>' ] );
+$check( 'ordinary post save cannot advance review date', $review_date === get_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_REVIEW_DATE, true ) );
+$check( 'changed content has no automatic classification', ! $review_service->classify_content_change( $page_id, null )->success && 'valid' === get_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_REVIEW_VALIDITY, true ) );
+$check( 'minor edit preserves review validity', $review_service->classify_content_change( $page_id, 'minor_edit' )->success && 'valid' === get_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_REVIEW_VALIDITY, true ) );
+wp_update_post( [ 'ID' => $page_id, 'post_content' => '<p>Materially revised medical content.</p>' ] );
+$before_supersede = get_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_REVIEW_LOG, true );
+$check( 'medical content update supersedes validity', $review_service->classify_content_change( $page_id, 'medical_content_update' )->success && 'superseded' === get_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_REVIEW_VALIDITY, true ) );
+$after_supersede = get_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_REVIEW_LOG, true );
+$check( 'superseding appends without rewriting history', is_array( $before_supersede ) && is_array( $after_supersede ) && $before_supersede[0] === $after_supersede[0] && count( $after_supersede ) === count( $before_supersede ) + 1 );
+$check( 'new review after superseding returns valid', $review_service->record( $request )->success && 'valid' === get_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_REVIEW_VALIDITY, true ) );
+for ( $i = 0; $i < 26; ++$i ) { $review_service->record( $request ); }
+$check( 'actual review log is append-only and capped at 25', 25 === count( (array) get_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_REVIEW_LOG, true ) ) );
+$due_request = new \DLA\MedicalTrust\Review\ReviewRecordRequest( $page_id, $expert_tr, '2024-08-31', 'signed historical approval' );
+$review_service->record( $due_request );
+$freshness = $review_service->freshness_for_post( $page_id, new DateTimeImmutable( '2026-09-01', new DateTimeZone( 'UTC' ) ) );
+$check( 'due review remains valid and retains its historical date', 'due' === $freshness && 'valid' === get_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_REVIEW_VALIDITY, true ) && '2024-08-31' === get_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_REVIEW_DATE, true ) );
 
 echo sprintf( 'WordPress integration: %d passed, %d failed%s', $pass, count( $failures ), PHP_EOL );
 if ( ! empty( $failures ) ) {

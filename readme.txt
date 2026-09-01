@@ -3,7 +3,7 @@ Contributors: drleylaarvas
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 8.0
-Stable tag: 0.2.0-M2
+Stable tag: 0.3.0-M3
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -20,7 +20,7 @@ yönetir.
 
 Tasarım ilkesi: yanlış bir güven sinyali üretmektense hiçbir sinyal üretme.
 
-= Bu sürümde (M2 — çözümleme katmanı) =
+= Bu sürümde (M3 — tıbbi inceleme alanı ve iş akışı çekirdeği) =
 
 * Uzman içerik türü (dla_expert), herkese açık değil
 * Tıbbi konu taksonomisi (dla_medical_topic), hiyerarşik, herkese açık değil
@@ -34,6 +34,11 @@ Tasarım ilkesi: yanlış bir güven sinyali üretmektense hiçbir sinyal üretm
 * Domain nesneleri, WordPress repository katmanı ve deterministik kaynak resolver'ı
 * Skorlama, top-tier çeşitlilik bandı, rendezvous hashing ve sürüm damgalı seçim cache'i
 * Salt-okunur resolver açıklama paneli
+* Korumalı tıbbi inceleme kaydı: reviewed/valid durumu, uzman ve kaydeden kullanıcı ayrımı,
+  geçmiş tarih, imza referansı ve içerik hash'i tek yetkili servis yoluyla yazılır
+* Append-only, son 25 olayla sınırlı inceleme geçmişi; supersede olayları önceki kayda bağlanır
+* Tıbbi konu politikasından çalışma anında türetilen current/due freshness; cron veya kalıcı freshness alanı yoktur
+* Açık değişiklik sınıflandırma API'si: minor_edit geçerliliği korur, medical_content_update kaydı supersede eder
 
 = Bu sürümde YOK (bilinçli) =
 
@@ -71,6 +76,12 @@ alanında idari bilgi olarak saklanır ve sıralamayı etkilemez.
 Varsayılan olarak korunur. Silme, ayarlardan açıkça istenmedikçe yapılmaz.
 
 == Changelog ==
+
+= 0.3.0-M3 =
+* Medical review domain: deterministic content hash and runtime freshness evaluator.
+* ReviewService is the sole review-record write path; protected metadata blocks direct updates.
+* Append-only 25-event review history, explicit change classification, validity superseding, and `dla_mt/v1/review_recorded` hook.
+* Pure tests and isolated WordPress integration coverage were extended for the review workflow.
 
 = 0.2.0-M2 =
 * Polylang kimlik senkronizasyonu ve idempotent onarım.

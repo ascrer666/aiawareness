@@ -223,7 +223,10 @@ final class MetaRegistry {
 
 	private function register_page_meta(): void {
 		$edit   = static fn(): bool => current_user_can( Capabilities::EDIT_META );
-		$review = static fn(): bool => current_user_can( Capabilities::REVIEW );
+		// Review alanları REST/meta UI ile yazılamaz. M3'te tek yazma yolu
+		// ReviewService + ReviewMetaGuard bağlamıdır; doğrudan meta auth'ı
+		// hiçbir kullanıcıya açmak bu sınırı delerdi.
+		$review = static fn(): bool => false;
 
 		foreach ( Settings::eligible_post_types() as $pt ) {
 			$this->post_meta( $pt, self::PAGE_GROUP_UID, 'string', [ self::class, 'sanitize_uid' ], $edit );
@@ -260,7 +263,7 @@ final class MetaRegistry {
 				self::PAGE_REVIEW_VALIDITY,
 				'string',
 				static fn( $value ): string => (string) Sanitizer::enum( $value, ReviewValidity::class ),
-				$edit
+				$review
 			);
 
 			// --- Yalnızca inceleme yetkisi olan kullanıcı yazabilir ---

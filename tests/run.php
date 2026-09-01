@@ -11,6 +11,7 @@ require_once __DIR__ . '/bootstrap.php';
 require_once __DIR__ . '/harness.php';
 require_once __DIR__ . '/unit-m1.php';
 require_once __DIR__ . '/unit-m2.php';
+require_once __DIR__ . '/unit-m3.php';
 
 echo PHP_EOL . str_repeat( '─', 60 ) . PHP_EOL;
 printf( 'Toplam: %d   Geçen: %d   Başarısız: %d%s', T::$pass + T::$fail, T::$pass, T::$fail, PHP_EOL );

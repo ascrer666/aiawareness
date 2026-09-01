@@ -20,15 +20,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 final class ReviewStatus extends EnumBase {
 
 	public const NONE     = 'none';
+	public const PENDING  = 'pending_review';
 	public const REVIEWED = 'reviewed';
 
 	public static function values(): array {
-		return [ self::NONE, self::REVIEWED ];
+		return [ self::NONE, self::PENDING, self::REVIEWED ];
 	}
 
 	public static function labels(): array {
 		return [
 			self::NONE     => __( 'İncelenmedi', 'dla-medical-trust' ),
+			self::PENDING  => __( 'Tıbbi inceleme bekliyor', 'dla-medical-trust' ),
 			self::REVIEWED => __( 'Tıbbi olarak incelendi', 'dla-medical-trust' ),
 		];
 	}
