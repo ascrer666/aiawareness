@@ -68,7 +68,11 @@ final class TrustDataRepository {
 			$review_date = '';
 		}
 
-		$commentary = null !== $reviewer ? (string) get_post_meta( $post_id, MetaRegistry::PAGE_COMMENTARY, true ) : '';
+		$flags = get_post_meta( $post_id, MetaRegistry::PAGE_DISPLAY_FLAGS, true );
+		$flags = is_array( $flags ) ? $flags : [];
+		$show_commentary = ! array_key_exists( 'show_commentary', $flags ) || (bool) $flags['show_commentary'];
+		$show_sources = ! array_key_exists( 'show_sources', $flags ) || (bool) $flags['show_sources'];
+		$commentary = null !== $reviewer && $show_commentary ? (string) get_post_meta( $post_id, MetaRegistry::PAGE_COMMENTARY, true ) : '';
 		$data = new TrustData(
 			$post_id,
 			$author_mode,
@@ -80,7 +84,7 @@ final class TrustDataRepository {
 			$status,
 			$validity,
 			$commentary,
-			$this->selected_sources( $post_id )
+			$show_sources ? $this->selected_sources( $post_id ) : []
 		);
 
 		return $data->has_visible_facts() ? $data : null;

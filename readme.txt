@@ -3,7 +3,7 @@ Contributors: drleylaarvas
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 8.0
-Stable tag: 0.4.0-M4
+Stable tag: 0.5.0-M5
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -20,7 +20,7 @@ yönetir.
 
 Tasarım ilkesi: yanlış bir güven sinyali üretmektense hiçbir sinyal üretme.
 
-= Bu sürümde (M4 — Medical Trust Component ve render) =
+= Bu sürümde (M5 — Medical Content Admin UX ve editoryal workflow) =
 
 * Uzman içerik türü (dla_expert), herkese açık değil
 * Tıbbi konu taksonomisi (dla_medical_topic), hiyerarşik, herkese açık değil
@@ -48,6 +48,11 @@ Tasarım ilkesi: yanlış bir güven sinyali üretmektense hiçbir sinyal üretm
 * Varsayılan kapalı, ayarlardan açılabilen `the_content` enjeksiyonu; çift render koruması
 * JS'siz, responsive ve `dla-mt-*` kapsamlı CSS; `--dla-mt-accent`, `--dla-mt-border`,
   `--dla-mt-radius`, `--dla-mt-surface` tasarım token'ları
+* Sayfa düzenleme ekranında Tıbbi İçerik Bilgileri paneli: açık birincil konu, yazar modu,
+  sayfaya özgü uzman değerlendirmesi, görünürlük ve slot bazlı güvenli kaynak override'ları
+* ReviewService'i bypass etmeyen tarihli inceleme action'ı, doğrudan kullanıcı yetkisi ve
+  bilinçli içerik-değişikliği sınıflandırması
+* Hazırlık uyarıları ile içerik listesi Medical Topic / Reviewer / Review State / Source Coverage sütunları
 
 = Bu sürümde YOK (bilinçli) =
 
@@ -75,6 +80,11 @@ alanında idari bilgi olarak saklanır ve sıralamayı etkilemez.
 Varsayılan olarak korunur. Silme, ayarlardan açıkça istenmedikçe yapılmaz.
 
 == Changelog ==
+
+= 0.5.0-M5 =
+* Medical Content paneli, kaynak override doğrulaması ve sayfaya özgü commentary yönetimi.
+* Güvenli review-record action, açık content-change sınıflandırması, readiness uyarıları ve içerik listesi sütunları.
+* Gerçek WordPress admin save/capability/Polylang commentary akışlarıyla genişletilmiş testler.
 
 = 0.4.0-M4 =
 * Premium ve compact Medical Trust Box, shortcode, template tag ve tema override desteği.

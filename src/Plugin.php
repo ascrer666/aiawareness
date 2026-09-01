@@ -14,7 +14,11 @@ declare( strict_types = 1 );
 namespace DLA\MedicalTrust;
 
 use DLA\MedicalTrust\Admin\ExpertMetaBox;
+use DLA\MedicalTrust\Admin\MedicalContentList;
+use DLA\MedicalTrust\Admin\PageMedicalMetaBox;
 use DLA\MedicalTrust\Admin\ResolverExplanationPanel;
+use DLA\MedicalTrust\Admin\ReadinessPanel;
+use DLA\MedicalTrust\Admin\ReviewWorkflowMetaBox;
 use DLA\MedicalTrust\Admin\SettingsPage;
 use DLA\MedicalTrust\Admin\SourceMetaBox;
 use DLA\MedicalTrust\Admin\TopicTermFields;
@@ -83,6 +87,10 @@ final class Plugin {
 			( new TopicTermFields() )->register();
 			( new SettingsPage() )->register();
 			( new UserProfileFields() )->register();
+			( new PageMedicalMetaBox() )->register();
+			( new ReviewWorkflowMetaBox() )->register();
+			( new MedicalContentList() )->register();
+			( new ReadinessPanel() )->register();
 			( new ResolverExplanationPanel() )->register();
 		}
 	}

@@ -424,6 +424,48 @@ $warm_queries = (int) $wpdb->num_queries - $queries_before;
 $check( 'M4 warm source cache does not cost more queries than cold resolution', $warm_queries <= $cold_queries );
 echo sprintf( 'M4 query profile: cold=%d warm=%d%s', $cold_queries, $warm_queries, PHP_EOL );
 
+/* M5 — real admin save/capability flow; review writes remain in ReviewService. */
+$m5_page = wp_insert_post( [ 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'M5 Medical Page', 'post_content' => '<p>M5 content.</p>' ] );
+$page_box = new \DLA\MedicalTrust\Admin\PageMedicalMetaBox();
+wp_set_current_user( $admin_id );
+$_POST = [
+	'dla_mt_page_medical_nonce' => wp_create_nonce( 'dla_mt_save_page_medical' ),
+	'dla_mt_author_mode' => 'expert', 'dla_mt_author_expert' => $expert_tr,
+	'dla_mt_primary_topic' => $topic_tr_id, 'dla_mt_secondary_topics' => [ $topic_en_id ],
+	'dla_mt_commentary' => '<script>alert(1)</script><p>M5 <strong>safe</strong></p>',
+	'dla_mt_source_mode' => 'manual', 'dla_mt_override_academic' => $academic_source,
+	'dla_mt_override_authority' => $academic_source, 'dla_mt_override_publication' => 0,
+	'dla_mt_show_commentary' => '1', 'dla_mt_show_sources' => '1',
+];
+$page_box->save( $m5_page, get_post( $m5_page ) );
+$m5_overrides = (array) get_post_meta( $m5_page, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_SOURCE_OVERRIDES, true );
+$m5_commentary = (string) get_post_meta( $m5_page, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_COMMENTARY, true );
+$check( 'M5 page panel saves explicit primary topic and author mode', 'expert' === get_post_meta( $m5_page, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_AUTHOR_MODE, true ) && $topic_uid === get_post_meta( $m5_page, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_PRIMARY_TOPIC_UID, true ) );
+$check( 'M5 page panel sanitizes language-specific commentary', ! str_contains( $m5_commentary, '<script' ) && str_contains( $m5_commentary, '<strong>safe</strong>' ) );
+$check( 'M5 source overrides accept only matching active slot sources', $academic_source === (int) ( $m5_overrides['academic'] ?? 0 ) && ! isset( $m5_overrides['authority'] ) );
+
+$workflow = new \DLA\MedicalTrust\Admin\ReviewWorkflowMetaBox();
+$_POST = [ 'dla_mt_review_workflow_nonce' => wp_create_nonce( 'dla_mt_review_workflow' ), 'dla_mt_record_review' => '1', 'dla_mt_record_review_confirm' => '1', 'dla_mt_reviewer_expert' => $expert_tr, 'dla_mt_review_date' => '2026-08-01', 'dla_mt_signoff_reference' => 'M5 test approval' ];
+$workflow->save( $m5_page, get_post( $m5_page ) );
+$check( 'M5 ordinary admin cannot record review through workflow UI', '' === (string) get_post_meta( $m5_page, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_REVIEW_DATE, true ) );
+wp_set_current_user( (int) $reviewer_id );
+$_POST['dla_mt_review_workflow_nonce'] = wp_create_nonce( 'dla_mt_review_workflow' );
+$workflow->save( $m5_page, get_post( $m5_page ) );
+$check( 'M5 directly authorized user records review through ReviewService UI', 'reviewed' === get_post_meta( $m5_page, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_REVIEW_STATUS, true ) && '2026-08-01' === get_post_meta( $m5_page, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_REVIEW_DATE, true ) );
+wp_update_post( [ 'ID' => $m5_page, 'post_content' => '<p>M5 materially revised content.</p>' ] );
+$_POST = [ 'dla_mt_review_workflow_nonce' => wp_create_nonce( 'dla_mt_review_workflow' ) ];
+ob_start(); $workflow->render( get_post( $m5_page ) ); $workflow_html = (string) ob_get_clean();
+$check( 'M5 changed valid review prompts with no preselected classification', str_contains( $workflow_html, 'İçerik değişti' ) && ! str_contains( $workflow_html, 'checked="checked"' ) );
+$_POST['dla_mt_change_classification'] = 'medical_content_update';
+$workflow->save( $m5_page, get_post( $m5_page ) );
+$check( 'M5 medical update classification supersedes review', 'superseded' === get_post_meta( $m5_page, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_REVIEW_VALIDITY, true ) );
+$m5_translation = wp_insert_post( [ 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'M5 Medical Page EN' ] );
+$GLOBALS['dla_mt_test_post_translations'][ $m5_page ] = [ 'tr' => $m5_page, 'en' => $m5_translation ];
+$GLOBALS['dla_mt_test_post_translations'][ $m5_translation ] = [ 'tr' => $m5_page, 'en' => $m5_translation ];
+update_post_meta( $m5_translation, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_COMMENTARY, '<p>English-only commentary.</p>' );
+$check( 'M5 Polylang page commentary remains language-specific', '<p>English-only commentary.</p>' === get_post_meta( $m5_translation, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_COMMENTARY, true ) && get_post_meta( $m5_page, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_COMMENTARY, true ) !== get_post_meta( $m5_translation, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_COMMENTARY, true ) );
+$_POST = [];
+
 echo sprintf( 'WordPress integration: %d passed, %d failed%s', $pass, count( $failures ), PHP_EOL );
 if ( ! empty( $failures ) ) {
 	echo 'Failed: ' . implode( ', ', $failures ) . PHP_EOL;
