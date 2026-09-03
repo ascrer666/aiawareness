@@ -66,9 +66,15 @@
 
 /* ---------------------------------------------------------- portre */
 
+/*
+ * Portre olculeri tek yerde. Dar gorunumde metinle ayni hizada kalacak
+ * kadar kucuk, genis gorunumde yuze bakildiginda taninacak kadar buyuk
+ * olmali; 72px her iki ucta da yetersiz kaliyordu.
+ */
 .dla-mt .dla-mt__portrait {
-  width: 4.5rem;
-  height: 4.5rem;
+  width: 4.75rem;
+  height: 4.75rem;
+  flex: none;
   margin: 0;
   padding: 0;
   overflow: hidden;
@@ -246,7 +252,7 @@
  */
 @media (max-width: 479px) {
   .dla-mt { padding: 1rem; gap: .75rem; }
-  .dla-mt .dla-mt__portrait { width: 3.5rem; height: 3.5rem; }
+  .dla-mt .dla-mt__portrait { width: 4rem; height: 4rem; }
   .dla-mt .dla-mt__name { font-size: 1rem; }
   .dla-mt .dla-mt__source-list { padding-left: 1rem; }
 }
@@ -255,10 +261,18 @@
 @media (min-width: 560px) {
   .dla-mt--default {
     grid-template-columns: auto minmax(0, 1fr);
-    column-gap: 1.15rem;
+    column-gap: 1.35rem;
   }
 
   .dla-mt--default .dla-mt__body { grid-column: 2; }
+
+  /* Iki sutunlu duzende portrenin cevresinde yer var; kutu genisledikce
+   * fotograf da buyur, ancak 104px'te durur — daha buyugu metin blogunu
+   * asagi itip dengeyi bozuyor. */
+  .dla-mt .dla-mt__portrait {
+    width: clamp(5.5rem, 4rem + 2.6vw, 6.5rem);
+    height: clamp(5.5rem, 4rem + 2.6vw, 6.5rem);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) { .dla-mt * { scroll-behavior: auto; } }
