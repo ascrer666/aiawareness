@@ -15,6 +15,7 @@ use DLA\MedicalTrust\Domain\Enum\PublicationType;
 use DLA\MedicalTrust\Meta\MetaRegistry;
 use DLA\MedicalTrust\PostTypes\SourcePostType;
 use DLA\MedicalTrust\Support\UrlPolicy;
+use DLA\MedicalTrust\Taxonomies\MedicalTopicTaxonomy;
 use DLA\MedicalTrust\Taxonomies\SourceTypeTaxonomy;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -31,6 +32,78 @@ final class SourceMetaBox {
 		add_action( 'add_meta_boxes_' . SourcePostType::SLUG, [ $this, 'add_meta_box' ] );
 		add_action( 'save_post_' . SourcePostType::SLUG, [ $this, 'save' ], 10, 2 );
 		add_action( 'admin_notices', [ $this, 'render_notices' ] );
+		add_filter( 'manage_' . SourcePostType::SLUG . '_posts_columns', [ $this, 'columns' ] );
+		add_action( 'manage_' . SourcePostType::SLUG . '_posts_custom_column', [ $this, 'column_content' ], 10, 2 );
+	}
+
+	/**
+	 * Liste sutunlari: eksik kayitlar tek bakista gorunsun.
+	 *
+	 * @param array<string,string> $columns
+	 * @return array<string,string>
+	 */
+	public function columns( $columns ): array {
+		$columns = is_array( $columns ) ? $columns : [];
+		$out     = [];
+
+		foreach ( $columns as $key => $label ) {
+			$out[ $key ] = $label;
+
+			if ( 'title' === $key ) {
+				$out['dla_mt_type']    = __( 'Tur', 'dla-medical-trust' );
+				$out['dla_mt_topics']  = __( 'Konu', 'dla-medical-trust' );
+				$out['dla_mt_missing'] = __( 'Durum', 'dla-medical-trust' );
+			}
+		}
+
+		return $out;
+	}
+
+	public function column_content( string $column, int $post_id ): void {
+		if ( 'dla_mt_type' === $column ) {
+			$terms = get_the_terms( $post_id, SourceTypeTaxonomy::SLUG );
+			echo is_array( $terms ) && ! empty( $terms )
+				? esc_html( \DLA\MedicalTrust\Domain\Enum\SourceType::label( $terms[0]->slug ) )
+				: '<span style="color:#8e3a44">' . esc_html__( 'yok', 'dla-medical-trust' ) . '</span>';
+
+			return;
+		}
+
+		if ( 'dla_mt_topics' === $column ) {
+			$terms = get_the_terms( $post_id, MedicalTopicTaxonomy::SLUG );
+
+			if ( ! is_array( $terms ) || empty( $terms ) ) {
+				echo '<span style="color:#8e3a44">' . esc_html__( 'yok', 'dla-medical-trust' ) . '</span>';
+
+				return;
+			}
+
+			echo esc_html( implode( ', ', wp_list_pluck( $terms, 'name' ) ) );
+
+			return;
+		}
+
+		if ( 'dla_mt_missing' === $column ) {
+			$missing = self::missing_requirements( $post_id );
+
+			if ( empty( $missing ) ) {
+				echo '<span style="color:#2c6b47">&#10004; ' . esc_html__( 'kullanilabilir', 'dla-medical-trust' ) . '</span>';
+
+				return;
+			}
+
+			printf(
+				'<span style="color:#8e3a44" title="%1$s">&#10006; %2$s</span>',
+				esc_attr( implode( ' ', $missing ) ),
+				esc_html(
+					sprintf(
+						/* translators: %d: eksik sayisi. */
+						_n( '%d eksik', '%d eksik', count( $missing ), 'dla-medical-trust' ),
+						count( $missing )
+					)
+				)
+			);
+		}
 	}
 
 	public function add_meta_box(): void {
@@ -42,6 +115,91 @@ final class SourceMetaBox {
 			'normal',
 			'high'
 		);
+	}
+
+
+	/**
+	 * Zorunlu alan rehberi ve canli eksiklik uyarisi.
+	 *
+	 * Bir kaynak; turu, konusu veya tanimlayicisi eksikse sorgudan HIC donmez
+	 * ve tani panelinde reddedilmis aday olarak bile gorunmez. Bu sessiz eleme
+	 * en cok kafa karistiran davranisti; artik ekranda soyleniyor.
+	 */
+	private function render_requirements( \WP_Post $post ): void {
+		$missing = self::missing_requirements( $post->ID );
+
+		printf(
+			'<p class="description" style="max-width:70ch">%s</p>',
+			esc_html__( 'Bir kaynagin sayfalarda gorunebilmesi icin DORT sey gerekir: kaynak turu (asagida), en az bir tanimlayici veya adres, sag sutundaki "Tibbi Konular" kutusundan en az bir konu, ve kaydin Yayimlanmis olmasi.', 'dla-medical-trust' )
+		);
+
+		if ( empty( $missing ) ) {
+			return;
+		}
+
+		echo '<div class="notice notice-warning inline"><p><strong>';
+		esc_html_e( 'Bu kaynak su haliyle hicbir sayfada gorunmez:', 'dla-medical-trust' );
+		echo '</strong></p><ul style="list-style:disc;margin-left:20px">';
+
+		foreach ( $missing as $item ) {
+			printf( '<li>%s</li>', esc_html( $item ) );
+		}
+
+		echo '</ul></div>';
+	}
+
+	/**
+	 * Kaynagin secime girmesini engelleyen eksikler.
+	 *
+	 * @return string[]
+	 */
+	public static function missing_requirements( int $post_id ): array {
+		$missing = self::missing_data_requirements( $post_id );
+
+		if ( 'publish' !== get_post_status( $post_id ) ) {
+			$missing[] = __( 'Kayit yayimlanmadi. Aday (beklemede) ve emekli kayitlar secime girmez.', 'dla-medical-trust' );
+		}
+
+		return $missing;
+	}
+
+	/**
+	 * Yayim durumu HARIC eksikler.
+	 *
+	 * Aday (pending) kayitlar BILINCLI olarak bekletilir; bunlari bozuk
+	 * kayitlarla ayni sepete koymak, kullaniciya duzeltecek bir hata varmis
+	 * gibi gosteriyordu. Oysa yapilmasi gereken tek sey onaylayip yayimlamak.
+	 *
+	 * @return string[]
+	 */
+	public static function missing_data_requirements( int $post_id ): array {
+		$missing = [];
+
+		$types = get_the_terms( $post_id, SourceTypeTaxonomy::SLUG );
+		if ( ! is_array( $types ) || empty( $types ) ) {
+			$missing[] = __( 'Kaynak turu secilmedi (Akademik / Otorite / Bilimsel Yayin).', 'dla-medical-trust' );
+		}
+
+		$topics = get_the_terms( $post_id, MedicalTopicTaxonomy::SLUG );
+		if ( ! is_array( $topics ) || empty( $topics ) ) {
+			$missing[] = __( 'Tibbi konu baglanmadi. Sag sutundaki "Tibbi Konular" kutusunu kullanin.', 'dla-medical-trust' );
+		}
+
+		$canonical = UrlPolicy::canonical(
+			[
+				'doi'           => (string) get_post_meta( $post_id, MetaRegistry::SOURCE_DOI, true ),
+				'pmc_id'        => (string) get_post_meta( $post_id, MetaRegistry::SOURCE_PMC_ID, true ),
+				'publisher_url' => (string) get_post_meta( $post_id, MetaRegistry::SOURCE_PUBLISHER_URL, true ),
+				'url'           => (string) get_post_meta( $post_id, MetaRegistry::SOURCE_URL, true ),
+				'pmid'          => (string) get_post_meta( $post_id, MetaRegistry::SOURCE_PMID, true ),
+			]
+		);
+
+		if ( null === $canonical ) {
+			$missing[] = __( 'DOI, PMC ID, yayinci adresi, kurum adresi veya PMID alanlarindan en az biri doldurulmali.', 'dla-medical-trust' );
+		}
+
+		return $missing;
 	}
 
 	public function render( \WP_Post $post ): void {
@@ -56,6 +214,8 @@ final class SourceMetaBox {
 			'url'           => $get( MetaRegistry::SOURCE_URL ),
 			'pmid'          => $get( MetaRegistry::SOURCE_PMID ),
 		];
+
+		$this->render_requirements( $post );
 
 		echo '<table class="form-table" role="presentation"><tbody>';
 
@@ -130,7 +290,12 @@ final class SourceMetaBox {
 			__( 'Varsayılan 0 bırakın. Yükseltmek skoru artırır ve kaynağı öne çıkarır; ancak durum, slot uyumu ve minimum konu yakınlığı kısıtlarını hiçbir değerde atlayamaz.', 'dla-medical-trust' )
 		);
 
-		Field::section( __( 'Künye', 'dla-medical-trust' ) );
+		Field::section( __( 'Künye (tamamı isteğe bağlı)', 'dla-medical-trust' ) );
+
+		printf(
+			'<tr><td colspan="2"><p class="description" style="max-width:70ch">%s</p></td></tr>',
+			esc_html__( 'Bu bölümdeki hiçbir alan zorunlu değildir ve hiçbiri kaynağın yayımlanmasını engellemez. Boş bırakılan alanlar kutuda basitçe gösterilmez — bilmediğiniz bir yılı tahmin etmeyin.', 'dla-medical-trust' )
+		);
 
 		Field::text( 'dla_mt_publisher', __( 'Yayıncı / kurum', 'dla-medical-trust' ), $get( MetaRegistry::SOURCE_PUBLISHER ) );
 		Field::text( 'dla_mt_journal', __( 'Dergi', 'dla-medical-trust' ), $get( MetaRegistry::SOURCE_JOURNAL ) );
@@ -140,8 +305,9 @@ final class SourceMetaBox {
 			'dla_mt_pub_year',
 			__( 'Yayın yılı', 'dla-medical-trust' ),
 			(int) get_post_meta( $post->ID, MetaRegistry::SOURCE_PUB_YEAR, true ),
-			1800,
-			(int) current_time( 'Y' ) + 1
+			0,
+			(int) current_time( 'Y' ) + 1,
+			__( 'Bilinmiyorsa 0 bırakın — zorunlu değildir. Kurum sayfalarının çoğunda yayın yılı yoktur; 0 ise kutuda tarih gösterilmez ve tazelik puanı hesaba katılmaz.', 'dla-medical-trust' )
 		);
 
 		Field::text(

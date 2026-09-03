@@ -65,6 +65,37 @@ final class Capabilities {
 	/**
 	 * Etkinleştirmede çalışır. Yalnızca role verilebilir yetenekler dağıtılır.
 	 */
+	/**
+	 * Meta yetenekleri tek yönetim yeteneğine çevirir.
+	 *
+	 * `map_for()` üç meta yeteneğe benzersiz ad verdiği için, WordPress'in
+	 * onları çözebilmesi bu filtreye bağlıdır.
+	 */
+	public static function register_meta_cap_filter(): void {
+		add_filter( 'map_meta_cap', [ self::class, 'map_meta_cap' ], 10, 2 );
+	}
+
+	/**
+	 * @param string[] $caps
+	 * @return string[]
+	 */
+	public static function map_meta_cap( $caps, $cap ): array {
+		$map = [
+			'edit_dla_expert'   => self::MANAGE_EXPERTS,
+			'read_dla_expert'   => self::MANAGE_EXPERTS,
+			'delete_dla_expert' => self::MANAGE_EXPERTS,
+			'edit_dla_source'   => self::MANAGE_SOURCES,
+			'read_dla_source'   => self::MANAGE_SOURCES,
+			'delete_dla_source' => self::MANAGE_SOURCES,
+		];
+
+		if ( isset( $map[ $cap ] ) ) {
+			return [ $map[ $cap ] ];
+		}
+
+		return is_array( $caps ) ? $caps : [ (string) $caps ];
+	}
+
 	public static function add_to_roles(): void {
 		$admin = get_role( 'administrator' );
 		if ( $admin instanceof \WP_Role ) {
@@ -152,11 +183,36 @@ final class Capabilities {
 	 *
 	 * @return array<string,string>
 	 */
-	public static function map_for( string $cap ): array {
+	/**
+	 * CPT yetenek eşlemesi.
+	 *
+	 * ────────────────────────────────────────────────────────────────────
+	 *  DİKKAT — buradaki en kolay hata:
+	 *
+	 *  `edit_post` / `read_post` / `delete_post` META yeteneklerdir. Üçünü de
+	 *  primitive `dla_manage_experts` yeteneğine eşlerseniz, `map_meta_cap`
+	 *  açıkken WordPress `$post_type_meta_caps['dla_manage_experts']` kaydını
+	 *  oluşturur ve bu primitive yeteneği kalıcı olarak "meta yetenek" sayar.
+	 *
+	 *  Sonuç: `current_user_can( 'dla_manage_experts' )` nesne ID'si olmadan
+	 *  çağrıldığında `do_not_allow` döner. WordPress CPT menüsünü tam olarak
+	 *  bu çağrıyla gösterdiği için MENÜ HİÇBİR KURULUMDA GÖRÜNMEZ.
+	 *
+	 *  Bu yüzden meta yetenekler AYRI adlar alır ve `map_meta_cap` filtresiyle
+	 *  (bkz. register_meta_cap_filter) tek yönetim yeteneğine çevrilir.
+	 * ────────────────────────────────────────────────────────────────────
+	 *
+	 * @param string $singular Meta yetenek adlarının kökü, örn. `dla_expert`.
+	 * @return array<string,string>
+	 */
+	public static function map_for( string $cap, string $singular ): array {
 		return [
-			'edit_post'              => $cap,
-			'read_post'              => $cap,
-			'delete_post'            => $cap,
+			// Meta yetenekler — benzersiz adlar; filtre çevirir.
+			'edit_post'              => 'edit_' . $singular,
+			'read_post'              => 'read_' . $singular,
+			'delete_post'            => 'delete_' . $singular,
+
+			// Primitive yetenekler — hepsi tek yönetim yeteneğine bağlı.
 			'edit_posts'             => $cap,
 			'edit_others_posts'      => $cap,
 			'publish_posts'          => $cap,

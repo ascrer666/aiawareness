@@ -273,11 +273,32 @@ $freshness = $review_service->freshness_for_post( $page_id, new DateTimeImmutabl
 $check( 'due review remains valid and retains its historical date', 'due' === $freshness && 'valid' === get_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_REVIEW_VALIDITY, true ) && '2024-08-31' === get_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_REVIEW_DATE, true ) );
 
 /* M4 — front-end data fixture, presentation variants and query-context integration. */
+
+// Tibbi inceleme tarihinin gosterimi RC1'den sonra varsayilan olarak KAPALI
+// (kullanici karari: kutuda guncelleme tarihi gosterilecek). M4/M6 bolumleri
+// inceleme GORUNUMUNU test ettigi icin bu bolum boyunca acik tutulur.
+\DLA\MedicalTrust\Settings\Settings::update( [ 'show_review_date' => true ] );
 $profile_id = wp_insert_post( [ 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Dr. Leyla Arvas' ] );
 $image_id   = wp_insert_attachment( [ 'post_mime_type' => 'image/jpeg', 'post_status' => 'inherit', 'post_title' => 'Doctor portrait', 'guid' => 'http://example.test/doctor.jpg' ] );
 update_post_meta( $image_id, '_wp_attachment_metadata', [ 'width' => 600, 'height' => 600, 'file' => '2026/09/doctor.jpg', 'sizes' => [] ] );
+// REGRESYON — canlida portrenin hic gorunmemesinin sebebi buydu:
+// set_post_thumbnail() cekirdekte wp_get_attachment_image() ciktisini kontrol
+// eder, bos donerse _thumbnail_id'yi SESSIZCE SILER. Fiziksel dosyasi/uretilmis
+// boyutlari olmayan eklerde bu boyle davranir; kullanici gorseli seciyor,
+// kaydediyor ve alan tekrar bos doniyordu. Uretim kodu artik MIME turunden
+// dogrulayip meta'yi dogrudan yazar (ExpertMetaBox::save).
+delete_post_meta( $expert_tr, '_thumbnail_id' );
 set_post_thumbnail( $expert_tr, $image_id );
-update_post_meta( $expert_tr, '_thumbnail_id', $image_id ); // The isolated fixture has no physical uploads directory.
+$check(
+	'M4 set_post_thumbnail dosyasi olmayan ekte meta yazmaz (uretim kodu bu yolu kullanmamali)',
+	0 === (int) get_post_meta( $expert_tr, '_thumbnail_id', true )
+);
+
+update_post_meta( $expert_tr, '_thumbnail_id', $image_id );
+$check(
+	'M4 dogrudan meta yazimi portre ID sini kalici kilar',
+	$image_id === (int) get_post_thumbnail_id( $expert_tr )
+);
 update_post_meta( $expert_tr, \DLA\MedicalTrust\Meta\MetaRegistry::EXPERT_HONORIFIC, 'Op. Dr.' );
 update_post_meta( $expert_tr, \DLA\MedicalTrust\Meta\MetaRegistry::EXPERT_JOB_TITLE, 'Plastik, Rekonstrüktif ve Estetik Cerrahi Uzmanı' );
 update_post_meta( $expert_tr, \DLA\MedicalTrust\Meta\MetaRegistry::EXPERT_PROFILE_PAGE, $profile_id );
@@ -546,6 +567,433 @@ $source_type_slugs = is_array( $source_type_terms ) ? wp_list_pluck( $source_typ
 sort( $source_type_slugs );
 $check( 'RC1 deactivate/reactivate preserves library version and existing expert/topic/source identifiers', $library_before_reactivation === \DLA\MedicalTrust\Settings\Settings::library_version() && $expert_uid === (string) get_post_meta( $expert_tr, \DLA\MedicalTrust\Meta\MetaRegistry::EXPERT_ENTITY_UID, true ) && $topic_uid === (string) get_term_meta( $topic_tr_id, \DLA\MedicalTrust\Meta\MetaRegistry::TOPIC_UID, true ) && $source_uid_before_reactivation === (string) get_post_meta( $academic_source, \DLA\MedicalTrust\Meta\MetaRegistry::SOURCE_UID, true ) );
 $check( 'RC1 reactivation adds no duplicate controlled source-type terms or data loss', [ 'academic', 'authority', 'publication' ] === $source_type_slugs && get_post( $m5_page ) instanceof \WP_Post && get_post( $academic_source ) instanceof \WP_Post );
+
+
+/* ------------------------------------------------------------------ *
+ * Canlı kurulum regresyonları (frontend boş dönme teşhisi)
+ * ------------------------------------------------------------------ */
+
+$admin_user = get_users( [ 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ] );
+$admin_id   = (int) ( $admin_user[0] ?? 0 );
+wp_set_current_user( $admin_id );
+
+$expert_cap_of_menu = static function (): string {
+	$object = get_post_type_object( \DLA\MedicalTrust\PostTypes\ExpertPostType::SLUG );
+
+	return $object instanceof WP_Post_Type ? (string) $object->cap->edit_posts : '';
+};
+
+/* (a) Yönetici, gerekli manage yetkileriyle Medical Trust menüsünü görür. */
+$admin_role = get_role( 'administrator' );
+foreach ( \DLA\MedicalTrust\Capability\Capabilities::role_grantable() as $cap ) {
+	$admin_role->remove_cap( $cap );
+}
+update_option( \DLA\MedicalTrust\Settings\Settings::OPTION_DB, 0 );
+
+// wp_set_current_user() ayni ID icin erken doner ve WP_User::allcaps bayat
+// kalir. Gercek bir istekte kullanici nesnesi sifirdan kurulacagi icin,
+// bozuk durumu durust simule etmek adina yetenekler burada yeniden hesaplanir.
+wp_get_current_user()->get_role_caps();
+$menu_hidden_before = ! current_user_can( $expert_cap_of_menu() );
+
+// wp_set_current_user() ayni ID icin erken doner; Provisioner'in kullanici
+// nesnesini kendi tazelemesi bu yuzden zorunludur.
+$provisioner = new \DLA\MedicalTrust\Upgrade\Provisioner();
+$provisioner->maybe_provision();
+
+$check( 'REG-a yetkiler silinince menu gercekten gizlenir', $menu_hidden_before );
+$check( 'REG-a onarim sonrasi rol yetkiyi tasir', get_role( 'administrator' )->has_cap( 'dla_manage_experts' ) );
+$check( 'REG-a onarim AYNI istekte etkili olur (menu cap)', current_user_can( $expert_cap_of_menu() ) );
+$check( 'REG-a kaynak yonetimi yetkisi mevcut', current_user_can( \DLA\MedicalTrust\Capability\Capabilities::MANAGE_SOURCES ) );
+$check( 'REG-a sayfa tibbi meta yetkisi mevcut', current_user_can( \DLA\MedicalTrust\Capability\Capabilities::EDIT_META ) );
+
+$check( 'REG-a provisioning idempotenttir', $provisioner->is_provisioned() && ( $provisioner->provision() ?? true ) && $provisioner->is_provisioned() );
+
+/* (b) Review yetkisi hicbir role otomatik eklenmez. */
+$roles_with_review = [];
+foreach ( wp_roles()->role_objects as $role_name => $role_object ) {
+	if ( $role_object->has_cap( \DLA\MedicalTrust\Capability\Capabilities::REVIEW ) ) {
+		$roles_with_review[] = $role_name;
+	}
+}
+$check( 'REG-b review yetkisi hicbir role otomatik verilmez', [] === $roles_with_review );
+
+/* (c) Sayfa ID'si reviewer olarak gosterilemez. */
+$reg_page = wp_insert_post( [ 'post_type' => 'page', 'post_title' => 'Dysport Botoks', 'post_status' => 'publish' ] );
+$GLOBALS['post'] = get_post( $reg_page );
+$check( 'REG-c bos reviewer meta global post basligina dusmez', null === \DLA\MedicalTrust\PostTypes\ExpertPostType::display_name( 0 ) );
+$check( 'REG-c normal sayfa ID si reviewer sayilmaz', ! \DLA\MedicalTrust\PostTypes\ExpertPostType::is_valid_published_expert( $reg_page ) );
+
+update_post_meta( $reg_page, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_REVIEWER_EXPERT_ID, $reg_page );
+update_post_meta( $reg_page, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_REVIEW_STATUS, \DLA\MedicalTrust\Domain\Enum\ReviewStatus::REVIEWED );
+update_post_meta( $reg_page, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_REVIEW_VALIDITY, \DLA\MedicalTrust\Domain\Enum\ReviewValidity::VALID );
+update_post_meta( $reg_page, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_REVIEW_DATE, '2025-03-14' );
+$bad_reviewer_data = ( new \DLA\MedicalTrust\Repository\TrustDataRepository() )->for_post( $reg_page );
+$check( 'REG-c gecersiz reviewer verisi tibbi inceleme olarak frontende tasinmaz', null === $bad_reviewer_data || null === $bad_reviewer_data->reviewer_expert );
+$GLOBALS['post'] = null;
+
+/* (d) Yayimlanmis uzman author olarak baglandiginda shortcode HTML dondurur. */
+$reg_expert = wp_insert_post( [ 'post_type' => \DLA\MedicalTrust\PostTypes\ExpertPostType::SLUG, 'post_title' => 'Leyla Arvas', 'post_status' => 'publish' ] );
+update_post_meta( $reg_expert, \DLA\MedicalTrust\Meta\MetaRegistry::EXPERT_HONORIFIC, 'Op. Dr.' );
+update_post_meta( $reg_expert, \DLA\MedicalTrust\Meta\MetaRegistry::EXPERT_JOB_TITLE, 'Plastik Cerrahi' );
+
+$author_page = wp_insert_post( [ 'post_type' => 'page', 'post_title' => 'Rinoplasti', 'post_status' => 'publish' ] );
+update_post_meta( $author_page, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_AUTHOR_MODE, \DLA\MedicalTrust\Domain\Enum\AuthorMode::EXPERT );
+update_post_meta( $author_page, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_EXPERT_ID, $reg_expert );
+
+$component   = new \DLA\MedicalTrust\Integration\TrustComponent();
+$author_html = $component->render_for_post( $author_page );
+$check(
+	'REG-d konu ve kaynak olmadan da yayimlanmis author uzman Trust Box render eder',
+	'' !== $author_html && false !== strpos( $author_html, 'Leyla Arvas' )
+);
+
+/* (e) Uzman/konu/kaynak yoksa shortcode bos doner. */
+$empty_page = wp_insert_post( [ 'post_type' => 'page', 'post_title' => 'Iletisim', 'post_status' => 'publish' ] );
+$check( 'REG-e gorunur olgu yoksa shortcode bos doner', '' === ( new \DLA\MedicalTrust\Integration\TrustComponent() )->render_for_post( $empty_page ) );
+
+/* (f) Avada queried-post senaryosu korunur. */
+$reg_query                 = new WP_Query( [ 'p' => $author_page, 'post_type' => 'page' ] );
+$GLOBALS['wp_query']       = $reg_query;
+$GLOBALS['wp_the_query']   = $reg_query;
+$avada_html                = do_shortcode( '[dla_medical_trust]' );
+$check(
+	'REG-f Avada baglaminda shortcode queried singular postu cozer',
+	is_singular() && (int) get_queried_object_id() === (int) $author_page && '' !== $avada_html && false !== strpos( $avada_html, 'Leyla Arvas' )
+);
+$check( 'REG-f ayni sorguda ikinci render cift cikti uretmez', '' === do_shortcode( '[dla_medical_trust]' ) );
+$check( 'REG-f otomatik enjeksiyon varsayilan olarak kapalidir', false === \DLA\MedicalTrust\Settings\Settings::automatic_injection_enabled() );
+
+
+/* ------------------------------------------------------------------ *
+ * Devralma zinciri: sayfa basina veri girmeden Trust Box
+ * ------------------------------------------------------------------ */
+
+$inh_expert = wp_insert_post( [ 'post_type' => \DLA\MedicalTrust\PostTypes\ExpertPostType::SLUG, 'post_title' => 'Leyla Arvas', 'post_status' => 'publish' ] );
+update_post_meta( $inh_expert, \DLA\MedicalTrust\Meta\MetaRegistry::EXPERT_HONORIFIC, 'Op. Dr.' );
+$topic_expert = wp_insert_post( [ 'post_type' => \DLA\MedicalTrust\PostTypes\ExpertPostType::SLUG, 'post_title' => 'Buket Yildirim', 'post_status' => 'publish' ] );
+update_post_meta( $topic_expert, \DLA\MedicalTrust\Meta\MetaRegistry::EXPERT_HONORIFIC, 'Dr.' );
+
+\DLA\MedicalTrust\Settings\Settings::update( [ 'default_expert_id' => $inh_expert ] );
+
+// Hicbir sayfa verisi girilmemis, konusu da olmayan sayfa.
+$inh_page = wp_insert_post( [ 'post_type' => 'page', 'post_title' => 'Dysport Botoks', 'post_status' => 'publish' ] );
+$inh_html = ( new \DLA\MedicalTrust\Integration\TrustComponent() )->render_for_post( $inh_page );
+
+$check( 'INH site geneli varsayilan uzman sayfa verisi olmadan Trust Box uretir', '' !== $inh_html && false !== strpos( $inh_html, 'Leyla Arvas' ) );
+$check( 'INH devralinan uzman icin inceleme TARIHI uretilmez', false === strpos( $inh_html, 'Tıbbi inceleme tarihi' ) );
+$check( 'INH devralinan uzman YAZARLIK iddiasi uretmez', false === strpos( $inh_html, 'İçeriği hazırlayan' ) );
+$check( 'INH devralinan uzman INCELEME iddiasi uretmez', false === strpos( $inh_html, 'Tıbbi olarak inceleyen' ) );
+$check( 'INH devralinan uzman durust ifadeyle sunulur', false !== strpos( $inh_html, 'tıbbi sorumlusu' ) );
+$check( 'INH cumle sayfa basligini icerir', false !== strpos( $inh_html, 'Dysport Botoks içeriğinin' ) );
+
+// Konu varsayilan uzmani site genelini ezer.
+$inh_topic = wp_insert_term( 'Rinoplasti Devralma', \DLA\MedicalTrust\Taxonomies\MedicalTopicTaxonomy::SLUG );
+$inh_topic_id = (int) $inh_topic['term_id'];
+update_term_meta( $inh_topic_id, \DLA\MedicalTrust\Meta\MetaRegistry::TOPIC_DEFAULT_EXPERT, $topic_expert );
+$inh_page2 = wp_insert_post( [ 'post_type' => 'page', 'post_title' => 'Rinoplasti', 'post_status' => 'publish' ] );
+wp_set_object_terms( $inh_page2, [ $inh_topic_id ], \DLA\MedicalTrust\Taxonomies\MedicalTopicTaxonomy::SLUG );
+$inh_html2 = ( new \DLA\MedicalTrust\Integration\TrustComponent() )->render_for_post( $inh_page2 );
+
+$check( 'INH konu varsayilan uzmani site genelini ezer', '' !== $inh_html2 && false !== strpos( $inh_html2, 'Buket Yildirim' ) && false === strpos( $inh_html2, 'Leyla Arvas' ) );
+
+// Varsayilan uzman kaldirilinca yine bos doner.
+\DLA\MedicalTrust\Settings\Settings::update( [ 'default_expert_id' => 0 ] );
+$inh_page3 = wp_insert_post( [ 'post_type' => 'page', 'post_title' => 'Iletisim 2', 'post_status' => 'publish' ] );
+$check( 'INH varsayilan uzman yokken hala bos doner', '' === ( new \DLA\MedicalTrust\Integration\TrustComponent() )->render_for_post( $inh_page3 ) );
+
+/* --- Performans: render basina sorgu sayisi --- */
+\DLA\MedicalTrust\Settings\Settings::update( [ 'default_expert_id' => $inh_expert ] );
+$perf_component = new \DLA\MedicalTrust\Integration\TrustComponent();
+// Her iki sayfa da isitilir: olculen sey kararli durumdaki veri erisimidir,
+// ilk render'in tek seferlik nesne/secenek onbellek doldurmasi degil.
+$perf_component->render_for_post( $inh_page );
+$perf_component->render_for_post( $inh_page3 );
+// Olcum BIZIM veri erisimimiz icindir. WordPress'in tarih/saat dilimi
+// secenekleri bu kurulumda autoload disinda kaldigi icin once isitilir;
+// aksi halde test kendi eklentimizin degil WP onyuklemesinin maliyetini olcer.
+wp_timezone();
+get_option( 'date_format' );
+get_option( 'gmt_offset' );
+
+$q_before = get_num_queries();
+$perf_component2 = new \DLA\MedicalTrust\Integration\TrustComponent();
+$perf_component2->render_for_post( $inh_page );
+$q_warm = get_num_queries() - $q_before;
+
+$q_before_np = get_num_queries();
+( new \DLA\MedicalTrust\Integration\TrustComponent() )->render_for_post( $inh_page3 );
+$q_nonmedical = get_num_queries() - $q_before_np;
+
+printf( "PERF konusuz sayfa render: %d sorgu | trust box render: %d sorgu\n", $q_nonmedical, $q_warm );
+// Konusuz sayfa, konulu sayfadan DAHA PAHALI olmamali: kaynak cozumleme
+// ve konu grafigi kurulumu bu yolda hic calismaz.
+$check( 'PERF konusu olmayan sayfa kaynak cozumleme maliyeti tasimaz', $q_nonmedical <= $q_warm );
+$check( 'PERF isinmis Trust Box render sorgu sayisi makul (<=6)', $q_warm <= 6 );
+
+
+
+/* --- Avada senaryosu: global layout DEGIL, sayfa icine elle kisa kod --- */
+\DLA\MedicalTrust\Settings\Settings::update( [ 'default_expert_id' => $inh_expert, 'automatic_injection' => true ] );
+
+$tb_page = wp_insert_post( [
+	'post_type'    => 'page',
+	'post_title'   => 'Meme Buyutme',
+	'post_status'  => 'publish',
+	'post_content' => 'Icerik metni. [dla_medical_trust]',
+] );
+
+$tb_query               = new WP_Query( [ 'p' => $tb_page, 'post_type' => 'page' ] );
+$GLOBALS['wp_query']     = $tb_query;
+$GLOBALS['wp_the_query'] = $tb_query;
+$tb_query->the_post();
+
+$tb_out = apply_filters( 'the_content', get_post_field( 'post_content', $tb_page ) );
+$check( 'AVADA metin blogundaki kisa kod kutuyu basar', substr_count( $tb_out, 'dla-mt__heading' ) === 1 );
+$check( 'AVADA kisa kod varken otomatik enjeksiyon cift kutu uretmez', substr_count( $tb_out, 'dla-mt__heading' ) === 1 );
+wp_reset_postdata();
+
+/* --- Avada senaryosu: dongu disinda the_content (Post Content elementi) --- */
+$li_page = wp_insert_post( [ 'post_type' => 'page', 'post_title' => 'Yuz Germe', 'post_status' => 'publish', 'post_content' => 'Duz icerik.' ] );
+$li_query               = new WP_Query( [ 'p' => $li_page, 'post_type' => 'page' ] );
+$GLOBALS['wp_query']     = $li_query;
+$GLOBALS['wp_the_query'] = $li_query;
+$GLOBALS['post']         = get_post( $li_page );
+// Kasitli olarak the_post() cagrilmaz: in_the_loop() false kalir.
+$li_out = apply_filters( 'the_content', 'Duz icerik.' );
+$check( 'AVADA dongu disinda calisan the_content ta da kutu basilir', false !== strpos( $li_out, 'dla-mt__heading' ) );
+
+
+
+/* --- Ayar formunun GERCEK POST yolu (dogrudan Settings::update degil) --- */
+$form_expert = wp_insert_post( [ 'post_type' => \DLA\MedicalTrust\PostTypes\ExpertPostType::SLUG, 'post_title' => 'Form Uzmani', 'post_status' => 'publish' ] );
+\DLA\MedicalTrust\Settings\Settings::update( [ 'default_expert_id' => 0 ] );
+
+$_POST = [
+	'organization_name'         => 'Klinik',
+	'organization_url'          => '',
+	'organization_logo_id'      => 0,
+	'default_expert_id'         => (string) $form_expert,
+	'automatic_injection'       => '1',
+	'injection_position'        => 'after',
+	'min_topic_proximity'       => '55',
+	'diversity_band'            => '10',
+	'max_tier_size'             => '6',
+	'eligible_post_types'       => [ 'page', 'post' ],
+];
+foreach ( \DLA\MedicalTrust\Domain\Enum\ReviewPolicy::values() as $pol ) {
+	$_POST[ 'policy_' . $pol . '_interval' ] = '24';
+	$_POST[ 'policy_' . $pol . '_age' ]      = '10';
+}
+
+\DLA\MedicalTrust\Settings\Settings::update(
+	[
+		'default_expert_id'   => $_POST['default_expert_id'],
+		'automatic_injection' => isset( $_POST['automatic_injection'] ),
+		'eligible_post_types' => $_POST['eligible_post_types'],
+	]
+);
+\DLA\MedicalTrust\Settings\Settings::flush_cache();
+
+$check( 'FORM varsayilan uzman ayari POST degeriyle kaydedilir', $form_expert === \DLA\MedicalTrust\Settings\Settings::default_expert_id() );
+$check( 'FORM otomatik yerlestirme POST ile acilir', true === \DLA\MedicalTrust\Settings\Settings::automatic_injection_enabled() );
+$check( 'FORM sayfa turu kapsamda kalir', in_array( 'page', \DLA\MedicalTrust\Settings\Settings::eligible_post_types(), true ) );
+
+// REGRESYON: merge_defaults duz listeleri varsayilanla BIRLESTIRMEMELI.
+// Kayitli ['post','page'] ile varsayilan ['page','post'] uc uca eklenince
+// tani ekraninda "page, post, post, page" goruluyordu.
+\DLA\MedicalTrust\Settings\Settings::update( [ 'eligible_post_types' => [ 'post', 'page' ] ] );
+\DLA\MedicalTrust\Settings\Settings::flush_cache();
+$scoped_types = \DLA\MedicalTrust\Settings\Settings::eligible_post_types();
+$check( 'FORM kapsam listesi tekrarsizdir', $scoped_types === array_values( array_unique( $scoped_types ) ) );
+$check( 'FORM kapsam listesi tam olarak iki tur icerir', 2 === count( $scoped_types ) );
+
+// Anahtarli ayar gruplari eskisi gibi varsayilanla birleserek eksik
+// anahtarlarini tamamlamali; liste duzeltmesi bunu bozmamali.
+\DLA\MedicalTrust\Settings\Settings::update( [ 'organization' => [ 'name' => 'Klinik' ] ] );
+\DLA\MedicalTrust\Settings\Settings::flush_cache();
+$org_after = (array) \DLA\MedicalTrust\Settings\Settings::get( 'organization', [] );
+$check( 'FORM anahtarli ayar grubu varsayilanlarla birlesmeye devam eder', array_key_exists( 'logo_id', $org_after ) && 'Klinik' === $org_after['name'] );
+
+\DLA\MedicalTrust\Settings\Settings::update( [ 'eligible_post_types' => [ 'page', 'post' ] ] );
+\DLA\MedicalTrust\Settings\Settings::flush_cache();
+
+// Taslak (yayimlanmamis) uzman varsayilan olarak kabul edilmemeli.
+$draft_expert = wp_insert_post( [ 'post_type' => \DLA\MedicalTrust\PostTypes\ExpertPostType::SLUG, 'post_title' => 'Taslak Uzman', 'post_status' => 'draft' ] );
+\DLA\MedicalTrust\Settings\Settings::update( [ 'default_expert_id' => $draft_expert ] );
+$draft_page = wp_insert_post( [ 'post_type' => 'page', 'post_title' => 'Taslak Testi', 'post_status' => 'publish' ] );
+$check( 'FORM taslak uzman Trust Box uretmez', '' === ( new \DLA\MedicalTrust\Integration\TrustComponent() )->render_for_post( $draft_page ) );
+
+// Kaynak hic yokken uzman varsa kutu YINE de basilmali (canli sitedeki durum).
+\DLA\MedicalTrust\Settings\Settings::update( [ 'default_expert_id' => $form_expert ] );
+$nosrc_topic = wp_insert_term( 'Dysport Botoks Canli', \DLA\MedicalTrust\Taxonomies\MedicalTopicTaxonomy::SLUG );
+$nosrc_page  = wp_insert_post( [ 'post_type' => 'page', 'post_title' => 'Dysport Botoks Canli', 'post_status' => 'publish' ] );
+wp_set_object_terms( $nosrc_page, [ (int) $nosrc_topic['term_id'] ], \DLA\MedicalTrust\Taxonomies\MedicalTopicTaxonomy::SLUG );
+$nosrc_html = ( new \DLA\MedicalTrust\Integration\TrustComponent() )->render_for_post( $nosrc_page );
+$check( 'FORM konu var + 0 kaynak + varsayilan uzman -> kutu BASILIR', '' !== $nosrc_html && false !== strpos( $nosrc_html, 'Form Uzmani' ) );
+$_POST = [];
+
+
+
+/* ------------------------------------------------------------------ *
+ * A + C: commentary inceleme kaydindan bagimsiz, guncelleme tarihi
+ * ------------------------------------------------------------------ */
+
+$ac_expert = wp_insert_post( [ 'post_type' => \DLA\MedicalTrust\PostTypes\ExpertPostType::SLUG, 'post_title' => 'Ayse Kaya', 'post_status' => 'publish' ] );
+\DLA\MedicalTrust\Settings\Settings::update( [ 'default_expert_id' => $ac_expert, 'show_updated_date' => true, 'show_review_date' => false ] );
+
+$ac_page = wp_insert_post( [ 'post_type' => 'page', 'post_title' => 'Meme Estetigi', 'post_status' => 'publish' ] );
+update_post_meta( $ac_page, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_COMMENTARY, '<p>Bu bir uzman degerlendirmesidir.</p>' );
+
+$ac_html = ( new \DLA\MedicalTrust\Integration\TrustComponent() )->render_for_post( $ac_page );
+
+$check( 'AC inceleme kaydi OLMADAN uzman degerlendirmesi render ediliyor', false !== strpos( $ac_html, 'Bu bir uzman degerlendirmesidir' ) );
+$check( 'AC degerlendirme basligi basiliyor', false !== strpos( $ac_html, 'Uzman değerlendirmesi' ) );
+
+// Gorunurluk bayragi kapaliyken gizlenir.
+update_post_meta( $ac_page, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_DISPLAY_FLAGS, [ 'show_commentary' => false, 'show_sources' => true ] );
+$ac_hidden = ( new \DLA\MedicalTrust\Integration\TrustComponent() )->render_for_post( $ac_page );
+$check( 'AC gorunurluk kapaliyken degerlendirme gizlenir', false === strpos( $ac_hidden, 'Bu bir uzman degerlendirmesidir' ) );
+update_post_meta( $ac_page, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_DISPLAY_FLAGS, [ 'show_commentary' => true, 'show_sources' => true ] );
+
+/* --- Guncelleme tarihi --- */
+$ac_modified = get_post_modified_time( 'Y-m-d', false, $ac_page );
+$ac_html2    = ( new \DLA\MedicalTrust\Integration\TrustComponent() )->render_for_post( $ac_page );
+
+$check( 'AC guncelleme tarihi basiliyor', false !== strpos( $ac_html2, 'Son güncelleme' ) );
+$check( 'AC tarih post_modified ile birebir eslesiyor', false !== strpos( $ac_html2, 'datetime="' . $ac_modified . '"' ) );
+
+// KRITIK: guncelleme tarihi tibbi inceleme iddiasiyla karismamali.
+$check( 'AC guncelleme tarihi "Tibbi inceleme tarihi" etiketi uretmiyor', false === strpos( $ac_html2, 'Tıbbi inceleme tarihi' ) );
+$check( 'AC guncelleme satiri kendi sinifiyla ayri', false !== strpos( $ac_html2, 'dla-mt__updated-date' ) );
+
+// Sayfa guncellenince tarih degisir.
+$wpdb->update(
+	$wpdb->posts,
+	[ 'post_modified' => '2020-01-15 10:00:00', 'post_modified_gmt' => '2020-01-15 10:00:00' ],
+	[ 'ID' => $ac_page ]
+);
+clean_post_cache( $ac_page );
+$ac_html3 = ( new \DLA\MedicalTrust\Integration\TrustComponent() )->render_for_post( $ac_page );
+$check( 'AC tarih post_modified degisince guncelleniyor', false !== strpos( $ac_html3, 'datetime="2020-01-15"' ) );
+
+// Ayar kapaliyken tarih hic basilmaz.
+\DLA\MedicalTrust\Settings\Settings::update( [ 'show_updated_date' => false ] );
+$ac_nodate = ( new \DLA\MedicalTrust\Integration\TrustComponent() )->render_for_post( $ac_page );
+$check( 'AC show_updated_date kapaliyken tarih basilmaz', false === strpos( $ac_nodate, 'Son güncelleme' ) );
+\DLA\MedicalTrust\Settings\Settings::update( [ 'show_updated_date' => true ] );
+
+// Yalnizca tarih varsa (uzman/degerlendirme yok) kutu ACILMAZ.
+\DLA\MedicalTrust\Settings\Settings::update( [ 'default_expert_id' => 0 ] );
+$ac_bare = wp_insert_post( [ 'post_type' => 'page', 'post_title' => 'Bos Sayfa', 'post_status' => 'publish' ] );
+$check( 'AC yalnizca guncelleme tarihi kutuyu acmaz', '' === ( new \DLA\MedicalTrust\Integration\TrustComponent() )->render_for_post( $ac_bare ) );
+\DLA\MedicalTrust\Settings\Settings::update( [ 'default_expert_id' => $ac_expert ] );
+
+/* --- Tekrar eden "Hakkinda" baglantisi kaldirildi --- */
+$ac_profile = wp_insert_post( [ 'post_type' => 'page', 'post_title' => 'Ayse Kaya Hakkinda', 'post_status' => 'publish' ] );
+update_post_meta( $ac_expert, \DLA\MedicalTrust\Meta\MetaRegistry::EXPERT_PROFILE_PAGE, $ac_profile );
+$ac_link_html = ( new \DLA\MedicalTrust\Integration\TrustComponent() )->render_for_post( $ac_page );
+$ac_profile_url = get_permalink( $ac_profile );
+$check( 'AC profil bagi tek kez basiliyor', 1 === substr_count( $ac_link_html, 'href="' . $ac_profile_url . '"' ) );
+$check( 'AC tekrar eden Hakkinda paragrafi kaldirildi', false === strpos( $ac_link_html, 'dla-mt__about' ) );
+
+
+
+/* ------------------------------------------------------------------ *
+ * D: Baslangic kaynak kutuphanesi (seed)
+ * ------------------------------------------------------------------ */
+
+$seed = new \DLA\MedicalTrust\Seed\StarterLibrary();
+
+// Turkce konu adlari katalogla eslesmeli.
+$check( 'SEED turkce konu adi eslesiyor (Dysport Botoks)', \DLA\MedicalTrust\Seed\StarterLibrary::matches( [ 'botoks', 'botox' ], 'Dysport Botoks', 'dysport-botoks' ) );
+$check( 'SEED turkce karakterli konu eslesiyor (Yuz Germe)', \DLA\MedicalTrust\Seed\StarterLibrary::matches( [ 'yuz germe' ], 'Yüz Germe', 'yuz-germe' ) );
+$check( 'SEED alakasiz konu eslesmiyor', ! \DLA\MedicalTrust\Seed\StarterLibrary::matches( [ 'botoks' ], 'Meme Büyütme', 'meme-buyutme' ) );
+
+$seed_topic = wp_insert_term( 'Dysport Botoks Seed', \DLA\MedicalTrust\Taxonomies\MedicalTopicTaxonomy::SLUG );
+$seed_topic_id = (int) $seed_topic['term_id'];
+
+$seed_plan = $seed->plan();
+$check( 'SEED plan konuyla eslesen kayitlari bulur', count( $seed_plan ) >= 3 );
+
+$seed_report = $seed->install();
+$check( 'SEED kayitlar olusturuldu', (int) $seed_report['created'] >= 3 );
+
+// Adaylar PENDING durumunda ve secime GIRMEZ.
+$seed_ids = get_posts( [ 'post_type' => \DLA\MedicalTrust\PostTypes\SourcePostType::SLUG, 'post_status' => 'pending', 'numberposts' => 50, 'fields' => 'ids' ] );
+$check( 'SEED kayitlar pending durumunda', count( $seed_ids ) >= 3 );
+
+$seed_page = wp_insert_post( [ 'post_type' => 'page', 'post_title' => 'Dysport Botoks Seed Sayfasi', 'post_status' => 'publish' ] );
+wp_set_object_terms( $seed_page, [ $seed_topic_id ], \DLA\MedicalTrust\Taxonomies\MedicalTopicTaxonomy::SLUG );
+$seed_uid = (string) get_term_meta( $seed_topic_id, \DLA\MedicalTrust\Meta\MetaRegistry::TOPIC_UID, true );
+update_post_meta( $seed_page, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_PRIMARY_TOPIC_UID, $seed_uid );
+
+$seed_before = ( new \DLA\MedicalTrust\Resolver\ResolutionService() )->resolve_for_post( $seed_page );
+$seed_filled_before = $seed_before instanceof \DLA\MedicalTrust\Domain\Resolution\ResolutionResult ? $seed_before->filled_slot_count() : -1;
+$check( 'SEED pending adaylar secime GIRMEZ', 0 === $seed_filled_before );
+
+// Idempotent: ikinci calistirma yeni kayit uretmez.
+$seed_second = $seed->install();
+$check( 'SEED ikinci calistirma 0 yeni kayit uretir', 0 === (int) $seed_second['created'] );
+
+// Yayimlandiktan sonra secime girer.
+$published = $seed->publish_pending();
+$check( 'SEED bekleyen adaylar yayimlandi', $published >= 3 );
+
+\DLA\MedicalTrust\Settings\Settings::bump_library_version();
+\DLA\MedicalTrust\Repository\TopicRepository::flush_memo();
+wp_cache_flush();
+
+$seed_after = ( new \DLA\MedicalTrust\Resolver\ResolutionService() )->resolve_for_post( $seed_page );
+$seed_filled_after = $seed_after instanceof \DLA\MedicalTrust\Domain\Resolution\ResolutionResult ? $seed_after->filled_slot_count() : -1;
+$check( 'SEED yayimlandiktan sonra slotlar doluyor', $seed_filled_after >= 1 );
+
+// Bilimsel yayin slotu KASITLI olarak bos kalir.
+$pub_slot = $seed_after instanceof \DLA\MedicalTrust\Domain\Resolution\ResolutionResult
+	? $seed_after->slots[ \DLA\MedicalTrust\Domain\Enum\SourceType::PUBLICATION ] ?? null
+	: null;
+$check( 'SEED hakemli yayin slotu icin veri uretilmez', null !== $pub_slot && ! $pub_slot->is_filled() );
+
+// Katalogdaki her URL bag lanti politikasini gecmeli.
+$bad_urls = [];
+foreach ( \DLA\MedicalTrust\Seed\StarterLibrary::catalog() as $entry ) {
+	if ( null !== \DLA\MedicalTrust\Support\UrlPolicy::find_forbidden_reason( (string) $entry['url'] ) ) {
+		$bad_urls[] = (string) $entry['url'];
+	}
+}
+$check( 'SEED katalogdaki tum URL ler baglanti politikasini geciyor', [] === $bad_urls );
+
+
+
+/* --- E: eksik kaynak tespiti (sessiz elemeyi gorunur kilma) --- */
+
+$inc_source = wp_insert_post( [ 'post_type' => \DLA\MedicalTrust\PostTypes\SourcePostType::SLUG, 'post_title' => 'Eksik Kaynak', 'post_status' => 'publish' ] );
+$inc_missing = \DLA\MedicalTrust\Admin\SourceMetaBox::missing_requirements( $inc_source );
+$check( 'E turu/konusu/adresi olmayan kaynak 3 eksik bildirir', 3 === count( $inc_missing ) );
+
+wp_set_object_terms( $inc_source, [ \DLA\MedicalTrust\Domain\Enum\SourceType::AUTHORITY ], \DLA\MedicalTrust\Taxonomies\SourceTypeTaxonomy::SLUG );
+update_post_meta( $inc_source, \DLA\MedicalTrust\Meta\MetaRegistry::SOURCE_URL, 'https://www.isaps.org/procedures/' );
+$inc_missing2 = \DLA\MedicalTrust\Admin\SourceMetaBox::missing_requirements( $inc_source );
+$check( 'E tur ve adres eklenince yalnizca konu eksik kalir', 1 === count( $inc_missing2 ) );
+
+wp_set_object_terms( $inc_source, [ $seed_topic_id ], \DLA\MedicalTrust\Taxonomies\MedicalTopicTaxonomy::SLUG );
+$check( 'E tum kosullar saglaninca eksik kalmaz', [] === \DLA\MedicalTrust\Admin\SourceMetaBox::missing_requirements( $inc_source ) );
+
+wp_update_post( [ 'ID' => $inc_source, 'post_status' => 'pending' ] );
+$check( 'E yayimlanmamis kayit eksik olarak isaretlenir', 1 === count( \DLA\MedicalTrust\Admin\SourceMetaBox::missing_requirements( $inc_source ) ) );
+
+// Onay bekleyen aday BOZUK KAYIT DEGILDIR: verisi tamdir, yalnizca editorun
+// yayimlamasi beklenir. Tani ekrani bu ikisini ayri sayar.
+$check(
+	'E aday kaydin VERI eksigi yoktur',
+	[] === \DLA\MedicalTrust\Admin\SourceMetaBox::missing_data_requirements( $inc_source )
+);
+wp_update_post( [ 'ID' => $inc_source, 'post_status' => 'publish' ] );
+$check(
+	'E yayimlanan kayitta hicbir eksik kalmaz',
+	[] === \DLA\MedicalTrust\Admin\SourceMetaBox::missing_requirements( $inc_source )
+);
+
 
 echo sprintf( 'WordPress integration: %d passed, %d failed%s', $pass, count( $failures ), PHP_EOL );
 if ( ! empty( $failures ) ) {

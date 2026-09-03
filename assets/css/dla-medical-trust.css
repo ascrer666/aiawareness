@@ -1,60 +1,269 @@
+/*
+ * Trust Box stilleri.
+ *
+ * ÖZGÜLLÜK NOTU: tipografi kuralları bilinçli olarak `.dla-mt` ile
+ * niteleniyor (örn. `.dla-mt .dla-mt__heading`). Tek sınıflı seçiciler,
+ * temaların `.post-content h2` gibi kurallarına kaybediyor ve başlık
+ * devasa çıkıyordu. Buradaki iki/üç seviyeli seçiciler bunu engeller;
+ * `!important` kullanmaya gerek kalmaz.
+ */
+
 .dla-mt {
   --dla-mt-accent: #176a62;
-  --dla-mt-border: #c8d9d5;
-  --dla-mt-radius: 18px;
-  --dla-mt-surface: #f6fbfa;
-  --dla-mt-text: #19302d;
-  --dla-mt-muted: #4b625e;
+  --dla-mt-border: #e2e4e6;
+  --dla-mt-radius: 10px;
+  --dla-mt-surface: #fafafa;
+  --dla-mt-text: #1d2226;
+  --dla-mt-muted: #5c6469;
   box-sizing: border-box;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 1.25rem;
+  gap: .85rem;
   max-width: 100%;
-  margin: 2rem 0;
-  padding: clamp(1.25rem, 3vw, 2rem);
+  margin: 1.75rem 0;
+  padding: clamp(1rem, 2.2vw, 1.5rem);
   color: var(--dla-mt-text);
   background: var(--dla-mt-surface);
   border: 1px solid var(--dla-mt-border);
   border-radius: var(--dla-mt-radius);
-  border-inline-start: 5px solid var(--dla-mt-accent);
+  border-inline-start: 3px solid var(--dla-mt-accent);
   font-family: inherit;
-  line-height: 1.6;
+  font-size: 1rem;
+  line-height: 1.55;
 }
-.dla-mt *, .dla-mt *::before, .dla-mt *::after { box-sizing: border-box; }
-.dla-mt__header { grid-column: 1 / -1; }
-.dla-mt__heading { margin: 0; color: var(--dla-mt-text); font: inherit; font-size: clamp(1.125rem, 2vw, 1.45rem); font-weight: 750; line-height: 1.25; }
-.dla-mt__body { min-width: 0; }
-.dla-mt__portrait { width: 5.75rem; height: 5.75rem; margin: 0; overflow: hidden; border: 3px solid #fff; border-radius: 50%; box-shadow: 0 4px 16px rgb(25 48 45 / 16%); }
-.dla-mt__portrait-image { display: block; width: 100%; height: 100%; object-fit: cover; }
-.dla-mt__expert { margin-bottom: 1rem; }
-.dla-mt__eyebrow, .dla-mt__about, .dla-mt__freshness, .dla-mt__citation-meta { color: var(--dla-mt-muted); font-size: .875rem; }
-.dla-mt__eyebrow { margin: 0 0 .2rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
-.dla-mt__name { margin: 0; font-size: 1.2rem; font-weight: 750; line-height: 1.3; }
-.dla-mt__profile-link, .dla-mt__about a, .dla-mt__source a { color: var(--dla-mt-accent); text-decoration-thickness: .08em; text-underline-offset: .15em; overflow-wrap: anywhere; }
-.dla-mt__specialty { margin: .25rem 0 0; color: var(--dla-mt-muted); overflow-wrap: anywhere; }
-.dla-mt__about { margin: .45rem 0 0; }
-.dla-mt__attribution { padding: .875rem 1rem; background: rgb(255 255 255 / 66%); border-radius: calc(var(--dla-mt-radius) - 6px); }
-.dla-mt__attribution p, .dla-mt__footer p { margin: 0; }
-.dla-mt__attribution p + p { margin-top: .45rem; }
-.dla-mt__review-date { font-weight: 650; }
-.dla-mt__freshness { margin-bottom: 0; }
-.dla-mt__commentary, .dla-mt__sources { margin-top: 1.35rem; }
-.dla-mt__subheading { margin: 0 0 .6rem; font: inherit; font-size: 1rem; font-weight: 750; }
-.dla-mt__richtext > :first-child { margin-top: 0; }
-.dla-mt__richtext > :last-child { margin-bottom: 0; }
-.dla-mt__source-list { display: grid; gap: .85rem; margin: 0; padding-left: 1.35rem; }
-.dla-mt__source { padding-left: .2rem; }
-.dla-mt__source-type { display: block; margin-bottom: .1rem; color: var(--dla-mt-muted); font-size: .78rem; font-weight: 700; letter-spacing: .02em; }
-.dla-mt__source cite { font-style: normal; font-weight: 650; }
-.dla-mt__citation-meta { display: block; margin-top: .1rem; }
-.dla-mt__footer { grid-column: 1 / -1; padding-top: 1rem; color: var(--dla-mt-muted); border-top: 1px solid var(--dla-mt-border); font-size: .85rem; }
-.dla-mt--compact { gap: .9rem; margin: 1.25rem 0; padding: 1.1rem 1.25rem; border-radius: min(var(--dla-mt-radius), 12px); }
-.dla-mt--compact .dla-mt__expert { margin-bottom: .75rem; }
-.dla-mt--compact .dla-mt__attribution { padding: 0; background: transparent; }
-.dla-mt--compact .dla-mt__commentary, .dla-mt--compact .dla-mt__sources { margin-top: 1rem; }
+
+.dla-mt *,
+.dla-mt *::before,
+.dla-mt *::after { box-sizing: border-box; }
+
+/* ---------------------------------------------------------- başlık */
+
+.dla-mt .dla-mt__header {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 0;
+}
+
+.dla-mt .dla-mt__header .dla-mt__heading {
+  margin: 0;
+  padding: 0;
+  color: var(--dla-mt-text);
+  font-family: inherit;
+  font-size: clamp(.95rem, .9rem + .4vw, 1.125rem);
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: .005em;
+  text-transform: none;
+}
+
+/* ---------------------------------------------------------- gövde */
+
+.dla-mt .dla-mt__body {
+  min-width: 0;
+  display: grid;
+  gap: .8rem;
+}
+
+/* ---------------------------------------------------------- portre */
+
+.dla-mt .dla-mt__portrait {
+  width: 4.5rem;
+  height: 4.5rem;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 2px 10px rgb(25 48 45 / 12%);
+}
+
+.dla-mt .dla-mt__portrait-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ---------------------------------------------------------- uzman */
+
+.dla-mt .dla-mt__expert { margin: 0; }
+
+.dla-mt .dla-mt__eyebrow {
+  margin: 0 0 .15rem;
+  color: var(--dla-mt-muted);
+  font-size: .72rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.dla-mt .dla-mt__name {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 650;
+  line-height: 1.3;
+}
+
+.dla-mt .dla-mt__specialty {
+  margin: .1rem 0 0;
+  color: var(--dla-mt-muted);
+  font-size: .9rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.dla-mt .dla-mt__profile-link,
+.dla-mt .dla-mt__source a {
+  color: var(--dla-mt-accent);
+  text-decoration-thickness: .07em;
+  text-underline-offset: .15em;
+  overflow-wrap: anywhere;
+}
+
+/* Uzman adi bir baglanti olsa da surekli alti cizili durmasi gorsel
+ * gurultu yaratiyordu; vurgu hover ve klavye odaginda gelir. */
+.dla-mt .dla-mt__profile-link { text-decoration: none; }
+
+.dla-mt .dla-mt__profile-link:hover,
+.dla-mt .dla-mt__profile-link:focus-visible { text-decoration: underline; }
+
+.dla-mt a:focus-visible {
+  outline: 2px solid var(--dla-mt-accent);
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------------ atıf bloğu */
+
+/*
+ * Beyaz "kutu içinde kutu" kaldırıldı: iç içe iki yüzey, blokta
+ * dağınık bir görünüm üretiyordu. Yerine ince bir ayırıcı çizgi.
+ */
+.dla-mt .dla-mt__attribution {
+  margin: 0;
+  padding: .7rem 0 0;
+  background: none;
+  border-top: 1px solid var(--dla-mt-border);
+  border-radius: 0;
+  font-size: .92rem;
+}
+
+.dla-mt .dla-mt__attribution p { margin: 0; }
+.dla-mt .dla-mt__attribution p + p { margin-top: .3rem; }
+
+.dla-mt .dla-mt__review-date,
+.dla-mt .dla-mt__updated-date {
+  color: var(--dla-mt-muted);
+  font-size: .875rem;
+}
+
+.dla-mt .dla-mt__freshness {
+  color: var(--dla-mt-muted);
+  font-size: .85rem;
+}
+
+/* ------------------------------------------- değerlendirme ve kaynaklar */
+
+.dla-mt .dla-mt__commentary,
+.dla-mt .dla-mt__sources { margin: 0; }
+
+.dla-mt .dla-mt__body .dla-mt__subheading {
+  margin: 0 0 .4rem;
+  padding: 0;
+  color: var(--dla-mt-text);
+  font-family: inherit;
+  font-size: .95rem;
+  font-weight: 650;
+  line-height: 1.35;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.dla-mt .dla-mt__richtext { font-size: .95rem; }
+.dla-mt .dla-mt__richtext > :first-child { margin-top: 0; }
+.dla-mt .dla-mt__richtext > :last-child { margin-bottom: 0; }
+.dla-mt .dla-mt__richtext p { margin: 0 0 .5rem; }
+
+.dla-mt .dla-mt__source-list {
+  display: grid;
+  gap: .6rem;
+  margin: 0;
+  padding-left: 1.15rem;
+  font-size: .92rem;
+}
+
+.dla-mt .dla-mt__source { padding-left: .15rem; }
+
+.dla-mt .dla-mt__source-type {
+  display: block;
+  margin-bottom: .05rem;
+  color: var(--dla-mt-muted);
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.dla-mt .dla-mt__source cite { font-style: normal; font-weight: 600; }
+
+.dla-mt .dla-mt__citation-meta {
+  display: block;
+  margin-top: .05rem;
+  color: var(--dla-mt-muted);
+  font-size: .82rem;
+}
+
+/* ---------------------------------------------------------- altbilgi */
+
+.dla-mt .dla-mt__footer {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding-top: .7rem;
+  color: var(--dla-mt-muted);
+  border-top: 1px solid var(--dla-mt-border);
+  font-size: .8rem;
+  line-height: 1.45;
+}
+
+.dla-mt .dla-mt__footer p { margin: 0; }
+
+/* ---------------------------------------------------------- compact */
+
+.dla-mt--compact {
+  gap: .7rem;
+  margin: 1.25rem 0;
+  padding: .95rem 1.1rem;
+}
+
+.dla-mt--compact .dla-mt__body { gap: .65rem; }
+.dla-mt--compact .dla-mt__attribution { padding-top: .55rem; }
+
+/* ---------------------------------------------------------- mobil */
+
+/*
+ * 480px altında: portre küçülür ve metinle aynı hizada kalır, başlık
+ * iki satıra rahat sığar.
+ */
+@media (max-width: 479px) {
+  .dla-mt { padding: 1rem; gap: .75rem; }
+  .dla-mt .dla-mt__portrait { width: 3.5rem; height: 3.5rem; }
+  .dla-mt .dla-mt__name { font-size: 1rem; }
+  .dla-mt .dla-mt__source-list { padding-left: 1rem; }
+}
+
+/* 560px üstünde portre solda, gövde sağda. */
 @media (min-width: 560px) {
-  .dla-mt--default { grid-template-columns: auto minmax(0, 1fr); column-gap: 1.4rem; }
+  .dla-mt--default {
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 1.15rem;
+  }
+
   .dla-mt--default .dla-mt__body { grid-column: 2; }
 }
+
 @media (prefers-reduced-motion: reduce) { .dla-mt * { scroll-behavior: auto; } }
-@media print { .dla-mt { break-inside: avoid; color: #000; background: #fff; border-color: #777; } .dla-mt__source a::after { content: ' (' attr(href) ')'; font-size: .8em; word-break: break-all; } }
+
+@media print {
+  .dla-mt { break-inside: avoid; color: #000; background: #fff; border-color: #777; }
+  .dla-mt .dla-mt__source a::after { content: ' (' attr(href) ')'; font-size: .8em; word-break: break-all; }
+}

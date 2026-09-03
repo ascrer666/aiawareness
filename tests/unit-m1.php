@@ -13,6 +13,7 @@ use DLA\MedicalTrust\Domain\Enum\ReviewPolicy;
 use DLA\MedicalTrust\Domain\Enum\SourceHealth;
 use DLA\MedicalTrust\Domain\Enum\SourceType;
 use DLA\MedicalTrust\Identity\UidGenerator;
+use DLA\MedicalTrust\PostTypes\ExpertPostType;
 use DLA\MedicalTrust\Meta\MetaRegistry;
 use DLA\MedicalTrust\Settings\Settings;
 use DLA\MedicalTrust\Support\Sanitizer;
@@ -200,3 +201,17 @@ T::is(
 );
 
 /* ================================================================== */
+
+/* ================================================================== */
+T::group( 'Uzman adi birlestirme (unvan tekrari)' );
+
+T::is( 'unvan basliga eklenir', ExpertPostType::compose_name( 'Op. Dr.', 'Leyla Arvas' ), 'Op. Dr. Leyla Arvas' );
+T::is( 'baslik zaten unvanla basliyorsa tekrar edilmez', ExpertPostType::compose_name( 'Op. Dr.', 'Op. Dr. Leyla ARVAS' ), 'Op. Dr. Leyla ARVAS' );
+T::is( 'noktalama farki tekrar uretmez', ExpertPostType::compose_name( 'Op Dr', 'Op. Dr. Leyla ARVAS' ), 'Op. Dr. Leyla ARVAS' );
+T::is( 'buyuk kucuk harf farki tekrar uretmez', ExpertPostType::compose_name( 'OP. DR.', 'Op. Dr. Leyla ARVAS' ), 'Op. Dr. Leyla ARVAS' );
+T::is( 'fazla bosluk tekrar uretmez', ExpertPostType::compose_name( 'Op.  Dr.', 'Op. Dr. Leyla ARVAS' ), 'Op. Dr. Leyla ARVAS' );
+T::is( 'farkli unvan eklenir', ExpertPostType::compose_name( 'Prof. Dr.', 'Op. Dr. Leyla ARVAS' ), 'Prof. Dr. Op. Dr. Leyla ARVAS' );
+T::is( 'unvan bos ise baslik dondurulur', ExpertPostType::compose_name( '', 'Leyla Arvas' ), 'Leyla Arvas' );
+T::is( 'baslik bos ise unvan dondurulur', ExpertPostType::compose_name( 'Op. Dr.', '' ), 'Op. Dr.' );
+T::is( 'baslik tam olarak unvana esitse tekrar edilmez', ExpertPostType::compose_name( 'Op. Dr.', 'Op. Dr.' ), 'Op. Dr.' );
+T::is( 'benzer baslayan ad yanlislikla kirpilmaz', ExpertPostType::compose_name( 'Dr.', 'Drahsan Yildiz' ), 'Dr. Drahsan Yildiz' );

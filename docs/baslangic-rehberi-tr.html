@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DLA Medical Trust — Başlangıç Rehberi</title>
+  <style>
+    :root { --ink:#1b2638; --muted:#5d6878; --blue:#116f9b; --pale:#e9f6fb; --line:#dbe4ea; --paper:#fff; --ground:#f4f7f8; }
+    * { box-sizing:border-box; }
+    body { margin:0; color:var(--ink); background:var(--ground); font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif; }
+    main { max-width:960px; margin:36px auto; padding:0 20px 44px; }
+    header { padding:34px 38px; color:#fff; border-radius:18px 18px 0 0; background:linear-gradient(120deg,#124969,#157da7); }
+    h1 { margin:0 0 8px; font-size:clamp(1.8rem,4vw,2.55rem); line-height:1.2; }
+    h2 { margin:0 0 12px; font-size:1.35rem; line-height:1.3; }
+    h3 { margin:0 0 8px; font-size:1.05rem; }
+    p { margin:0 0 12px; }
+    section { padding:28px 38px; background:var(--paper); border:1px solid var(--line); border-top:0; }
+    section:last-child { border-radius:0 0 18px 18px; }
+    .lead { max-width:68ch; margin:0; font-size:1.08rem; opacity:.94; }
+    .notice { padding:16px 18px; border-left:4px solid var(--blue); border-radius:10px; background:var(--pale); }
+    .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; margin-top:16px; }
+    .card { padding:18px; border:1px solid var(--line); border-radius:12px; background:#fcfdfd; }
+    .tag { display:inline-block; margin-bottom:8px; padding:2px 8px; color:#075378; background:var(--pale); border-radius:999px; font-size:.76rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase; }
+    ol,ul { margin:12px 0; padding-left:22px; }
+    li { margin:7px 0; }
+    code { padding:2px 6px; color:#093d56; background:#edf3f5; border-radius:5px; font:0.92em ui-monospace,SFMono-Regular,Consolas,monospace; }
+    .tree { padding:14px 16px; overflow:auto; color:#dcedf5; background:#172633; border-radius:9px; font:0.92rem ui-monospace,SFMono-Regular,Consolas,monospace; white-space:pre; }
+    table { width:100%; margin-top:12px; border-collapse:collapse; }
+    th,td { padding:11px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; }
+    th { width:33%; background:#f8fafb; }
+    @media (max-width:680px) { main { margin:0; padding:0; } header,section { border-radius:0 !important; padding:24px 20px; } .grid { grid-template-columns:1fr; } }
+    @media print { body { background:#fff; } main { max-width:none; margin:0; } header { color:var(--ink); background:#fff; border:1px solid var(--line); } }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>DLA Medical Trust — Başlangıç Rehberi</h1>
+    <p class="lead">Tıbbi sorumluluk, gerçek inceleme ve küratörlü kaynakları Trust Box içinde gösterme rehberi.</p>
+  </header>
+
+  <section>
+    <h2>Önce temel ayrım</h2>
+    <div class="notice"><strong>Otomatik kaynak seçimi</strong> ile <strong>kutunun otomatik görünmesi</strong> ayrı ayarlardır. Eklenti konuya göre kaynakları otomatik seçebilir; ancak içeriği hazırlayan kişi, birincil konu ve gerçek tıbbi inceleme bilerek insan tarafından kaydedilir.</div>
+    <table>
+      <tr><th>Otomatik</th><td>Birincil tıbbi konuya göre, yayımlanmış kaynak kütüphanesinden uygun kaynaklar seçilir.</td></tr>
+      <tr><th>Manuel karar</th><td>İçeriği hazırlayan, birincil konu ve gerçek inceleme kaydı. Bunlar tıbbi sorumluluk verileridir.</td></tr>
+      <tr><th>Görünüm</th><td>Avada global layout içindeki shortcode ile veya otomatik yerleştirme ayarıyla Trust Box sayfaya eklenir.</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>Önerilen kurulum: Avada Global Content Layout</h2>
+    <p>Bu yöntemle her tekil sayfaya shortcode yazmazsınız. Global layout bir kez eklenir; eklenti ziyaret edilen gerçek sayfanın verisini bulur.</p>
+    <ol>
+      <li><strong>Avada → Layouts</strong> ekranında tıbbi içerik için kullandığınız global <strong>Content Layout</strong>'u açın.</li>
+      <li><strong>Post Content</strong> öğesinin hemen altına bir Code Block veya Text Block ekleyin.</li>
+      <li>Bu alanın içine yalnızca <code>[dla_medical_trust]</code> yazın.</li>
+      <li>Layout koşullarının, kutuyu göstermek istediğiniz Sayfa/Yazı türlerini kapsadığını kontrol edin.</li>
+      <li><strong>Medical Trust → Ayarlar</strong> ekranında <em>Otomatik Trust Box yerleştirme</em> kapalı kalsın. Böylece çift kutu oluşmaz.</li>
+    </ol>
+    <p>Dar yerleşimler için: <code>[dla_medical_trust display="compact"]</code></p>
+  </section>
+
+  <section>
+    <h2>Alternatif: içerik sonuna otomatik ekleme</h2>
+    <p>Avada layout kullanmak istemezseniz kutuyu eklenti kendisi ekleyebilir.</p>
+    <ol>
+      <li><strong>Medical Trust → Ayarlar</strong> ekranını açın.</li>
+      <li><strong>Kapsamdaki içerik türleri</strong> altında Sayfalar ve/veya Yazılar seçili olsun.</li>
+      <li><strong>Otomatik Trust Box yerleştirme</strong> seçeneğini işaretleyin.</li>
+      <li>Konumu <strong>İçerikten sonra</strong> yapıp kaydedin.</li>
+    </ol>
+    <div class="notice">Bu yöntemi seçerseniz Avada layout'a shortcode eklemeyin. Tek yerleştirme yöntemi kullanın.</div>
+  </section>
+
+  <section>
+    <h2>Veri akışı: neler nereye bağlı?</h2>
+    <div class="grid">
+      <div class="card"><span class="tag">Bir kez</span><h3>Uzmanlar</h3><p><strong>Medical Trust → Tıbbi Uzmanlar</strong> altında uzmanı yayımlayın. Unvan, uzmanlık, görsel, kısa biyografi ve doktor profil sayfası bağlantısını ekleyin.</p></div>
+      <div class="card"><span class="tag">Bir kez</span><h3>Tıbbi Konular</h3><p><strong>Medical Trust → Tıbbi Konular</strong> altında Botoks gibi konuları oluşturun ve ilgili inceleme politikasını atayın.</p></div>
+      <div class="card"><span class="tag">Güncel tutun</span><h3>Kaynaklar</h3><p><strong>Medical Trust → Kaynaklar</strong> altında kaynakları ekleyin, ilgili konuya bağlayın ve yayımlayın. Sadece yayımlanmış uygun kaynaklar seçime girer.</p></div>
+      <div class="card"><span class="tag">Her içerikte</span><h3>Sayfa bilgisi</h3><p>Düzenleme ekranındaki <strong>Tıbbi İçerik Bilgileri</strong> panelinde hazırlayanı ve <strong>Birincil tıbbi konu</strong>yu seçin. Kaynak modu <strong>Automatic</strong> kalabilir.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Bir sayfayı yayına hazırlama</h2>
+    <ol>
+      <li>Sayfa/yazı düzenleme ekranında <strong>Tıbbi İçerik Bilgileri</strong> panelini bulun.</li>
+      <li><strong>İçeriği hazırlayan</strong> alanında editoryal ekip veya gerçekten yazan uzmanı seçin.</li>
+      <li><strong>Birincil tıbbi konu</strong>yu seçin. Bu, otomatik kaynak seçiminin temelidir.</li>
+      <li><strong>Kaynak modu: Automatic</strong> seçili bırakın. Eklenti kaynakları konu ve kurallara göre doldurur.</li>
+      <li>İsterseniz yalnızca bu sayfaya ait kısa bir uzman değerlendirmesi ekleyin.</li>
+      <li>Gerçek onay varsa, sağdaki <strong>Tıbbi İnceleme ve Değişiklik Kararı</strong> kutusundan inceleyen uzmanı ve gerçek tarihi kaydedin.</li>
+      <li>Sayfayı güncelleyin ve ziyaretçi görünümünde sonucu kontrol edin.</li>
+    </ol>
+    <div class="notice"><strong>İnceleme yetkisi:</strong> Ekranda “Bu kullanıcı tıbbi inceleme kaydı oluşturamaz” yazması normaldir. Bir yönetici <strong>Kullanıcılar → Kullanıcıyı Düzenle → Medical Trust yetkileri</strong> bölümünden bu yetkiyi, yalnızca gerçek doktor onayını birinci elden alan kullanıcıya verebilir.</div>
+  </section>
+
+  <section>
+    <h2>Kutu görünmüyorsa</h2>
+    <ul>
+      <li>Sayfa/Yazı türü, <strong>Medical Trust → Ayarlar → Kapsamdaki içerik türleri</strong> içinde seçili olmayabilir.</li>
+      <li>Avada layout koşulları bu sayfayı kapsamıyor veya shortcode Post Content altında değil olabilir.</li>
+      <li>Sayfada gösterilebilecek doğrulanmış hiçbir bilgi yoksa eklenti boş kutu göstermez. En hızlı çözüm <strong>Medical Trust → Ayarlar → Varsayılan içerik sorumlusu</strong> alanına bir uzman seçmektir; bundan sonra kapsamdaki tüm sayfalarda kutu otomatik görünür. <strong>Birincil konu yalnızca otomatik kaynak seçimi için zorunludur</strong>; konu yokken kutu yine görünür, sadece kaynak listesi boş kalır.</li>
+      <li>Uzman veya kaynak taslak durumundadır; kullanılacak varlıklar yayımlanmış olmalıdır.</li>
+      <li>Kaynaklar ilgili konuya bağlanmamış veya kuralları karşılamıyor olabilir.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>En hızlı kurulum: her sayfayı tek tek doldurmadan</h2>
+    <p>Sayfa başına uzman seçmek zorunda değilsiniz. Görünen uzman bir <strong>devralma zinciri</strong> ile bulunur:</p>
+    <ol>
+      <li><strong>Sayfa</strong> — “İçeriği hazırlayan tıbbi uzman” seçilmişse o kullanılır.</li>
+      <li><strong>Konu</strong> — <em>Medical Trust → Tıbbi Konular</em> altında konuya “Varsayılan uzman” atanmışsa o kullanılır. Farklı tedavi grupları için farklı hekim göstermenin yolu budur.</li>
+      <li><strong>Site geneli</strong> — <em>Medical Trust → Ayarlar → Varsayılan içerik sorumlusu</em>.</li>
+    </ol>
+    <p>Yani tek yapmanız gereken: bir uzman yayımlayın, ayarlardan varsayılan olarak seçin, otomatik yerleştirmeyi açın. Kutu tüm kapsamdaki sayfaların içerik sonunda görünür ve cümle o sayfanın başlığını kullanır.</p>
+    <div class="notice"><strong>Devralınan uzman bir inceleme iddiası taşımaz.</strong> Kutu “<em>… içeriğinin tıbbi sorumlusu: Op. Dr. …</em>” der ve altında <strong>“Son güncelleme”</strong> tarihini gösterir. Bu tarih sayfanın WordPress güncelleme tarihinden otomatik gelir; gerçek bir olgudur ve hiçbir veri girişi gerektirmez.<br><br><strong>“Tıbbi inceleme tarihi” bundan ayrıdır ve varsayılan olarak kapalıdır.</strong> Yalnızca yetkili bir kullanıcının kaydettiği gerçek bir inceleme varsa, ayrı bir satırda ve kendi etiketiyle görünür. İki tarih hiçbir zaman birbirinin yerine geçmez: yapılmamış bir incelemeyi yapılmış gibi göstermek hem yanıltıcı olur hem de sağlık içeriği için ciddi bir risktir.</div>
+  </section>
+
+  <section>
+    <h2>Bilimsel kaynaklar nasıl doldurulur</h2>
+    <p>Kaynak seçimi otomatiktir, ancak seçebileceği bir kütüphane olmalıdır. En hızlı yol:</p>
+    <p><strong>Medical Trust → Ayarlar → Başlangıç kaynak kütüphanesi</strong> bölümünden <em>“Aday kaynakları oluştur”</em> düğmesi. Konularınızla eşleşen, adresleri doğrulanmış gerçek kaynaklar (ASPS, ISAPS, NHS, Cleveland Clinic) <strong>aday</strong> olarak oluşturulur. Gözden geçirip <em>“Bekleyen adayları yayımla”</em> dediğinizde seçime girerler.</p>
+    <div class="notice"><strong>Hakemli bilimsel yayın üretilmez.</strong> Bir konuya gerçekten uygun yayını seçmek küratörlük ister; DOI uydurmak sistemin tüm amacını bozardı. “Bilimsel Yayın” slotu siz eklemedikçe boş kalır ve kutu onsuz görünür — bu kasıtlı bir davranıştır.</div>
+    <h3>Elle kaynak eklerken zorunlu dört şey</h3>
+    <ol>
+      <li><strong>Kaynak türü</strong> — Akademik / Otorite / Bilimsel Yayın (kaynak ekranındaki radyo).</li>
+      <li><strong>En az bir tanımlayıcı veya adres</strong> — DOI, PMC ID, yayıncı adresi, kurum adresi veya PMID.</li>
+      <li><strong>En az bir tıbbi konu</strong> — sağ sütundaki “Tıbbi Konular” kutusu. En sık atlanan adım budur.</li>
+      <li><strong>Yayımlanmış durum</strong> — aday ve emekli kayıtlar seçime girmez.</li>
+    </ol>
+    <p>Bunlardan biri eksikse kaynak <strong>hiçbir sayfada görünmez</strong>. Kaynak ekranı ve <em>Kaynaklar</em> listesindeki “Durum” sütunu eksikleri açıkça söyler.</p>
+  </section>
+
+  <section>
+    <h2>Performans</h2>
+    <ul>
+      <li><strong>JavaScript yok.</strong> Kutu tamamen sunucuda üretilir; tarayıcıda çalışan kod, harici istek veya düzen kayması (CLS) yoktur.</li>
+      <li><strong>Tek CSS dosyası</strong> (~5 KB) ve yalnızca kutunun görüneceği sayfalarda yüklenir.</li>
+      <li><strong>Isınmış render’da ek veritabanı sorgusu yok.</strong> WordPress zaten sayfanın meta ve terim verisini yüklediği için kutu bunları yeniden sorgulamaz. Ölçülen değer: 0 sorgu.</li>
+      <li><strong>Konusu olmayan sayfada kaynak çözümlemesi hiç çalışmaz</strong> — konu grafiği kurulmaz, sorgu yapılmaz.</li>
+      <li>Kaynak seçimi sayfa başına bir kez hesaplanıp saklanır; yalnızca kaynak kütüphanesi değiştiğinde yeniden hesaplanır.</li>
+    </ul>
+    <div class="notice">Sayfa önbelleği (WP Rocket, LiteSpeed, Cloudflare) kullanıyorsanız kutu tam uyumludur: çıktı ziyaretçiye göre değişmez, çerez veya oturum kullanmaz.</div>
+  </section>
+
+  <section>
+    <h2>Sol menüde “Medical Trust” hiç görünmüyorsa</h2>
+    <p>Bu, eklentinin eski bir sürümünde giderilmiş bir hatadır. Menü gizli kaldığında uzman, konu ve kaynak oluşturulamadığı için sayfa panelindeki açılır listeler boş kalır ve Trust Box hiçbir sayfada görünmez.</p>
+    <ul>
+      <li>Eklenti dosyalarını güncel sürümle değiştirmeniz yeterlidir. <strong>Yeniden etkinleştirme gerekmez, hiçbir veri taşınmaz veya silinmez.</strong></li>
+      <li>Güncellemeden sonraki ilk yönetim paneli isteğinde eksik yönetici yetkileri kendiliğinden tamamlanır ve yeşil bir bilgi bildirimi görürsünüz.</li>
+      <li>Menü hâlâ görünmüyorsa kırmızı bir uyarı çıkar: bu durumda bir rol yönetimi eklentisi yetkileri kilitliyor olabilir. Eklentiyi devre dışı bırakıp yeniden etkinleştirmek sorunu giderir.</li>
+    </ul>
+    <div class="notice"><strong>Tıbbi inceleme yetkisi bu onarıma dahil değildir.</strong> O yetki kasıtlı olarak hiçbir role otomatik verilmez; yalnızca doktor onayını birinci elden alan kullanıcıya, kullanıcı bazında verilir.</div>
+  </section>
+
+  <section>
+    <h2>Hızlı kontrol listesi</h2>
+    <div class="tree">Medical Trust
+├── Tıbbi Uzmanlar       → uzman, profil bağlantısı, uzmanlık
+├── Tıbbi Konular        → konu ve inceleme politikası
+├── Kaynaklar            → yayımlanmış, konuya bağlı kaynaklar
+└── Ayarlar              → kapsam + Avada/otomatik yerleştirme tercihi
+
+Sayfa / Yazı düzenleme ekranı
+├── Tıbbi İçerik Bilgileri              → hazırlayan, konu, otomatik kaynaklar
+└── Tıbbi İnceleme ve Değişiklik Kararı → gerçek inceleme kaydı</div>
+  </section>
+</main>
+</body>
+</html>

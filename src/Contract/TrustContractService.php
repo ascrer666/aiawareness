@@ -73,7 +73,14 @@ final class TrustContractService {
 		$flags       = is_array( $flags ) ? $flags : [];
 		$show_commentary = ! array_key_exists( 'show_commentary', $flags ) || (bool) $flags['show_commentary'];
 		$show_sources    = ! array_key_exists( 'show_sources', $flags ) || (bool) $flags['show_sources'];
-		$commentary      = $applicable ? (string) get_post_meta( $post_id, MetaRegistry::PAGE_COMMENTARY, true ) : '';
+		// Kontrat KANONIK gercekleri tasir; sunum bayraklari onu SILEMEZ.
+		// (Sunum tarafi icin bkz. TrustDataRepository.) Tek degisiklik:
+		// commentary artik tibbi inceleme kaydina bagli degil.
+		$commentary      = (string) get_post_meta( $post_id, MetaRegistry::PAGE_COMMENTARY, true );
+
+		// Icerik guncelleme tarihi: medical_review'dan AYRI anahtar.
+		// Tuketici bunu dateModified'a esleyebilir; lastReviewed'a ASLA.
+		$content_updated = $this->nullable_string( substr( (string) get_post_field( 'post_modified', $post_id ), 0, 10 ) );
 		$organization    = $this->organization();
 		$topic_data      = $this->topic_data( $post_id, $page['topic']->uid );
 		$source_data     = $this->selected_sources( $post_id );
@@ -89,6 +96,7 @@ final class TrustContractService {
 					'language'       => Languages::adapter()->post_language( $post_id ),
 					'locale'         => (string) get_locale(),
 				],
+				'content_updated' => $content_updated,
 				'organization'    => $organization,
 				'authorship'      => [
 					'mode'         => $author_mode,

@@ -13,6 +13,7 @@ declare( strict_types = 1 );
 
 namespace DLA\MedicalTrust;
 
+use DLA\MedicalTrust\Admin\DiagnosticsPanel;
 use DLA\MedicalTrust\Admin\ExpertMetaBox;
 use DLA\MedicalTrust\Admin\MedicalContentList;
 use DLA\MedicalTrust\Admin\PageMedicalMetaBox;
@@ -23,6 +24,7 @@ use DLA\MedicalTrust\Admin\SettingsPage;
 use DLA\MedicalTrust\Admin\SourceMetaBox;
 use DLA\MedicalTrust\Admin\TopicTermFields;
 use DLA\MedicalTrust\Admin\UserProfileFields;
+use DLA\MedicalTrust\Capability\Capabilities;
 use DLA\MedicalTrust\I18n\IdentitySync;
 use DLA\MedicalTrust\Identity\UidGenerator;
 use DLA\MedicalTrust\Integration\TrustComponent;
@@ -35,6 +37,7 @@ use DLA\MedicalTrust\Review\ReviewMetaGuard;
 use DLA\MedicalTrust\Settings\Settings;
 use DLA\MedicalTrust\Taxonomies\MedicalTopicTaxonomy;
 use DLA\MedicalTrust\Taxonomies\SourceTypeTaxonomy;
+use DLA\MedicalTrust\Upgrade\Provisioner;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -43,6 +46,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 final class Plugin {
 
 	public function boot(): void {
+		// Meta yetenek cevirisi: CPT menulerinin gorunmesi buna baglidir.
+		Capabilities::register_meta_cap_filter();
+
 		// --- Depolama ---
 		( new ExpertPostType() )->register();
 		( new SourcePostType() )->register();
@@ -83,6 +89,12 @@ final class Plugin {
 
 		// --- Admin ---
 		if ( is_admin() ) {
+			// Yetenek sağlama EN BAŞTA çalışır: CPT menülerinin görünmesi
+			// administrator'ün `dla_manage_experts` yeteneğine bağlıdır ve
+			// bu yetenek yalnızca aktivasyonda veriliyordu. Dosya kopyalayarak
+			// güncellenen kurulumlarda menü bu yüzden kayboluyordu.
+			( new Provisioner() )->register();
+
 			( new ExpertMetaBox() )->register();
 			( new SourceMetaBox() )->register();
 			( new TopicTermFields() )->register();
@@ -93,6 +105,7 @@ final class Plugin {
 			( new MedicalContentList() )->register();
 			( new ReadinessPanel() )->register();
 			( new ResolverExplanationPanel() )->register();
+			( new DiagnosticsPanel() )->register();
 		}
 	}
 

@@ -73,6 +73,29 @@ final class Field {
 		self::close_row( $description );
 	}
 
+	/**
+	 * Renk alani: renk secici + hex metin kutusu birlikte.
+	 * Bos birakilirsa stil sayfasindaki varsayilan kullanilir.
+	 */
+	public static function color( string $id, string $label, string $value, string $description = '' ): void {
+		self::open_row( $id, $label );
+
+		// Inline JS yok: renk kutusu sunucu tarafinda cizilir. Bos deger
+		// "varsayilani kullan" anlamina geldigi icin type="color" tek basina
+		// yetmez (o alan her zaman bir deger tasir).
+		printf(
+			'<span style="display:inline-block;width:26px;height:26px;vertical-align:middle;margin-inline-end:8px;'
+			. 'background:%1$s;border:1px solid #8c8f94;border-radius:3px"></span>'
+			. '<input type="text" id="%2$s" name="%2$s" value="%3$s" class="regular-text code" '
+			. 'placeholder="#f86011" pattern="#[0-9a-fA-F]{6}" style="max-width:140px">',
+			esc_attr( '' !== $value ? $value : '#176a62' ),
+			esc_attr( $id ),
+			esc_attr( $value )
+		);
+
+		self::close_row( $description );
+	}
+
 	public static function number( string $id, string $label, $value, int $min, int $max, string $description = '' ): void {
 		self::open_row( $id, $label );
 		printf(

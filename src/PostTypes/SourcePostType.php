@@ -59,7 +59,7 @@ final class SourcePostType {
 				'query_var'           => false,
 				'supports'            => [ 'title' ],
 				'capability_type'     => [ 'dla_source', 'dla_sources' ],
-				'capabilities'        => Capabilities::map_for( Capabilities::MANAGE_SOURCES ),
+				'capabilities'        => Capabilities::map_for( Capabilities::MANAGE_SOURCES, 'dla_source' ),
 				'map_meta_cap'        => true,
 			]
 		);

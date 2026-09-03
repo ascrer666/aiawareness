@@ -33,8 +33,29 @@ final class TrustData {
 		public string $review_status,
 		public string $review_validity,
 		public string $commentary,
-		public array $sources
+		public array $sources,
+		/**
+		 * Gorunen uzmanin nereden geldigi:
+		 *   reviewer | author  -> sayfaya ozel, dogrulanmis iddia
+		 *   topic | site       -> devralinan icerik sorumlusu; YAZARLIK veya
+		 *                         INCELEME iddiasi TASIMAZ.
+		 */
+		public string $primary_expert_source = '',
+		/**
+		 * Sayfanin post_modified tarihi (Y-m-d) veya null.
+		 *
+		 * Bu bir TIBBI INCELEME tarihi DEGILDIR ve onun yerine gecemez;
+		 * sablonda kendi etiketiyle ("Son guncelleme") ayri satirda gosterilir.
+		 */
+		public ?string $updated_date = null
 	) {}
+
+	/**
+	 * Gorunen uzman devralma zincirinden mi geldi?
+	 */
+	public function primary_expert_is_inherited(): bool {
+		return in_array( $this->primary_expert_source, [ 'topic', 'site' ], true );
+	}
 
 	public function has_visible_facts(): bool {
 		return null !== $this->primary_expert

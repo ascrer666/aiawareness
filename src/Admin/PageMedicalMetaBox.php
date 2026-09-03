@@ -51,7 +51,7 @@ final class PageMedicalMetaBox {
 		$this->expert_select( 'dla_mt_author_expert', __( 'İçeriği hazırlayan tıbbi uzman', 'dla-medical-trust' ), (int) get_post_meta( $post->ID, MetaRegistry::PAGE_EXPERT_ID, true ), __( 'Yalnızca içerik gerçekten bu uzman tarafından hazırlandıysa seçin.', 'dla-medical-trust' ) );
 		Field::readonly_row( __( 'Tıbbi olarak inceleyen uzman', 'dla-medical-trust' ), $this->reviewer_label( $post->ID ), __( 'Reviewer ataması, tarihli inceleme kaydının parçasıdır. Yalnızca aşağıdaki tıbbi inceleme işleminden yetkili kullanıcı tarafından kaydedilir.', 'dla-medical-trust' ) );
 		$this->topic_selects( $primary_uid, array_map( 'intval', (array) $selected_terms ) );
-		Field::textarea( 'dla_mt_commentary', __( 'Uzman değerlendirmesi (isteğe bağlı)', 'dla-medical-trust' ), (string) get_post_meta( $post->ID, MetaRegistry::PAGE_COMMENTARY, true ), __( 'Bu sayfaya ve bu dile özeldir; genel uzman biyografisi değildir. İzinli sınırlı HTML kullanılabilir.', 'dla-medical-trust' ), 5 );
+		Field::textarea( 'dla_mt_commentary', __( 'Uzman değerlendirmesi (isteğe bağlı)', 'dla-medical-trust' ), (string) get_post_meta( $post->ID, MetaRegistry::PAGE_COMMENTARY, true ), __( 'Bu sayfaya ve bu dile özeldir; genel uzman biyografisi değildir. Kutuda gösterilen uzmana ATFEDİLİR — yalnızca uzmanın gerçekten söylediği veya onayladığı ifadeleri yazın. Tıbbi inceleme kaydı gerekmez; metin girildiği anda görünür. İzinli sınırlı HTML kullanılabilir.', 'dla-medical-trust' ), 5 );
 		$this->source_overrides( $post->ID );
 		Field::checkbox( 'dla_mt_show_commentary', __( 'Görünürlük', 'dla-medical-trust' ), ! array_key_exists( 'show_commentary', $flags ) || (bool) $flags['show_commentary'], __( 'Uzman değerlendirmesini göster', 'dla-medical-trust' ) );
 		Field::checkbox( 'dla_mt_show_sources', __( 'Kaynak görünürlüğü', 'dla-medical-trust' ), ! array_key_exists( 'show_sources', $flags ) || (bool) $flags['show_sources'], __( 'Seçilmiş tıbbi kaynakları göster', 'dla-medical-trust' ) );
@@ -82,9 +82,22 @@ final class PageMedicalMetaBox {
 		Field::select( $id, $label, $value > 0 ? (string) $value : '', $options, $description, __( '— seçilmedi —', 'dla-medical-trust' ) );
 	}
 
+	/**
+	 * Reviewer etiketi.
+	 *
+	 * Yalnızca YAYIMLANMIŞ bir `dla_expert` kaydı reviewer sayılır. Sıradan
+	 * bir Page/Post ID'si reviewer gibi gösterilemez.
+	 *
+	 * Eski hata: `get_post( 0 )` WordPress'te global post'a düşüyordu; meta
+	 * boşken düzenlenen sayfanın kendi başlığı reviewer sanılıyordu.
+	 */
 	private function reviewer_label( int $post_id ): string {
-		$reviewer = get_post( (int) get_post_meta( $post_id, MetaRegistry::PAGE_REVIEWER_EXPERT_ID, true ) );
-		return $reviewer instanceof \WP_Post ? $reviewer->post_title : __( 'Henüz tarihli tıbbi inceleme kaydı yok', 'dla-medical-trust' );
+		$reviewer_id = (int) get_post_meta( $post_id, MetaRegistry::PAGE_REVIEWER_EXPERT_ID, true );
+		$name        = ExpertPostType::display_name( $reviewer_id );
+
+		return null !== $name
+			? $name
+			: __( 'Henüz geçerli tıbbi inceleme kaydı yok', 'dla-medical-trust' );
 	}
 
 	/** @param int[] $selected */

@@ -32,6 +32,7 @@ final class TrustBlockRenderer {
 		}
 
 		$this->assets->enqueue();
+		$accent     = \DLA\MedicalTrust\Settings\Settings::accent_color();
 		$trust_data = $data;
 		ob_start();
 		require $template;

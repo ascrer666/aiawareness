@@ -44,6 +44,10 @@ final class Settings {
 			'max_tier_size'             => 6,
 			'require_signoff_reference' => true,
 			'eligible_post_types'       => [ 'page', 'post' ],
+			'default_expert_id'         => 0,
+			'accent_color'              => '',
+			'show_updated_date'         => true,
+			'show_review_date'          => false,
 			'automatic_injection'       => false,
 			'injection_position'        => 'after',
 			'retain_data_on_uninstall'  => true,
@@ -96,7 +100,14 @@ final class Settings {
 			}
 
 			if ( is_array( $defaults[ $key ] ) && is_array( $value ) ) {
-				$out[ $key ] = array_merge( $defaults[ $key ], $value );
+				// DIKKAT: yalnizca ANAHTARLI ayar gruplari (organization,
+				// review_policies) birlestirilir. Duz listeler birlestirilirse
+				// varsayilan ['page','post'] ile kayitli ['post','page'] uc uca
+				// eklenip "page, post, post, page" gibi tekrarli bir liste
+				// uretiliyordu; listelerde kayitli deger tek dogru kaynaktir.
+				$out[ $key ] = self::is_keyed( $defaults[ $key ] )
+					? array_merge( $defaults[ $key ], $value )
+					: array_values( $value );
 				continue;
 			}
 
@@ -104,6 +115,23 @@ final class Settings {
 		}
 
 		return $out;
+	}
+
+	/**
+	 * Anahtarli ayar grubu mu, yoksa duz liste mi?
+	 *
+	 * SAF.
+	 *
+	 * @param array<mixed> $value
+	 */
+	private static function is_keyed( array $value ): bool {
+		foreach ( array_keys( $value ) as $key ) {
+			if ( ! is_int( $key ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -186,6 +214,26 @@ final class Settings {
 			$out['eligible_post_types'] = array_values( array_unique( $clean ) );
 		}
 
+		if ( array_key_exists( 'default_expert_id', $input ) ) {
+			$out['default_expert_id'] = Sanitizer::post_id_of_type(
+				$input['default_expert_id'],
+				\DLA\MedicalTrust\PostTypes\ExpertPostType::SLUG
+			);
+		}
+
+		if ( array_key_exists( 'accent_color', $input ) ) {
+			$hex = sanitize_hex_color( trim( (string) $input['accent_color'] ) );
+			$out['accent_color'] = is_string( $hex ) ? $hex : '';
+		}
+
+		if ( array_key_exists( 'show_updated_date', $input ) ) {
+			$out['show_updated_date'] = (bool) $input['show_updated_date'];
+		}
+
+		if ( array_key_exists( 'show_review_date', $input ) ) {
+			$out['show_review_date'] = (bool) $input['show_review_date'];
+		}
+
 		if ( array_key_exists( 'automatic_injection', $input ) ) {
 			$out['automatic_injection'] = (bool) $input['automatic_injection'];
 		}
@@ -223,7 +271,51 @@ final class Settings {
 	public static function eligible_post_types(): array {
 		$types = self::get( 'eligible_post_types', [] );
 
-		return is_array( $types ) ? array_values( array_filter( array_map( 'strval', $types ) ) ) : [];
+		if ( ! is_array( $types ) ) {
+			return [];
+		}
+
+		// array_unique: eski kurulumlarda kayitli deger tekrarli olabilir.
+		return array_values( array_unique( array_filter( array_map( 'strval', $types ) ) ) );
+	}
+
+	/**
+	 * Site geneli varsayilan icerik sorumlusu uzman.
+	 *
+	 * Sayfada ve konuda uzman yoksa devreye girer. Bu bir YAZARLIK veya
+	 * TIBBI INCELEME iddiasi DEGILDIR; yalnizca icerigin tibbi sorumlusunu
+	 * bildirir. Inceleme tarihi buradan asla turetilmez.
+	 */
+	public static function default_expert_id(): int {
+		return (int) self::get( 'default_expert_id', 0 );
+	}
+
+	/**
+	 * Icerik guncelleme tarihi ("Son guncelleme") gosterilsin mi?
+	 *
+	 * Kaynak: post_modified. Gercek bir olgudur, insan eylemi iddia etmez.
+	 */
+	/**
+	 * Kutunun vurgu rengi. Bos ise stil sayfasindaki varsayilan gecerlidir.
+	 */
+	public static function accent_color(): string {
+		$hex = (string) self::get( 'accent_color', '' );
+
+		return 1 === preg_match( '/^#[0-9a-fA-F]{6}$/', $hex ) ? $hex : '';
+	}
+
+	public static function show_updated_date(): bool {
+		return (bool) self::get( 'show_updated_date', true );
+	}
+
+	/**
+	 * Tibbi inceleme tarihi gosterilsin mi?
+	 *
+	 * Varsayilan KAPALI. Yalnizca gercekten kaydedilmis bir inceleme varsa
+	 * ve bu ayar acikken gorunur. Guncelleme tarihinden tamamen bagimsizdir.
+	 */
+	public static function show_review_date(): bool {
+		return (bool) self::get( 'show_review_date', false );
 	}
 
 	public static function automatic_injection_enabled(): bool {

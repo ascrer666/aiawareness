@@ -65,12 +65,30 @@ final class TrustComponent {
 		return null === $data ? '' : $this->renderer->render( $data, $args );
 	}
 
+	/**
+	 * Otomatik yerleştirme.
+	 *
+	 * DİKKAT — `in_the_loop()` KULLANILMAZ. Avada/Fusion sayfa içeriğini
+	 * Global Layout'taki "Post Content" elementiyle basar ve bu çoğu zaman
+	 * ana döngünün DIŞINDA çalışır; `in_the_loop()` orada false döndüğü için
+	 * filtre sessizce atlanıyordu ve kutu hiçbir sayfada görünmüyordu.
+	 *
+	 * Yerine daha sağlam bir kısıt var: filtrelenen içerik, sorgulanan tekil
+	 * gönderinin kendi içeriği olmalı. Bu, widget / ilgili yazı / alıntı
+	 * çıktılarına sızmayı da engeller.
+	 */
 	public function inject( string $content ): string {
-		if ( ! Settings::automatic_injection_enabled() || is_feed() || is_embed() || ! is_singular() || ! in_the_loop() || ! is_main_query() ) {
+		if ( ! Settings::automatic_injection_enabled() || is_feed() || is_embed() || ! is_singular() ) {
 			return $content;
 		}
 		$post_id = $this->queried_singular_id();
 		if ( 0 === $post_id || isset( $this->injected[ $post_id ] ) || isset( $this->rendered_in_query[ $post_id ] ) || has_shortcode( $content, 'dla_medical_trust' ) ) {
+			return $content;
+		}
+
+		// Yalnızca sorgulanan gönderinin kendi içeriğine eklenir.
+		$current_id = get_the_ID();
+		if ( false !== $current_id && (int) $current_id !== $post_id ) {
 			return $content;
 		}
 		$html = $this->render_for_post( $post_id );
