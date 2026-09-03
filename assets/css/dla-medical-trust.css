@@ -119,6 +119,46 @@
   overflow-wrap: anywhere;
 }
 
+/* --------------------------------------------------- biyografi ve CTA */
+
+.dla-mt .dla-mt__bio {
+  margin: .5rem 0 0;
+  color: var(--dla-mt-text);
+  font-size: .92rem;
+  line-height: 1.6;
+}
+
+.dla-mt .dla-mt__cta { margin: .7rem 0 0; }
+
+/*
+ * Buton temanin .button kurallarindan bagimsiz olmali: Avada kendi
+ * buton stillerini genis seciciler ile basiyor ve devralinan dolgu
+ * kutuyu bozuyordu. Bu yuzden tum ozellikler burada acikca yaziliyor.
+ */
+.dla-mt .dla-mt__cta .dla-mt__button {
+  display: inline-block;
+  padding: .48rem 1.05rem;
+  color: #fff;
+  background: var(--dla-mt-accent);
+  border: 1px solid var(--dla-mt-accent);
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: .85rem;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: .01em;
+  text-decoration: none;
+  text-transform: none;
+  transition: opacity .15s ease;
+}
+
+.dla-mt .dla-mt__cta .dla-mt__button:hover,
+.dla-mt .dla-mt__cta .dla-mt__button:focus-visible {
+  color: #fff;
+  text-decoration: none;
+  opacity: .88;
+}
+
 .dla-mt .dla-mt__profile-link,
 .dla-mt .dla-mt__source a {
   color: var(--dla-mt-accent);
@@ -252,7 +292,7 @@
  */
 @media (max-width: 479px) {
   .dla-mt { padding: 1rem; gap: .75rem; }
-  .dla-mt .dla-mt__portrait { width: 4rem; height: 4rem; }
+  .dla-mt .dla-mt__portrait { width: 4.75rem; height: 4.75rem; }
   .dla-mt .dla-mt__name { font-size: 1rem; }
   .dla-mt .dla-mt__source-list { padding-left: 1rem; }
 }
@@ -270,8 +310,8 @@
    * fotograf da buyur, ancak 104px'te durur — daha buyugu metin blogunu
    * asagi itip dengeyi bozuyor. */
   .dla-mt .dla-mt__portrait {
-    width: clamp(5.5rem, 4rem + 2.6vw, 6.5rem);
-    height: clamp(5.5rem, 4rem + 2.6vw, 6.5rem);
+    width: clamp(6.5rem, 4.6rem + 3.2vw, 8rem);
+    height: clamp(6.5rem, 4.6rem + 3.2vw, 8rem);
   }
 }
 

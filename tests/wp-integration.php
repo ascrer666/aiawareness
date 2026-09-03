@@ -894,8 +894,24 @@ $ac_profile = wp_insert_post( [ 'post_type' => 'page', 'post_title' => 'Ayse Kay
 update_post_meta( $ac_expert, \DLA\MedicalTrust\Meta\MetaRegistry::EXPERT_PROFILE_PAGE, $ac_profile );
 $ac_link_html = ( new \DLA\MedicalTrust\Integration\TrustComponent() )->render_for_post( $ac_page );
 $ac_profile_url = get_permalink( $ac_profile );
-$check( 'AC profil bagi tek kez basiliyor', 1 === substr_count( $ac_link_html, 'href="' . $ac_profile_url . '"' ) );
+// Profil sayfasina TAM OLARAK iki bag cikar: uzman adi ve "Hakkimda"
+// butonu. Butun amaci gorunur bir CTA olmak; kaldirilan sey eskiden
+// gorsel gurultu yaratan ucuncu, etiketsiz "Hakkinda" paragrafiydi.
+$check( 'AC profil bagi ad ve buton olmak uzere iki kez basiliyor', 2 === substr_count( $ac_link_html, 'href="' . $ac_profile_url . '"' ) );
 $check( 'AC tekrar eden Hakkinda paragrafi kaldirildi', false === strpos( $ac_link_html, 'dla-mt__about' ) );
+$check( 'AC Hakkimda butonu render ediliyor', str_contains( $ac_link_html, 'dla-mt__button' ) );
+
+/* --- Kisa biyografi: alan doluysa gosterilir, bos ise profil sayfasindan turetilir --- */
+update_post_meta( $ac_expert, \DLA\MedicalTrust\Meta\MetaRegistry::EXPERT_SHORT_BIO, "Birinci cumle.\n\nIkinci cumle." );
+$ac_bio_html = ( new \DLA\MedicalTrust\Integration\TrustComponent() )->render_for_post( $ac_page );
+$check( 'AC kisa biyografi kutuda gosteriliyor', str_contains( $ac_bio_html, 'dla-mt__bio' ) && str_contains( $ac_bio_html, 'Birinci cumle.' ) );
+$check( 'AC duz metin biyografide satir sonlari paragrafa donusur', 2 === substr_count( $ac_bio_html, '<p>Birinci cumle.</p>' ) + substr_count( $ac_bio_html, '<p>Ikinci cumle.</p>' ) );
+
+delete_post_meta( $ac_expert, \DLA\MedicalTrust\Meta\MetaRegistry::EXPERT_SHORT_BIO );
+wp_update_post( [ 'ID' => $ac_profile, 'post_content' => '[fusion_builder_row]Profil sayfasindaki tanitim metni.[/fusion_builder_row]' ] );
+$ac_auto_html = ( new \DLA\MedicalTrust\Integration\TrustComponent() )->render_for_post( $ac_page );
+$check( 'AC biyografi bos ise profil sayfasindan turetilir', str_contains( $ac_auto_html, 'Profil sayfasindaki tanitim metni.' ) );
+$check( 'AC turetilen biyografide sayfa olusturucu kisa kodu kalmaz', ! str_contains( $ac_auto_html, 'fusion_builder_row' ) );
 
 
 

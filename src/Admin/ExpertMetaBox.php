@@ -129,7 +129,7 @@ final class ExpertMetaBox {
 			'dla_mt_short_bio',
 			__( 'Kısa biyografi', 'dla-medical-trust' ),
 			$bio,
-			__( 'Blokta gösterilecek 1–2 cümle. İzin verilen etiketler: p, br, strong, em, ul, ol, li, a.', 'dla-medical-trust' ),
+			__( 'Trust Box içinde uzmanlık başlığının altında gösterilir. BOŞ BIRAKIRSANIZ yukarıdaki "Kanonik profil sayfası"nın ilk 40 kelimesi otomatik kullanılır — kendi metninizi yazmak isterseniz buraya girin. İzin verilen etiketler: p, br, strong, em, ul, ol, li, a.', 'dla-medical-trust' ),
 			4
 		);
 

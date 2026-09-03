@@ -50,6 +50,18 @@ $updated_label = $to_label( $trust_data->updated_date );
 				<p class="dla-mt__eyebrow"><?php echo esc_html__( 'Tıbbi uzman', 'dla-medical-trust' ); ?></p>
 				<p class="dla-mt__name"><?php echo $person_link( $trust_data->primary_expert, 'dla-mt__profile-link' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- helper escapes name and URL. ?></p>
 				<?php if ( '' !== (string) $trust_data->primary_expert['specialty'] ) : ?><p class="dla-mt__specialty"><?php echo esc_html( (string) $trust_data->primary_expert['specialty'] ); ?></p><?php endif; ?>
+
+				<?php
+				$expert_bio     = (string) ( $trust_data->primary_expert['bio'] ?? '' );
+				$expert_profile = (string) ( $trust_data->primary_expert['profile_url'] ?? '' );
+				?>
+				<?php if ( 'default' === $display && '' !== $expert_bio ) : ?>
+					<div class="dla-mt__bio dla-mt__richtext"><?php echo wp_kses( $expert_bio, \DLA\MedicalTrust\Support\Sanitizer::allowed_html() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- allowlist is explicit. ?></div>
+				<?php endif; ?>
+
+				<?php if ( 'default' === $display && '' !== $expert_profile ) : ?>
+					<p class="dla-mt__cta"><a class="dla-mt__button" href="<?php echo esc_url( $expert_profile ); ?>"><?php echo esc_html__( 'Hakkımda', 'dla-medical-trust' ); ?></a></p>
+				<?php endif; ?>
 			</div>
 		<?php endif; ?>
 

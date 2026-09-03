@@ -236,7 +236,61 @@ final class TrustDataRepository {
 			'specialty'   => (string) get_post_meta( $expert_id, MetaRegistry::EXPERT_JOB_TITLE, true ),
 			'profile_url' => $profile_url,
 			'image_id'    => (int) get_post_thumbnail_id( $expert_id ),
+			'bio'         => $this->expert_bio( $expert_id, $profile ),
 		];
+	}
+
+	/**
+	 * Kutuda gosterilecek kisa tanitim.
+	 *
+	 * Once uzman kaydindaki "Kisa biyografi" alani; bos ise kanonik profil
+	 * sayfasinin OZETI kullanilir. Ikinci yol otomatiktir ama uydurma
+	 * degildir: metin editorun kendi yazdigi, kendi sitesinde yayimlanmis
+	 * icerigidir ve yalnizca ACIKCA baglanmis profil sayfasindan gelir.
+	 *
+	 * Sayfa govdesi son care olarak kullanilir; sayfa olusturucu kisa kodlari
+	 * (Avada/Fusion) once temizlenir, aksi halde kutuya "[fusion_builder_row]"
+	 * gibi artiklar dusuyordu.
+	 *
+	 * @param \WP_Post|null|false $profile
+	 */
+	private function expert_bio( int $expert_id, $profile ): string {
+		$bio = trim( (string) get_post_meta( $expert_id, MetaRegistry::EXPERT_SHORT_BIO, true ) );
+
+		if ( '' !== $bio ) {
+			// Alan duz metin kabul ediyor ve editorler satir sonuyla ayirarak
+			// yaziyor; wp_kses satir sonlarini etiketlemez, iki cumle tek
+			// satira yapisirdi. wpautop yalnizca p/br uretir — ikisi de
+			// izin listesinde, dolayisiyla sablondaki kses'ten gecer.
+			return wpautop( $bio );
+		}
+
+		if ( ! $profile instanceof \WP_Post || 'publish' !== $profile->post_status ) {
+			return '';
+		}
+
+		$source = trim( (string) $profile->post_excerpt );
+
+		if ( '' === $source ) {
+			// strip_shortcodes() YALNIZCA kayitli kisa kodlari siler. Tema
+			// degistiginde ya da eski bir sayfa olusturucunun artiklari
+			// kaldiginda kayitsiz kodlar metinde kalir ve kutuya
+			// "[fusion_builder_row]" gibi artiklar duserdi. Kalan kod benzeri
+			// belirteci de temizliyoruz; "[1]" gibi atif isaretleri, etiket
+			// adi harfle baslamak zorunda oldugu icin korunur.
+			$source = strip_shortcodes( (string) $profile->post_content );
+			$source = (string) preg_replace( '/\[\/?[a-z][a-z0-9_\-]*(?:[^\]]*)?\]/i', ' ', $source );
+		}
+
+		$source = trim( (string) preg_replace( '/\s+/u', ' ', wp_strip_all_tags( $source ) ) );
+
+		if ( '' === $source ) {
+			return '';
+		}
+
+		// wp_trim_words kelime sinirinda keser; cumle ortasinda kesilen metin
+		// "..." ile biter ve devaminin oldugu bellidir.
+		return '<p>' . esc_html( wp_trim_words( $source, 40, '…' ) ) . '</p>';
 	}
 
 	/** @return array<int,array<string,mixed>> */
