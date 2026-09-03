@@ -1782,9 +1782,9 @@ msgstr ""
 msgid "Medical Trust"
 msgstr ""
 
-#: src/PostTypes/SourcePostType.php:47
+#: templates/trust-block.php:123
 msgid "Kaynaklar"
-msgstr ""
+msgstr "Источники"
 
 #: src/PostTypes/SourcePostType.php:40
 msgid "Yeni kaynak ekle"
@@ -1957,11 +1957,3 @@ msgstr "Последнее обновление:"
 #: templates/trust-block.php:116
 msgid "Uzman değerlendirmesi"
 msgstr "Комментарий эксперта"
-
-#: templates/trust-block.php:123
-msgid "Seçilmiş tıbbi kaynaklar"
-msgstr "Отобранные медицинские источники"
-
-#: templates/trust-block.php:137
-msgid "Bu bölüm, içeriğin tıbbi sorumluluk ve inceleme bilgilerini sunar; kişisel tıbbi değerlendirme yerine geçmez."
-msgstr "Этот раздел содержит сведения о медицинской ответственности и проверке материала и не заменяет персональную медицинскую консультацию."

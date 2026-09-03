@@ -420,7 +420,7 @@ wp_set_object_terms( $no_sources_page, [ $no_sources_topic_id ], \DLA\MedicalTru
 update_post_meta( $no_sources_page, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_PRIMARY_TOPIC_UID, (string) get_term_meta( $no_sources_topic_id, \DLA\MedicalTrust\Meta\MetaRegistry::TOPIC_UID, true ) );
 $review_service->record( new \DLA\MedicalTrust\Review\ReviewRecordRequest( $no_sources_page, $expert_tr, '2026-08-01', 'M4 no-source approval' ) );
 $no_sources_html = $component->render_for_post( $no_sources_page );
-$check( 'M4 no qualified sources omits only source section', ! str_contains( $no_sources_html, 'Seçilmiş tıbbi kaynaklar' ) && str_contains( $no_sources_html, 'Tıbbi inceleme tarihi:' ) );
+$check( 'M4 no qualified sources omits only source section', ! str_contains( $no_sources_html, 'Kaynaklar' ) && str_contains( $no_sources_html, 'Tıbbi inceleme tarihi:' ) );
 
 update_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_COMMENTARY, '<script>alert(1)</script><p>Safe <strong>commentary</strong></p>' );
 wp_update_post( [ 'ID' => $academic_source, 'post_title' => '<img src=x onerror=alert(1)>Academic Evidence' ] );

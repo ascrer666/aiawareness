@@ -21,7 +21,7 @@ $person_link  = static function ( array $person, string $class = '' ): string {
 		? sprintf( '<span class="%1$s">%2$s</span>', esc_attr( $class ), $name )
 		: sprintf( '<a class="%1$s" href="%2$s">%3$s</a>', esc_attr( $class ), esc_url( $url ), $name );
 };
-$format     = get_option( 'date_format' );
+$format     = 'F Y';
 $to_label   = static function ( ?string $iso ) use ( $format ): string {
 	if ( null === $iso || '' === $iso ) {
 		return '';
@@ -120,7 +120,7 @@ $updated_label = $to_label( $trust_data->updated_date );
 
 		<?php if ( ! empty( $trust_data->sources ) ) : ?>
 			<div class="dla-mt__sources">
-				<h3 class="dla-mt__subheading"><?php echo esc_html__( 'Seçilmiş tıbbi kaynaklar', 'dla-medical-trust' ); ?></h3>
+				<h3 class="dla-mt__subheading"><?php echo esc_html__( 'Kaynaklar', 'dla-medical-trust' ); ?></h3>
 				<ol class="dla-mt__source-list">
 					<?php foreach ( $trust_data->sources as $source ) : ?>
 						<li class="dla-mt__source">
@@ -134,5 +134,4 @@ $updated_label = $to_label( $trust_data->updated_date );
 		<?php endif; ?>
 	</div>
 
-	<footer class="dla-mt__footer"><p><?php echo esc_html__( 'Bu bölüm, içeriğin tıbbi sorumluluk ve inceleme bilgilerini sunar; kişisel tıbbi değerlendirme yerine geçmez.', 'dla-medical-trust' ); ?></p></footer>
 </section>
