@@ -26,6 +26,7 @@ declare( strict_types = 1 );
 namespace DLA\MedicalTrust\Upgrade;
 
 use DLA\MedicalTrust\Capability\Capabilities;
+use DLA\MedicalTrust\Seed\StarterLibrary;
 use DLA\MedicalTrust\Settings\Settings;
 use DLA\MedicalTrust\Taxonomies\SourceTypeTaxonomy;
 
@@ -37,6 +38,7 @@ final class Provisioner {
 
 	private const NOTICE_REPAIRED = 'dla_mt_caps_repaired';
 	private const NOTICE_FAILED   = 'dla_mt_caps_failed';
+	private const OPTION_CATALOG_SYNC_VERSION = 'dla_mt_catalog_sync_version';
 
 	public function register(): void {
 		add_action( 'admin_init', [ $this, 'maybe_provision' ], 5 );
@@ -50,11 +52,18 @@ final class Provisioner {
 	 * okur — normal durumda ek sorgu maliyeti yoktur.
 	 */
 	public function maybe_provision(): void {
-		if ( $this->is_provisioned() ) {
-			return;
+		if ( ! $this->is_provisioned() ) {
+			$this->provision();
 		}
 
-		$this->provision();
+		if ( $this->catalog_sync_needed() ) {
+			( new StarterLibrary() )->synchronize_and_publish();
+			update_option( self::OPTION_CATALOG_SYNC_VERSION, StarterLibrary::CATALOG_VERSION, false );
+		}
+	}
+
+	private function catalog_sync_needed(): bool {
+		return StarterLibrary::CATALOG_VERSION !== (string) get_option( self::OPTION_CATALOG_SYNC_VERSION, '' );
 	}
 
 	public function is_provisioned(): bool {

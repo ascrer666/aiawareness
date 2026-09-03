@@ -910,43 +910,79 @@ $check( 'SEED turkce konu adi eslesiyor (Dysport Botoks)', \DLA\MedicalTrust\See
 $check( 'SEED turkce karakterli konu eslesiyor (Yuz Germe)', \DLA\MedicalTrust\Seed\StarterLibrary::matches( [ 'yuz germe' ], 'Yüz Germe', 'yuz-germe' ) );
 $check( 'SEED alakasiz konu eslesmiyor', ! \DLA\MedicalTrust\Seed\StarterLibrary::matches( [ 'botoks' ], 'Meme Büyütme', 'meme-buyutme' ) );
 
-$seed_topic = wp_insert_term( 'Dysport Botoks Seed', \DLA\MedicalTrust\Taxonomies\MedicalTopicTaxonomy::SLUG );
+$seed_topic = wp_insert_term( 'Meme Buyutme Seed', \DLA\MedicalTrust\Taxonomies\MedicalTopicTaxonomy::SLUG );
 $seed_topic_id = (int) $seed_topic['term_id'];
 
-$seed_plan = $seed->plan();
-$check( 'SEED plan konuyla eslesen kayitlari bulur', count( $seed_plan ) >= 3 );
+// Bu test grubu kendisinden once olusturulmus kaynaklardan bagimsiz olsun:
+// ayni katalog URL'lerini silip mevcut konu icin senkronizasyonu calistirir.
+foreach ( \DLA\MedicalTrust\Seed\StarterLibrary::catalog() as $entry ) {
+	if ( false === strpos( (string) $entry['title'], 'Breast' ) ) {
+		continue;
+	}
+	$prior_ids = get_posts( [ 'post_type' => \DLA\MedicalTrust\PostTypes\SourcePostType::SLUG, 'post_status' => 'any', 'numberposts' => 20, 'fields' => 'ids', 'meta_key' => \DLA\MedicalTrust\Meta\MetaRegistry::SOURCE_URL, 'meta_value' => (string) $entry['url'] ] );
+	foreach ( $prior_ids as $prior_id ) {
+		wp_delete_post( (int) $prior_id, true );
+	}
+}
+$seed_report = $seed->synchronize_and_publish( [ $seed_topic_id ] );
+$check( 'SEED mevcut konuda katalog kaynaklarini otomatik olusturur', (int) $seed_report['created'] >= 2 );
+$check( 'SEED otomatik olusan katalog kaynaklari yayindadir', (int) $seed_report['published'] >= 2 );
 
-$seed_report = $seed->install();
-$check( 'SEED kayitlar olusturuldu', (int) $seed_report['created'] >= 3 );
-
-// Adaylar PENDING durumunda ve secime GIRMEZ.
-$seed_ids = get_posts( [ 'post_type' => \DLA\MedicalTrust\PostTypes\SourcePostType::SLUG, 'post_status' => 'pending', 'numberposts' => 50, 'fields' => 'ids' ] );
-$check( 'SEED kayitlar pending durumunda', count( $seed_ids ) >= 3 );
-
-$seed_page = wp_insert_post( [ 'post_type' => 'page', 'post_title' => 'Dysport Botoks Seed Sayfasi', 'post_status' => 'publish' ] );
+$seed_page = wp_insert_post( [ 'post_type' => 'page', 'post_title' => 'Meme Buyutme Seed Sayfasi', 'post_status' => 'publish' ] );
 wp_set_object_terms( $seed_page, [ $seed_topic_id ], \DLA\MedicalTrust\Taxonomies\MedicalTopicTaxonomy::SLUG );
 $seed_uid = (string) get_term_meta( $seed_topic_id, \DLA\MedicalTrust\Meta\MetaRegistry::TOPIC_UID, true );
 update_post_meta( $seed_page, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_PRIMARY_TOPIC_UID, $seed_uid );
 
-$seed_before = ( new \DLA\MedicalTrust\Resolver\ResolutionService() )->resolve_for_post( $seed_page );
-$seed_filled_before = $seed_before instanceof \DLA\MedicalTrust\Domain\Resolution\ResolutionResult ? $seed_before->filled_slot_count() : -1;
-$check( 'SEED pending adaylar secime GIRMEZ', 0 === $seed_filled_before );
-
-// Idempotent: ikinci calistirma yeni kayit uretmez.
-$seed_second = $seed->install();
-$check( 'SEED ikinci calistirma 0 yeni kayit uretir', 0 === (int) $seed_second['created'] );
-
-// Yayimlandiktan sonra secime girer.
-$published = $seed->publish_pending();
-$check( 'SEED bekleyen adaylar yayimlandi', $published >= 3 );
-
-\DLA\MedicalTrust\Settings\Settings::bump_library_version();
-\DLA\MedicalTrust\Repository\TopicRepository::flush_memo();
-wp_cache_flush();
-
 $seed_after = ( new \DLA\MedicalTrust\Resolver\ResolutionService() )->resolve_for_post( $seed_page );
 $seed_filled_after = $seed_after instanceof \DLA\MedicalTrust\Domain\Resolution\ResolutionResult ? $seed_after->filled_slot_count() : -1;
-$check( 'SEED yayimlandiktan sonra slotlar doluyor', $seed_filled_after >= 1 );
+$check( 'SEED otomatik yayimlanan kaynaklar secime girer', $seed_filled_after >= 1 );
+
+// Idempotent: ikinci senkronizasyon yeni kayit veya iliski uretmez.
+$seed_second = $seed->synchronize_and_publish();
+$check( 'SEED ikinci senkronizasyon cift kaynak uretmez', 0 === (int) $seed_second['created'] && 0 === (int) $seed_second['relations_added'] );
+
+// Sonradan ayni anahtar kelimeyle eklenen konu, mevcut katalog kaynagiyla
+// baglanir; ikinci bir URL kaydi olusturulmaz.
+$catalog_before_extra_topic = get_posts( [ 'post_type' => \DLA\MedicalTrust\PostTypes\SourcePostType::SLUG, 'post_status' => 'publish', 'numberposts' => 500, 'fields' => 'ids' ] );
+$seed_topic_extra = wp_insert_term( 'Dysport Botoks Ek', \DLA\MedicalTrust\Taxonomies\MedicalTopicTaxonomy::SLUG );
+$seed_topic_extra_id = (int) $seed_topic_extra['term_id'];
+$catalog_after_extra_topic = get_posts( [ 'post_type' => \DLA\MedicalTrust\PostTypes\SourcePostType::SLUG, 'post_status' => 'publish', 'numberposts' => 500, 'fields' => 'ids' ] );
+$extra_topic_attached = false;
+foreach ( $catalog_after_extra_topic as $source_id ) {
+	$terms = get_the_terms( (int) $source_id, \DLA\MedicalTrust\Taxonomies\MedicalTopicTaxonomy::SLUG );
+	if ( is_array( $terms ) && in_array( $seed_topic_extra_id, array_map( static fn( WP_Term $term ): int => (int) $term->term_id, $terms ), true ) ) {
+		$extra_topic_attached = true;
+		break;
+	}
+}
+$check( 'SEED sonradan eklenen konu mevcut katalog kaynagiyla baglanir', $catalog_before_extra_topic === $catalog_after_extra_topic && $extra_topic_attached );
+
+// Elle olusturulan pending kaynak, otomatik katalog yayimlama yolundan korunur.
+$manual_pending = wp_insert_post( [ 'post_type' => \DLA\MedicalTrust\PostTypes\SourcePostType::SLUG, 'post_title' => 'Elle Girilen Aday', 'post_status' => 'pending' ] );
+update_post_meta( $manual_pending, \DLA\MedicalTrust\Meta\MetaRegistry::SOURCE_URL, 'https://example.org/manual-candidate' );
+$seed->synchronize_and_publish();
+$seed->publish_pending();
+$check( 'SEED katalog disi manual pending kaynak yayimlanmaz', 'pending' === get_post_status( $manual_pending ) );
+
+// RC1.1 tarafindan once olusturulmus, marker tasimayan tam katalog imzali
+// aday da yeni konu ile birlikte otomatik yayimlanir.
+$legacy_entry = null;
+foreach ( \DLA\MedicalTrust\Seed\StarterLibrary::catalog() as $entry ) {
+	if ( false !== strpos( (string) $entry['title'], 'Tummy Tuck' ) ) {
+		$legacy_entry = $entry;
+		break;
+	}
+}
+$legacy_source = wp_insert_post( [ 'post_type' => \DLA\MedicalTrust\PostTypes\SourcePostType::SLUG, 'post_title' => (string) $legacy_entry['title'], 'post_status' => 'pending' ] );
+update_post_meta( $legacy_source, \DLA\MedicalTrust\Meta\MetaRegistry::SOURCE_URL, (string) $legacy_entry['url'] );
+update_post_meta( $legacy_source, \DLA\MedicalTrust\Meta\MetaRegistry::SOURCE_PUBLISHER, (string) $legacy_entry['publisher'] );
+update_post_meta( $legacy_source, \DLA\MedicalTrust\Meta\MetaRegistry::SOURCE_PUBLICATION_TYPE, \DLA\MedicalTrust\Domain\Enum\PublicationType::INSTITUTIONAL_PAGE );
+update_post_meta( $legacy_source, \DLA\MedicalTrust\Meta\MetaRegistry::SOURCE_DISCOVERED_VIA, (string) $legacy_entry['via'] );
+update_post_meta( $legacy_source, \DLA\MedicalTrust\Meta\MetaRegistry::SOURCE_LANG, 'en' );
+update_post_meta( $legacy_source, \DLA\MedicalTrust\Meta\MetaRegistry::SOURCE_PEER_REVIEWED, false );
+wp_set_object_terms( $legacy_source, [ (string) $legacy_entry['type'] ], \DLA\MedicalTrust\Taxonomies\SourceTypeTaxonomy::SLUG, false );
+wp_insert_term( 'Karin Germe Legacy', \DLA\MedicalTrust\Taxonomies\MedicalTopicTaxonomy::SLUG );
+$check( 'SEED eski tam imzali katalog adayi otomatik yayimlanir', 'publish' === get_post_status( $legacy_source ) && '' !== (string) get_post_meta( $legacy_source, \DLA\MedicalTrust\Meta\MetaRegistry::SOURCE_CATALOG_KEY, true ) );
 
 // Bilimsel yayin slotu KASITLI olarak bos kalir.
 $pub_slot = $seed_after instanceof \DLA\MedicalTrust\Domain\Resolution\ResolutionResult

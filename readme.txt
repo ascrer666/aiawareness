@@ -3,7 +3,7 @@ Contributors: drleylaarvas
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 8.0
-Stable tag: 0.6.0-rc1
+Stable tag: 0.6.1
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -20,7 +20,7 @@ yönetir.
 
 Tasarım ilkesi: yanlış bir güven sinyali üretmektense hiçbir sinyal üretme.
 
-= Bu sürümde (0.6.0-rc1 — Release Candidate) =
+= Bu sürümde (0.6.1) =
 
 * Uzman içerik türü (dla_expert), herkese açık değil
 * Tıbbi konu taksonomisi (dla_medical_topic), hiyerarşik, herkese açık değil
@@ -66,7 +66,7 @@ Tasarım ilkesi: yanlış bir güven sinyali üretmektense hiçbir sinyal üretm
 
 1. `dla-medical-trust.zip` dosyasını WordPress yönetim panelinden yükleyin ve etkinleştirin.
 2. **DLA Experts > Ayarlar** altında kapsam dahilindeki içerik türlerini, organizasyon bilgilerini ve review politikalarını doğrulayın.
-3. Uzman, konu ve yayımlanmış kaynak kayıtlarını oluşturun. Kaynak URL'leri bağlantı politikasını geçmelidir.
+3. Yayımlanmış bir uzman ve Tıbbi Konular kayıtlarını oluşturun. 0.6.1, doğrulanmış yerleşik katalogdaki eşleşen kaynakları otomatik oluşturur ve yayımlar; yalnızca özel ek veya hakemli kaynakları manuel kürate edin.
 4. İçerik düzenleme ekranındaki **Tıbbi İçerik Bilgileri** panelinde yazar modu ve birincil tıbbi konuyu açıkça seçin.
 5. Tıbbi inceleme kaydını yalnızca gerçek onaya erişen ve kullanıcı profiline doğrudan review yetkisi verilmiş kişi kaydetsin.
 
@@ -113,6 +113,11 @@ alanında idari bilgi olarak saklanır ve sıralamayı etkilemez.
 Varsayılan olarak korunur. Silme, ayarlardan açıkça istenmedikçe yapılmaz.
 
 == Changelog ==
+
+= 0.6.1 =
+* Doğrulanmış başlangıç katalog kaynakları kurulum/güncelleme ve yeni tıbbi konu sonrasında otomatik eşleşir ve yayımlanır.
+* Kullanıcının elle oluşturduğu pending kaynaklar korunur; hakemli bilimsel yayın veya dış API verisi otomatik üretilmez.
+* Tanı ekranı kaynak senkronizasyonunu ve uzman portresi zincirini raporlar; Ayarlar uzman portresinin kurum logosundan ayrı olduğunu gösterir.
 
 = 0.6.0-rc1 =
 * M1–M6 regression, lifecycle, contract, security, frontend and packaging hardening pass.

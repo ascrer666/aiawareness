@@ -35,7 +35,7 @@
 <body>
 <main>
   <header>
-    <h1>DLA Medical Trust — Başlangıç Rehberi</h1>
+    <h1>DLA Medical Trust 0.6.1 — Başlangıç Rehberi</h1>
     <p class="lead">Tıbbi sorumluluk, gerçek inceleme ve küratörlü kaynakları Trust Box içinde gösterme rehberi.</p>
   </header>
 
@@ -43,7 +43,7 @@
     <h2>Önce temel ayrım</h2>
     <div class="notice"><strong>Otomatik kaynak seçimi</strong> ile <strong>kutunun otomatik görünmesi</strong> ayrı ayarlardır. Eklenti konuya göre kaynakları otomatik seçebilir; ancak içeriği hazırlayan kişi, birincil konu ve gerçek tıbbi inceleme bilerek insan tarafından kaydedilir.</div>
     <table>
-      <tr><th>Otomatik</th><td>Birincil tıbbi konuya göre, yayımlanmış kaynak kütüphanesinden uygun kaynaklar seçilir.</td></tr>
+      <tr><th>Otomatik</th><td>Birincil tıbbi konuya göre, doğrulanmış katalog kaynakları otomatik oluşturulur/yayımlanır ve uygun kaynaklar seçilir.</td></tr>
       <tr><th>Manuel karar</th><td>İçeriği hazırlayan, birincil konu ve gerçek inceleme kaydı. Bunlar tıbbi sorumluluk verileridir.</td></tr>
       <tr><th>Görünüm</th><td>Avada global layout içindeki shortcode ile veya otomatik yerleştirme ayarıyla Trust Box sayfaya eklenir.</td></tr>
     </table>
@@ -79,7 +79,7 @@
     <div class="grid">
       <div class="card"><span class="tag">Bir kez</span><h3>Uzmanlar</h3><p><strong>Medical Trust → Tıbbi Uzmanlar</strong> altında uzmanı yayımlayın. Unvan, uzmanlık, görsel, kısa biyografi ve doktor profil sayfası bağlantısını ekleyin.</p></div>
       <div class="card"><span class="tag">Bir kez</span><h3>Tıbbi Konular</h3><p><strong>Medical Trust → Tıbbi Konular</strong> altında Botoks gibi konuları oluşturun ve ilgili inceleme politikasını atayın.</p></div>
-      <div class="card"><span class="tag">Güncel tutun</span><h3>Kaynaklar</h3><p><strong>Medical Trust → Kaynaklar</strong> altında kaynakları ekleyin, ilgili konuya bağlayın ve yayımlayın. Sadece yayımlanmış uygun kaynaklar seçime girer.</p></div>
+      <div class="card"><span class="tag">Otomatik</span><h3>Kaynaklar</h3><p>Doğrulanmış katalog kaynakları konu oluşturulduğunda otomatik eşleşir ve yayımlanır. Yalnızca özel/hakemli ek kaynaklar gerektiğinde <strong>Medical Trust → Kaynaklar</strong> altında manuel kürasyon yapın.</p></div>
       <div class="card"><span class="tag">Her içerikte</span><h3>Sayfa bilgisi</h3><p>Düzenleme ekranındaki <strong>Tıbbi İçerik Bilgileri</strong> panelinde hazırlayanı ve <strong>Birincil tıbbi konu</strong>yu seçin. Kaynak modu <strong>Automatic</strong> kalabilir.</p></div>
     </div>
   </section>
@@ -124,7 +124,7 @@
   <section>
     <h2>Bilimsel kaynaklar nasıl doldurulur</h2>
     <p>Kaynak seçimi otomatiktir, ancak seçebileceği bir kütüphane olmalıdır. En hızlı yol:</p>
-    <p><strong>Medical Trust → Ayarlar → Başlangıç kaynak kütüphanesi</strong> bölümünden <em>“Aday kaynakları oluştur”</em> düğmesi. Konularınızla eşleşen, adresleri doğrulanmış gerçek kaynaklar (ASPS, ISAPS, NHS, Cleveland Clinic) <strong>aday</strong> olarak oluşturulur. Gözden geçirip <em>“Bekleyen adayları yayımla”</em> dediğinizde seçime girerler.</p>
+    <p>0.6.1 ile doğrulanmış katalog kaynakları kurulum/güncelleme sonrasında ve yeni veya yeniden adlandırılmış bir Tıbbi Konu kaydedildiğinde otomatik eşleşir ve yayımlanır. <strong>Medical Trust → Ayarlar → Başlangıç kaynak kütüphanesi</strong> bölümü yalnızca bu eşleştirmeyi elle yeniden çalıştırmak içindir. Elle oluşturduğunuz pending kaynaklar korunur ve otomatik yayımlanmaz.</p>
     <div class="notice"><strong>Hakemli bilimsel yayın üretilmez.</strong> Bir konuya gerçekten uygun yayını seçmek küratörlük ister; DOI uydurmak sistemin tüm amacını bozardı. “Bilimsel Yayın” slotu siz eklemedikçe boş kalır ve kutu onsuz görünür — bu kasıtlı bir davranıştır.</div>
     <h3>Elle kaynak eklerken zorunlu dört şey</h3>
     <ol>

@@ -17,6 +17,7 @@ namespace DLA\MedicalTrust\Taxonomies;
 
 use DLA\MedicalTrust\Capability\Capabilities;
 use DLA\MedicalTrust\PostTypes\SourcePostType;
+use DLA\MedicalTrust\Seed\StarterLibrary;
 use DLA\MedicalTrust\Settings\Settings;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -29,6 +30,18 @@ final class MedicalTopicTaxonomy {
 
 	public function register(): void {
 		add_action( 'init', [ $this, 'register_taxonomy' ], 6 );
+		add_action( 'created_' . self::SLUG, [ $this, 'synchronize_catalog_sources' ], 20, 2 );
+		add_action( 'edited_' . self::SLUG, [ $this, 'synchronize_catalog_sources' ], 20, 2 );
+	}
+
+	/**
+	 * A topic is an editor-confirmed medical classification. Once it exists,
+	 * the built-in verified catalog may safely attach matching sources; it does
+	 * not infer or assign a topic to any content page.
+	 */
+	public function synchronize_catalog_sources( int $term_id, int $tt_id ): void {
+		unset( $tt_id );
+		( new StarterLibrary() )->synchronize_and_publish( [ $term_id ] );
 	}
 
 	public function register_taxonomy(): void {

@@ -64,6 +64,8 @@ final class MetaRegistry {
 	public const SOURCE_VERIFIED_AT      = '_dla_verified_at';
 	public const SOURCE_RELEVANCE_NOTE   = '_dla_relevance_note';
 	public const SOURCE_HEALTH           = '_dla_health';
+	/** Built-in verified-catalog origin; never used for resolver scoring. */
+	public const SOURCE_CATALOG_KEY      = '_dla_catalog_key';
 
 	/* ----------------------------------------------------------- Topic */
 
@@ -136,6 +138,7 @@ final class MetaRegistry {
 		$this->post_meta( $pt, self::SOURCE_JOURNAL, 'string', [ Sanitizer::class, 'text' ], $auth );
 		$this->post_meta( $pt, self::SOURCE_AUTHORS, 'string', [ Sanitizer::class, 'text' ], $auth );
 		$this->post_meta( $pt, self::SOURCE_RELEVANCE_NOTE, 'string', [ Sanitizer::class, 'textarea' ], $auth );
+		$this->post_meta( $pt, self::SOURCE_CATALOG_KEY, 'string', [ self::class, 'sanitize_url' ], $auth );
 		$this->post_meta( $pt, self::SOURCE_LANG, 'string', [ Sanitizer::class, 'language_code' ], $auth );
 		$this->post_meta( $pt, self::SOURCE_PUB_YEAR, 'integer', [ Sanitizer::class, 'publication_year' ], $auth );
 		$this->post_meta( $pt, self::SOURCE_PEER_REVIEWED, 'boolean', [ Sanitizer::class, 'bool' ], $auth );

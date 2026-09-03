@@ -19,6 +19,7 @@ use DLA\MedicalTrust\Integration\TrustComponent;
 use DLA\MedicalTrust\Meta\MetaRegistry;
 use DLA\MedicalTrust\PostTypes\ExpertPostType;
 use DLA\MedicalTrust\Repository\TrustDataRepository;
+use DLA\MedicalTrust\Seed\StarterLibrary;
 use DLA\MedicalTrust\Settings\Settings;
 use DLA\MedicalTrust\Taxonomies\MedicalTopicTaxonomy;
 
@@ -152,6 +153,7 @@ final class DiagnosticsPanel {
 		);
 
 		$this->render_library_rows();
+		$this->render_catalog_sync_rows();
 
 		$this->row(
 			__( 'Yüklü eklenti sürümü', 'dla-medical-trust' ),
@@ -161,6 +163,52 @@ final class DiagnosticsPanel {
 		);
 
 		echo '</tbody></table>';
+	}
+
+	/** Latest automatic verified-catalog run; read-only diagnostic evidence. */
+	private function render_catalog_sync_rows(): void {
+		$report = get_option( StarterLibrary::OPTION_LAST_SYNC, [] );
+		if ( ! is_array( $report ) ) {
+			$report = [];
+		}
+
+		$ran_at = (string) ( $report['ran_at'] ?? '' );
+		$this->row(
+			__( 'Otomatik katalog senkronizasyonu', 'dla-medical-trust' ),
+			'' !== $ran_at ? $ran_at . ' UTC' : __( 'henüz çalışmadı', 'dla-medical-trust' ),
+			'' !== $ran_at,
+			__( '0.6.1 ile katalog, kurulum/güncelleme ve yeni tıbbi konu ekleme sonrası otomatik eşleşir. Yalnızca eklentinin doğrulanmış kaynakları yayımlanır.', 'dla-medical-trust' )
+		);
+
+		if ( '' === $ran_at ) {
+			return;
+		}
+
+		$this->row(
+			__( 'Son senkronizasyon sonucu', 'dla-medical-trust' ),
+			sprintf(
+				__( 'Yeni: %1$d · yayımlanan: %2$d · konu bağı: %3$d', 'dla-medical-trust' ),
+				(int) ( $report['created'] ?? 0 ),
+				(int) ( $report['published'] ?? 0 ),
+				(int) ( $report['relations_added'] ?? 0 )
+			),
+			true,
+			''
+		);
+
+		$this->row(
+			__( 'Eşleşmeyen tıbbi konu', 'dla-medical-trust' ),
+			(string) (int) ( $report['topics_unmatched'] ?? 0 ),
+			0 === (int) ( $report['topics_unmatched'] ?? 0 ),
+			__( 'Bu konu katalog anahtar kelimeleriyle eşleşmiyor; kaynak ataması yapılmadı ve editörün seçimi korunuyor.', 'dla-medical-trust' )
+		);
+
+		$this->row(
+			__( 'Korunan manuel pending kaynak', 'dla-medical-trust' ),
+			(string) (int) ( $report['manual_pending_preserved'] ?? 0 ),
+			true,
+			__( 'Elle oluşturulmuş aday kayıtlar otomatik yayımlanmaz veya değiştirilmez.', 'dla-medical-trust' )
+		);
 	}
 
 	/**

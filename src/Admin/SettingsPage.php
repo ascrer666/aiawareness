@@ -236,6 +236,8 @@ final class SettingsPage {
 			__( 'Sayfada ve konuda uzman seçilmemişse Trust Box bu uzmanı gösterir; böylece her sayfayı tek tek doldurmanız gerekmez. Devralma sırası: sayfa → konu → site geneli. Bu bir yazarlık veya tıbbi inceleme iddiası DEĞİLDİR; yalnızca içeriğin tıbbi sorumlusunu bildirir ve hiçbir inceleme tarihi üretmez.', 'dla-medical-trust' )
 		);
 
+		$this->render_default_expert_portrait( (int) ( $settings['default_expert_id'] ?? 0 ) );
+
 		Field::checkbox(
 			'automatic_injection',
 			__( 'Otomatik Trust Box yerleştirme', 'dla-medical-trust' ),
@@ -379,6 +381,31 @@ final class SettingsPage {
 		echo '</td></tr>';
 	}
 
+	/** The organization logo is deliberately not a substitute for the expert portrait. */
+	private function render_default_expert_portrait( int $expert_id ): void {
+		if ( $expert_id < 1 || ! ExpertPostType::is_valid_published_expert( $expert_id ) ) {
+			return;
+		}
+
+		$image_id = (int) get_post_thumbnail_id( $expert_id );
+		printf( '<tr><th scope="row">%s</th><td>', esc_html__( 'Trust Box portre onizlemesi', 'dla-medical-trust' ) );
+
+		if ( $image_id > 0 && wp_attachment_is_image( $image_id ) ) {
+			echo wp_get_attachment_image( $image_id, 'thumbnail', false, [ 'style' => 'width:72px;height:72px;object-fit:cover;border-radius:50%;border:1px solid #dcdcde' ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- core image API output.
+		} else {
+			echo '<span style="color:#8e3a44">' . esc_html__( 'Portre secilmedi; Trust Box fotosuz gorunecek.', 'dla-medical-trust' ) . '</span>';
+		}
+
+		printf(
+			'<p class="description">%1$s <a href="%2$s">%3$s</a></p>',
+			esc_html__( 'Portre, Ayarlardaki kurum logosundan degil bu uzmanın “Uzman fotografi” alanindan gelir.', 'dla-medical-trust' ),
+			esc_url( (string) get_edit_post_link( $expert_id ) ),
+			esc_html__( 'Uzman kaydini duzenle', 'dla-medical-trust' )
+		);
+
+		echo '</td></tr>';
+	}
+
 	/**
 	 * Baslangic kaynak kutuphanesi.
 	 */
@@ -445,7 +472,7 @@ final class SettingsPage {
 			printf( '<form method="post" action="%s" style="display:inline-block;margin-right:8px">', esc_url( admin_url( 'admin-post.php' ) ) );
 			wp_nonce_field( self::SEED_PUBLISH_ACTION, self::SEED_NONCE );
 			printf( '<input type="hidden" name="action" value="%s">', esc_attr( self::SEED_PUBLISH_ACTION ) );
-			submit_button( __( 'Kaynaklari olustur ve yayimla', 'dla-medical-trust' ), 'primary', 'submit', false );
+			submit_button( __( 'Katalogu simdi eslestir ve yayimla', 'dla-medical-trust' ), 'primary', 'submit', false );
 			echo '</form>';
 		}
 
@@ -547,11 +574,7 @@ final class SettingsPage {
 
 		check_admin_referer( self::SEED_PUBLISH_ACTION, self::SEED_NONCE );
 
-		$library   = new \DLA\MedicalTrust\Seed\StarterLibrary();
-		$report    = $library->install();
-		$published = $library->publish_pending();
-
-		$report['published'] = $published;
+		$report = ( new \DLA\MedicalTrust\Seed\StarterLibrary() )->synchronize_and_publish();
 		set_transient( self::SEED_NOTICE, $report, 60 );
 
 		$this->redirect_back();
