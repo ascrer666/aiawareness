@@ -123,6 +123,7 @@ define( 'DLA\MedicalTrust\TEXT_DOMAIN', 'dla-medical-trust' );
 
 require_once dirname( __DIR__ ) . '/src/Support/Autoloader.php';
 \DLA\MedicalTrust\Support\Autoloader::register( dirname( __DIR__ ) . '/src', 'DLA\\MedicalTrust' );
+( new \DLA\MedicalTrust\I18n\PolylangRegistration() )->register();
 
 ( new \DLA\MedicalTrust\Plugin() )->boot();
 if ( 0 === did_action( 'init' ) ) {
@@ -157,6 +158,31 @@ $check    = static function ( string $name, bool $condition ) use ( &$pass, &$fa
 
 $admin_id = (int) username_exists( 'm2admin' );
 wp_set_current_user( $admin_id );
+
+/* Polylang type declaration is filter-based so the plugin never requires a
+ * manual checkbox in Polylang's CPT settings. Sources intentionally remain
+ * absent: their library records are shared across translated pages. */
+$pll_post_types = apply_filters( 'pll_get_post_types', [], false );
+$pll_taxonomies = apply_filters( 'pll_get_taxonomies', [], false );
+$check( 'Polylang expert CPT is registered as translatable', in_array( 'dla_expert', $pll_post_types, true ) );
+$check( 'Polylang medical-topic taxonomy is registered as translatable', in_array( 'dla_medical_topic', $pll_taxonomies, true ) );
+$check( 'Polylang source CPT stays outside translated object types', ! in_array( 'dla_source', $pll_post_types, true ) );
+
+/* Real WordPress MO loading smoke test. Each supplied catalog must replace a
+ * frontend Trust Box label; post content and expert commentary are not part
+ * of gettext and are therefore intentionally outside this test. */
+$translation_smoke = [
+	'en_US' => 'Content Responsibility and Medical Review',
+	'de_DE' => 'Inhaltsverantwortung und medizinische Prüfung',
+	'fr_FR' => 'Responsabilité éditoriale et revue médicale',
+	'ru_RU' => 'Ответственность за содержание и медицинская проверка',
+];
+foreach ( $translation_smoke as $locale => $expected ) {
+	unload_textdomain( 'dla-medical-trust' );
+	$loaded = load_textdomain( 'dla-medical-trust', dirname( __DIR__ ) . '/languages/dla-medical-trust-' . $locale . '.mo' );
+	$check( 'MO load ' . $locale, $loaded && $expected === __( 'İçerik Sorumlusu ve Tıbbi Denetim', 'dla-medical-trust' ) );
+}
+unload_textdomain( 'dla-medical-trust' );
 
 /* UID generation + controlled taxonomy. */
 $topic_tr = wp_insert_term( 'Rinoplasti', \DLA\MedicalTrust\Taxonomies\MedicalTopicTaxonomy::SLUG );

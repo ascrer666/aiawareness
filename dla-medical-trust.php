@@ -61,6 +61,11 @@ if ( ! environment_is_supported() ) {
 require_once __DIR__ . '/src/Support/Autoloader.php';
 Support\Autoloader::register( __DIR__ . '/src', __NAMESPACE__ );
 
+// Polylang builds its translated object model on plugins_loaded priority 1.
+// Register our declarations while plugin files are loaded, before that hook
+// fires, rather than waiting for the regular plugin boot at priority 10.
+( new I18n\PolylangRegistration() )->register();
+
 register_activation_hook( __FILE__, [ Activation::class, 'activate' ] );
 register_deactivation_hook( __FILE__, [ Activation::class, 'deactivate' ] );
 

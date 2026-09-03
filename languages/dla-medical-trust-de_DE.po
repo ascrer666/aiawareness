@@ -1,0 +1,1967 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: DLA Medical Trust 0.6.1\n"
+"Language: de_DE\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: dla-medical-trust.php
+msgid "DLA Medical Trust"
+msgstr ""
+
+#: dla-medical-trust.php
+msgid "https://www.drleylaarvas.com/"
+msgstr ""
+
+#: dla-medical-trust.php
+msgid "Tıbbi içerik sorumluluk katmanı — uzman, konu, küratörlü kaynak kütüphanesi, tıbbi inceleme kayıtları ve deterministik kaynak çözümlemesi."
+msgstr ""
+
+#: dla-medical-trust.php
+msgid "Medical Content Trust"
+msgstr ""
+
+#: dla-medical-trust.php:51
+msgid "DLA Medical Trust için PHP 8.0 ve WordPress 6.0 gerekiyor. Eklenti devre dışı bırakıldı."
+msgstr ""
+
+#: src/Upgrade/Provisioner.php:171
+msgid "DLA Medical Trust:"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:77
+msgid "Yayımlanmış hiçbir tıbbi uzman kaydı yok, bu yüzden Trust Box hiçbir sayfada görünemez. Bir uzman oluşturup YAYIMLAYIN (taslak yeterli değildir), sonra Ayarlar’dan \"Varsayılan içerik sorumlusu\" olarak seçin."
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:79
+msgid "Uzman oluştur"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:81
+msgid "Tanı ekranını aç"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:102
+msgid "Kutu neden görünmüyor?"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:89
+msgid "Tanı"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:59
+msgid "Bu sayfaya erişim yetkiniz yok."
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:124
+msgid "Site geneli kurulum"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:128
+msgid "Yayımlanmış uzman sayısı"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:131
+msgid "Hiç yayımlanmış uzman yok. Medical Trust → Tıbbi Uzmanlar altında bir uzman oluşturup YAYIMLAYIN (taslak yeterli değildir)."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:233
+msgid "Varsayılan içerik sorumlusu"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:449
+msgid "seçilmedi"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:138
+msgid "Seçilmemiş. Ayarlar → Varsayılan içerik sorumlusu alanından bir uzman seçerseniz her sayfada tek tek uzman seçmeniz gerekmez."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:243
+msgid "Otomatik Trust Box yerleştirme"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:143
+msgid "açık"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:143
+msgid "kapalı"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:145
+msgid "Kapalı. Kutunun içerik sonunda kendiliğinden çıkması için Ayarlar’dan açın (veya sayfaya [dla_medical_trust] kısa kodunu koyun)."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:183
+msgid "Kapsamdaki içerik türleri"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:150
+msgid "hiçbiri"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:152
+msgid "Hiçbir içerik türü kapsamda değil. Ayarlar → Kapsamdaki içerik türleri altından en az \"Sayfa\"yı işaretleyin."
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:159
+msgid "Yüklü eklenti sürümü"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:177
+msgid "Otomatik katalog senkronizasyonu"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:178
+msgid "henüz çalışmadı"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:180
+msgid "0.6.1 ile katalog, kurulum/güncelleme ve yeni tıbbi konu ekleme sonrası otomatik eşleşir. Yalnızca eklentinin doğrulanmış kaynakları yayımlanır."
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:188
+msgid "Son senkronizasyon sonucu"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:190
+msgid "Yeni: %1$d · yayımlanan: %2$d · konu bağı: %3$d"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:200
+msgid "Eşleşmeyen tıbbi konu"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:203
+msgid "Bu konu katalog anahtar kelimeleriyle eşleşmiyor; kaynak ataması yapılmadı ve editörün seçimi korunuyor."
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:207
+msgid "Korunan manuel pending kaynak"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:210
+msgid "Elle oluşturulmuş aday kayıtlar otomatik yayımlanmaz veya değiştirilmez."
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:267
+msgid "Aday — yayimlanmayi bekliyor."
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:283
+msgid "Kütüphanedeki toplam kaynak"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:286
+msgid "Kütüphane boş. Ayarlar → Başlangıç kaynak kütüphanesi bölümünden hazır otorite kaynaklarını tek tıkla oluşturabilirsiniz."
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:290
+msgid "Kullanılabilir kaynak"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:294
+msgid "Hiçbir kaynak seçime giremiyor — çünkü hepsi hâlâ ADAY durumunda. Aşağıdaki \"Onay bekleyen aday\" satırındaki düğmeye basmanız yeterli."
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:295
+msgid "Hiçbir kaynak seçime giremiyor. Aşağıdaki \"Eksik kaynak\" satırına bakın."
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:304
+msgid "Onay bekleyen aday"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:306
+msgid "Bu kayıtların bilgileri tam; yalnızca sizin onayınızı bekliyorlar. Yayımlandıkları anda kutuda kaynak bölümü açılır."
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:308
+msgid "Ayarlar → adayları yayımla"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:313
+msgid "Eksik kaynak"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:316
+msgid "Bu kayıtlarda tür, konu veya adres eksik; düzeltilene kadar hiçbir sayfada görünmezler."
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:327
+msgid "Slot bazında kullanılabilir"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:349
+msgid "Şu anda seçime girmeyen kayıtlar"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:368
+msgid "Tek bir sayfayı incele"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:371
+msgid "Sayfayı düzenlerken adres çubuğundaki post=12149 sayısını buraya yazın."
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:382
+msgid "İncele"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:391
+msgid "Sayfa raporu"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:396
+msgid "Bu ID ile bir içerik bulunamadı."
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:407
+msgid "Başlık"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:408
+msgid "İçerik türü"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:411
+msgid "Kapsamda mı"
+msgstr ""
+
+#: src/Admin/ResolverExplanationPanel.php:248
+msgid "evet"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:543
+msgid "HAYIR"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:414
+msgid "Bu içerik türü Ayarlar’daki kapsam listesinde işaretli değil. Kutu bu yüzden hiç çalışmaz."
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:421
+msgid "Tıbbi konu"
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:76
+msgid "yok"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:428
+msgid "Not: konu yalnızca otomatik KAYNAK seçimi için gerekir. Konu olmadan da kutu görünebilir."
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:436
+msgid "1) Sayfa uzmanı"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:449
+msgid "GEÇERSİZ kayıt"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:442
+msgid "2) Konu varsayılan uzmanı"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:448
+msgid "3) Site geneli varsayılan"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:457
+msgid "Gösterilecek uzman bulundu mu"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:460
+msgid "Zincirin üç halkası da boş. En hızlı çözüm: bir uzman yayımlayıp Ayarlar → Varsayılan içerik sorumlusu alanına atayın."
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:471
+msgid "Gosterilen uzman kaydi"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:475
+msgid "bu kaydi duzenle"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:484
+msgid "Kutu çıktısı üretiliyor mu"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:487
+msgid "EVET (%d karakter)"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:488
+msgid "HAYIR — boş"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:490
+msgid "Gösterilecek doğrulanmış hiçbir bilgi olmadığı için kutu bilinçli olarak boş dönüyor."
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:496
+msgid "Bu sayfada üretilen kutu"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:499
+msgid "Veri tarafı çalışıyor. Kutu yine de sitede görünmüyorsa sebep yerleştirmedir: Otomatik yerleştirmeyi açın ya da Avada layout’unda [dla_medical_trust] kısa kodunun Post Content alanında olduğundan emin olun."
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:518
+msgid "Kayitli fotograf ID (ham meta)"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:519
+msgid "bos"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:521
+msgid "Uzman kaydinda _thumbnail_id yazili degil. Kaydi acip \"Uzman fotografi\" alanindaki \"Gorsel sec\" dugmesini kullanin ve Guncelle deyin."
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:531
+msgid "Ek kaydi mevcut mu"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:534
+msgid "BULUNAMADI"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:536
+msgid "Bu ID ile bir ek bulunamadi ya da ek degil. Ortam kutuphanesinden gorseli yeniden secin."
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:542
+msgid "Ek bir gorsel mi"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:545
+msgid "Ekin MIME turu gorsel degil (orn. PDF veya SVG). Portre icin PNG/JPG/WebP kullanin."
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:552
+msgid "Gorsel adresi uretiliyor mu"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:553
+msgid "HAYIR — bos"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:555
+msgid "Ekin dosyasi sunucuda bulunamiyor ya da metadata kaydi eksik. Gorseli ortam kutuphanesine yeniden yukleyin."
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:562
+msgid "Portre onizlemesi"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:573
+msgid "konu yok"
+msgstr ""
+
+#: src/Admin/DiagnosticsPanel.php:588
+msgid "atanmadı"
+msgstr ""
+
+#: src/Admin/ExpertMetaBox.php:67
+msgid "Uzman fotografini sec"
+msgstr ""
+
+#: src/Admin/ExpertMetaBox.php:68
+msgid "Bu gorseli kullan"
+msgstr ""
+
+#: src/Admin/ExpertMetaBox.php:79
+msgid "Eslesen icerik bulunamadi."
+msgstr ""
+
+#: src/Admin/ExpertMetaBox.php:80
+msgid "Arama basarisiz oldu; sayfayi yenileyip tekrar deneyin."
+msgstr ""
+
+#: src/Admin/ExpertMetaBox.php:88
+msgid "Uzman Bilgileri"
+msgstr ""
+
+#: src/Admin/ExpertMetaBox.php:111
+msgid "Unvan"
+msgstr ""
+
+#: src/Admin/ExpertMetaBox.php:113
+msgid "Örn. \"Op. Dr.\" — dile göre çevrilir."
+msgstr ""
+
+#: src/Admin/ExpertMetaBox.php:118
+msgid "Uzmanlık başlığı"
+msgstr ""
+
+#: src/Admin/ExpertMetaBox.php:120
+msgid "Örn. \"Plastik, Rekonstrüktif ve Estetik Cerrahi Uzmanı\"."
+msgstr ""
+
+#: src/Admin/ExpertMetaBox.php:125
+msgid "Üyelikler ve unvanlar"
+msgstr ""
+
+#: src/Admin/ExpertMetaBox.php:127
+msgid "Her satıra bir tane. Örn. TPRECD, EURAPS, ISAPS, ASPS."
+msgstr ""
+
+#: src/Admin/ExpertMetaBox.php:133
+msgid "Kanonik profil sayfası"
+msgstr ""
+
+#: src/Admin/ExpertMetaBox.php:135
+msgid "Sayfa, yazı, portfolyo, hizmet — arayüzü olan HER içerik türü aranır; Ayarlardaki kapsam listesiyle sınırlı değildir. URL değil post ID saklanır, slug değişirse bağlantı kırılmaz. Seçilen kayıt yayımlanmamışsa ön yüzde bağlantı çıkmaz."
+msgstr ""
+
+#: src/Admin/ExpertMetaBox.php:140
+msgid "Doğrulanabilir dış profiller"
+msgstr ""
+
+#: src/Admin/ExpertMetaBox.php:142
+msgid "Her satıra bir URL. Politikayı geçemeyen adresler kayıtta sessizce elenir."
+msgstr ""
+
+#: src/Admin/ExpertMetaBox.php:148
+msgid "Kısa biyografi"
+msgstr ""
+
+#: src/Admin/ExpertMetaBox.php:150
+msgid "Trust Box içinde uzmanlık başlığının altında gösterilir. BOŞ BIRAKIRSANIZ yukarıdaki \"Kanonik profil sayfası\"nın ilk 40 kelimesi otomatik kullanılır — kendi metninizi yazmak isterseniz buraya girin. İzin verilen etiketler: p, br, strong, em, ul, ol, li, a."
+msgstr ""
+
+#: src/Admin/ExpertMetaBox.php:157
+msgid "Varlık kimliği"
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:355
+msgid "İlk kayıtta üretilecek"
+msgstr ""
+
+#: src/Admin/ExpertMetaBox.php:159
+msgid "Dil-nötr kalıcı kimlik. Bir kez üretilir, asla değişmez."
+msgstr ""
+
+#: src/Admin/ExpertMetaBox.php:177
+msgid "Fotograf secilmedi — kutuda portre gorunmez."
+msgstr ""
+
+#: src/Admin/ExpertMetaBox.php:179
+msgid "Uzman fotografi"
+msgstr ""
+
+#: src/Admin/ExpertMetaBox.php:184
+msgid "Gorsel sec"
+msgstr ""
+
+#: src/Admin/ExpertMetaBox.php:186
+msgid "Kaldir"
+msgstr ""
+
+#: src/Admin/ExpertMetaBox.php:209
+msgid "Kayitli ek bir gorsel degil; kaydedince temizlenecek."
+msgstr ""
+
+#: src/Admin/ExpertMetaBox.php:223
+msgid "Ek ID:"
+msgstr ""
+
+#: src/Admin/ExpertMetaBox.php:225
+msgid "Trust Box icindeki portre BURADAN gelir. \"Gorsel sec\" dugmesi bu alani kendisi doldurur. Ayarlardaki \"Kurum logosu\" alani DEGILDIR."
+msgstr ""
+
+#: src/Admin/TopicTermFields.php:96
+msgid "— seçilmedi —"
+msgstr ""
+
+#: src/Admin/Field.php:248
+msgid "Seçili:"
+msgstr ""
+
+#: src/Admin/Field.php:250
+msgid "kaldır"
+msgstr ""
+
+#: src/Admin/Field.php:251
+msgid "Sayfa adının bir kısmını yazın (en az 2 harf)…"
+msgstr ""
+
+#: src/Admin/Field.php:252
+msgid "veya post ID:"
+msgstr ""
+
+#: src/Admin/Field.php:271
+msgid "Henüz belirlenemiyor"
+msgstr ""
+
+#: src/Admin/MedicalContentList.php:28
+msgid "Medical Topic"
+msgstr ""
+
+#: src/Admin/MedicalContentList.php:29
+msgid "Medical Reviewer"
+msgstr ""
+
+#: src/Admin/MedicalContentList.php:30
+msgid "Review Date"
+msgstr ""
+
+#: src/Admin/MedicalContentList.php:31
+msgid "Review State"
+msgstr ""
+
+#: src/Admin/MedicalContentList.php:32
+msgid "Source Coverage"
+msgstr ""
+
+#: src/Admin/MedicalContentList.php:47
+msgid "Medical Trust: all"
+msgstr ""
+
+#: src/Admin/MedicalContentList.php:47
+msgid "No topic"
+msgstr ""
+
+#: src/Admin/MedicalContentList.php:47
+msgid "No reviewer"
+msgstr ""
+
+#: src/Admin/MedicalContentList.php:47
+msgid "Never reviewed"
+msgstr ""
+
+#: src/Admin/MedicalContentList.php:47
+msgid "Superseded"
+msgstr ""
+
+#: src/Admin/PageMedicalMetaBox.php:38
+msgid "Tıbbi İçerik Bilgileri"
+msgstr ""
+
+#: src/Admin/PageMedicalMetaBox.php:48
+msgid "Bu alanlar sayfanın Medical Trust verisini yönetir. Kimlik, UID veya kaynak ID girmeyin."
+msgstr ""
+
+#: src/Admin/PageMedicalMetaBox.php:50
+msgid "İçeriği hazırlayan"
+msgstr ""
+
+#: src/Admin/PageMedicalMetaBox.php:50
+msgid "Editoryal ekip seçildiğinde uzman yazar zorunlu değildir. Tıbbi inceleyen uzman ayrı bir bilgidir."
+msgstr ""
+
+#: src/Admin/PageMedicalMetaBox.php:51
+msgid "İçeriği hazırlayan tıbbi uzman"
+msgstr ""
+
+#: src/Admin/PageMedicalMetaBox.php:51
+msgid "Yalnızca içerik gerçekten bu uzman tarafından hazırlandıysa seçin."
+msgstr ""
+
+#: src/Admin/ReviewWorkflowMetaBox.php:80
+msgid "Tıbbi olarak inceleyen uzman"
+msgstr ""
+
+#: src/Admin/PageMedicalMetaBox.php:52
+msgid "Reviewer ataması, tarihli inceleme kaydının parçasıdır. Yalnızca aşağıdaki tıbbi inceleme işleminden yetkili kullanıcı tarafından kaydedilir."
+msgstr ""
+
+#: src/Admin/PageMedicalMetaBox.php:54
+msgid "Uzman değerlendirmesi (isteğe bağlı)"
+msgstr ""
+
+#: src/Admin/PageMedicalMetaBox.php:54
+msgid "Bu sayfaya ve bu dile özeldir; genel uzman biyografisi değildir. Kutuda gösterilen uzmana ATFEDİLİR — yalnızca uzmanın gerçekten söylediği veya onayladığı ifadeleri yazın. Tıbbi inceleme kaydı gerekmez; metin girildiği anda görünür. İzinli sınırlı HTML kullanılabilir."
+msgstr ""
+
+#: src/Admin/PageMedicalMetaBox.php:56
+msgid "Görünürlük"
+msgstr ""
+
+#: src/Admin/PageMedicalMetaBox.php:56
+msgid "Uzman değerlendirmesini göster"
+msgstr ""
+
+#: src/Admin/PageMedicalMetaBox.php:57
+msgid "Kaynak görünürlüğü"
+msgstr ""
+
+#: src/Admin/PageMedicalMetaBox.php:57
+msgid "Seçilmiş tıbbi kaynakları göster"
+msgstr ""
+
+#: src/Admin/PageMedicalMetaBox.php:100
+msgid "Henüz geçerli tıbbi inceleme kaydı yok"
+msgstr ""
+
+#: src/Admin/PageMedicalMetaBox.php:110
+msgid "Birincil tıbbi konu"
+msgstr ""
+
+#: src/Admin/PageMedicalMetaBox.php:110
+msgid "Zorunlu karar: birden çok konu varsa otomatik seçilmez."
+msgstr ""
+
+#: src/Admin/PageMedicalMetaBox.php:110
+msgid "— birincil konu seçin —"
+msgstr ""
+
+#: src/Admin/PageMedicalMetaBox.php:111
+msgid "İkincil tıbbi konular"
+msgstr ""
+
+#: src/Admin/PageMedicalMetaBox.php:113
+msgid "İsteğe bağlıdır. Birincil konu ayrıca yukarıda açıkça seçilmelidir."
+msgstr ""
+
+#: src/Admin/PageMedicalMetaBox.php:118
+msgid "Kaynak modu"
+msgstr ""
+
+#: src/Admin/PageMedicalMetaBox.php:118
+msgid "Automatic"
+msgstr ""
+
+#: src/Admin/PageMedicalMetaBox.php:118
+msgid "Manual Overrides"
+msgstr ""
+
+#: src/Admin/PageMedicalMetaBox.php:118
+msgid "Automatic varsayılandır. Boş bırakılan slotlar manual modda da resolver tarafından otomatik doldurulur."
+msgstr ""
+
+#: src/Admin/PageMedicalMetaBox.php:126
+msgid "Yalnızca aktif ve doğru türdeki kaynaklar listelenir."
+msgstr ""
+
+#: src/Admin/PageMedicalMetaBox.php:126
+msgid "— otomatik seç —"
+msgstr ""
+
+#: src/Admin/PostSearch.php:70
+msgid "(baslıksız)"
+msgstr ""
+
+#: src/Admin/PostSearch.php:74
+msgid "YAYIMLANMAMIS"
+msgstr ""
+
+#: src/Admin/PostSearch.php:81
+msgid "Yetkiniz yok."
+msgstr ""
+
+#: src/Admin/ReadinessPanel.php:35
+msgid "Medical Trust Hazırlık Durumu"
+msgstr ""
+
+#: src/Admin/ReadinessPanel.php:50
+msgid "Tıbbi konu atanmamış"
+msgstr ""
+
+#: src/Admin/ReadinessPanel.php:52
+msgid "Birincil konu seçilmemiş"
+msgstr ""
+
+#: src/Admin/ReadinessPanel.php:62
+msgid "Tıbbi inceleme kaydı yok"
+msgstr ""
+
+#: src/Admin/ReadinessPanel.php:66
+msgid "İçerik güncellendi, inceleme geçersizleşti"
+msgstr ""
+
+#: src/Admin/ReadinessPanel.php:74
+msgid "Inceleyen uzman geçersiz veya atanmamış"
+msgstr ""
+
+#: src/Admin/ReadinessPanel.php:78
+msgid "Inceleme süresi doldu"
+msgstr ""
+
+#: src/Admin/ReadinessPanel.php:84
+msgid "Uygun kaynak seçilemedi"
+msgstr ""
+
+#: src/Admin/ReadinessPanel.php:88
+msgid "Uzman değerlendirmesi yok (isteğe bağlı)"
+msgstr ""
+
+#: src/Admin/ReadinessPanel.php:91
+msgid "Bütünlük engelleri"
+msgstr ""
+
+#: src/Admin/ReadinessPanel.php:92
+msgid "Tamamlanması önerilenler"
+msgstr ""
+
+#: src/Admin/ReadinessPanel.php:95
+msgid "Medical Trust bilgileri hazır."
+msgstr ""
+
+#: src/Admin/ReadinessPanel.php:111
+msgid "Yayımlanmış tıbbi uzman yok. Önce Medical Trust → Tıbbi Uzmanlar altında bir uzman oluşturup yayımlayın."
+msgstr ""
+
+#: src/Admin/ReadinessPanel.php:113
+msgid "Uzman ekle"
+msgstr ""
+
+#: src/Admin/ReadinessPanel.php:119
+msgid "Tıbbi konu tanımlanmamış. Kaynak seçimi konu olmadan çalışmaz."
+msgstr ""
+
+#: src/Admin/ReadinessPanel.php:121
+msgid "Konu ekle"
+msgstr ""
+
+#: src/Admin/ReadinessPanel.php:129
+msgid "Önce kurulumu tamamlayın"
+msgstr ""
+
+#: src/Admin/ReadinessPanel.php:131
+msgid "Bu adımlar tamamlanana kadar sayfa düzeyi tıbbi bilgiler doldurulamaz."
+msgstr ""
+
+#: src/Admin/ReadinessPanel.php:182
+msgid "Aç"
+msgstr ""
+
+#: src/Admin/ResolverExplanationPanel.php:55
+msgid "Kaynak Çözümlemesi (tanı)"
+msgstr ""
+
+#: src/Admin/ResolverExplanationPanel.php:66
+msgid "Yalnızca tanı amaçlıdır. Bu panel çözümleyicinin sonucunu etkilemez: cache'e yazmaz, seçimi değiştirmez. Sayfa, panel açık olsa da olmasa da aynı kaynakları çözer."
+msgstr ""
+
+#: src/Admin/ResolverExplanationPanel.php:74
+msgid "Bu sayfa tıbbi içerik olarak işaretlenmemiş — tıbbi konu atanmamış. Çözümleme yapılmadı."
+msgstr ""
+
+#: src/Admin/ResolverExplanationPanel.php:95
+msgid "Rendezvous seed anahtarı"
+msgstr ""
+
+#: src/Admin/ResolverExplanationPanel.php:97
+msgid "Dolu slot"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:151
+msgid "Minimum konu yakınlığı"
+msgstr ""
+
+#: src/Admin/ResolverExplanationPanel.php:101
+msgid "Kütüphane sürümü"
+msgstr ""
+
+#: src/Admin/ResolverExplanationPanel.php:103
+msgid "Cache durumu"
+msgstr ""
+
+#: src/Admin/ResolverExplanationPanel.php:105
+msgid "yazılmamış veya bayat — sonraki render'da hesaplanacak"
+msgstr ""
+
+#: src/Admin/ResolverExplanationPanel.php:106
+msgid "güncel"
+msgstr ""
+
+#: src/Admin/ResolverExplanationPanel.php:113
+msgid "Konu yakınlıkları"
+msgstr ""
+
+#: src/Admin/ResolverExplanationPanel.php:116
+msgid "Konu bulunamadı."
+msgstr ""
+
+#: src/Admin/TopicTermFields.php:168
+msgid "Konu kimliği"
+msgstr ""
+
+#: src/Admin/ResolverExplanationPanel.php:206
+msgid "Basamak"
+msgstr ""
+
+#: src/Admin/ResolverExplanationPanel.php:205
+msgid "Yakınlık"
+msgstr ""
+
+#: src/Admin/ResolverExplanationPanel.php:127
+msgid "Tabanı geçti mi"
+msgstr ""
+
+#: src/Admin/ResolverExplanationPanel.php:140
+msgid "hayır"
+msgstr ""
+
+#: src/Admin/ResolverExplanationPanel.php:152
+msgid "dolu"
+msgstr ""
+
+#: src/Admin/ResolverExplanationPanel.php:153
+msgid "BOŞ"
+msgstr ""
+
+#: src/Admin/ResolverExplanationPanel.php:161
+msgid "Çeşitlilik bandı: %1$d · Havuz: %2$d/%3$d · Değerlendirilen aday: %4$d"
+msgstr ""
+
+#: src/Admin/ResolverExplanationPanel.php:173
+msgid "Sayfa düzeyi override uygulandı: skorlama ve band atlandı."
+msgstr ""
+
+#: src/Admin/ResolverExplanationPanel.php:180
+msgid "Override reddedildi, otomatik çözüme düşüldü:"
+msgstr ""
+
+#: src/Admin/ResolverExplanationPanel.php:188
+msgid "Hiç aday yok. Bu konuda bu türde yayımlanmış kaynak bulunmuyor."
+msgstr ""
+
+#: src/Admin/ResolverExplanationPanel.php:197
+msgid "Havuzda tek aday var: bu konudaki tüm sayfalar aynı kaynağı gösterecek. Çeşitlilik için bu türde yakın kalitede kaynak eklemeniz gerekir."
+msgstr ""
+
+#: src/PostTypes/SourcePostType.php:38
+msgid "Kaynak"
+msgstr ""
+
+#: src/Admin/ResolverExplanationPanel.php:207
+msgid "Skor bileşenleri"
+msgstr ""
+
+#: src/Admin/ResolverExplanationPanel.php:208
+msgid "Skor"
+msgstr ""
+
+#: src/Admin/ResolverExplanationPanel.php:209
+msgid "Havuz"
+msgstr ""
+
+#: src/Admin/ResolverExplanationPanel.php:210
+msgid "Ağırlık"
+msgstr ""
+
+#: src/Admin/ResolverExplanationPanel.php:211
+msgid "Sonuç"
+msgstr ""
+
+#: src/Admin/ResolverExplanationPanel.php:227
+msgid "SEÇİLDİ"
+msgstr ""
+
+#: src/Admin/ResolverExplanationPanel.php:258
+msgid "uygun değil"
+msgstr ""
+
+#: src/Admin/ResolverExplanationPanel.php:259
+msgid "yakınlık tabanının altında"
+msgstr ""
+
+#: src/Admin/ResolverExplanationPanel.php:260
+msgid "slot uyuşmuyor"
+msgstr ""
+
+#: src/Admin/ResolverExplanationPanel.php:261
+msgid "bandın dışında"
+msgstr ""
+
+#: src/Admin/ResolverExplanationPanel.php:262
+msgid "havuz sınırında kırpıldı"
+msgstr ""
+
+#: src/Admin/ResolverExplanationPanel.php:263
+msgid "havuzda ama seçilmedi"
+msgstr ""
+
+#: src/Admin/ReviewWorkflowMetaBox.php:32
+msgid "Tıbbi İnceleme ve Değişiklik Kararı"
+msgstr ""
+
+#: src/Admin/ReviewWorkflowMetaBox.php:41
+msgid "Mevcut durum"
+msgstr ""
+
+#: src/Admin/ReviewWorkflowMetaBox.php:44
+msgid "Bu kullanıcı tıbbi inceleme kaydı oluşturamaz. İnceleme yetkisi kullanıcı bazında ayrı verilmelidir."
+msgstr ""
+
+#: src/Admin/ReviewWorkflowMetaBox.php:46
+msgid "Yeni tıbbi inceleme kaydı"
+msgstr ""
+
+#: src/Admin/ReviewWorkflowMetaBox.php:48
+msgid "Gerçek inceleme tarihi"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:202
+msgid "Onay dayanağı"
+msgstr ""
+
+#: src/Admin/ReviewWorkflowMetaBox.php:50
+msgid "Bu inceleme kaydının gerçek tıbbi onaya dayandığını doğruluyorum."
+msgstr ""
+
+#: src/Admin/ReviewWorkflowMetaBox.php:51
+msgid "Tıbbi incelemeyi kaydet"
+msgstr ""
+
+#: src/Admin/ReviewWorkflowMetaBox.php:76
+msgid "İçerik değişti: bilinçli sınıflandırma gerekli."
+msgstr ""
+
+#: src/Admin/ReviewWorkflowMetaBox.php:76
+msgid "Küçük düzeltme — yazım, noktalama veya tıbbi anlamı değiştirmeyen biçim düzenlemesi; inceleme korunur."
+msgstr ""
+
+#: src/Admin/ReviewWorkflowMetaBox.php:76
+msgid "Tıbbi / içerik güncellemesi — mevcut inceleme yeni içeriğe uygulanmaz ve superseded olur."
+msgstr ""
+
+#: src/Admin/ReviewWorkflowMetaBox.php:80
+msgid "— uzman seçin —"
+msgstr ""
+
+#: src/Domain/Enum/ReviewFreshness.php:26
+msgid "Yeniden inceleme zamanı geldi"
+msgstr "Medizinische Überprüfung fällig"
+
+#: src/Domain/Enum/ReviewFreshness.php:26
+msgid "Güncel"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:67
+msgid "Medical Trust Ayarları"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:50
+msgid "Ayarlar"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:72
+msgid "Ayarlar kaydedildi."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:81
+msgid "Organizasyon"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:84
+msgid "Bu bolum KLINIGI tanimlar, doktoru DEGIL. Icerigi editoryal ekip hazirladiginda yazar olarak bu kurum bildirilir. Doktorun adi, unvani ve FOTOGRAFI ayri yerdedir: Medical Trust -> Tibbi Uzmanlar."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:91
+msgid "Kurum adi"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:93
+msgid "Klinigin / muayenehanenin adi. Buraya doktorun adini YAZMAYIN — doktor bilgisi uzman kaydindan gelir."
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:253
+msgid "Kurum adresi"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:100
+msgid "Klinigin web adresi."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:108
+msgid "İnceleme politikaları"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:111
+msgid "Konular bu politikalardan birine bağlanır. Konu başına serbest sayı girmek yerine adlandırılmış politika kullanılır; böylece tutarlılık korunur."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:123
+msgid "İnceleme aralığı (ay)"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:130
+msgid "Kaynak yaş sınırı (yıl)"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:141
+msgid "Kaynak çözümleme"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:144
+msgid "Bu değerler M2'deki çözümleyici tarafından kullanılacak. M1'de yalnızca saklanır."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:155
+msgid "Bu tabanın altındaki hiçbir kaynak seçilmez — slot boş kalacak olsa bile. Editör önceliği dahil hiçbir puan bu kısıtı atlayamaz."
+msgstr ""
+
+#: src/Admin/TopicTermFields.php:152
+msgid "Çeşitlilik bandı"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:164
+msgid "En yüksek skora bu kadar yakın adaylar aynı seçim havuzuna girer ve sayfalar arasında deterministik olarak dağıtılır. Daraltmak çeşitliliği azaltır, genişletmek kalite eşiğini gevşetir."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:169
+msgid "Azami havuz boyutu"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:173
+msgid "Bant geniş kaldığında havuzu skor sırasına göre kırpar. Kalitenin sessizce sulanmasına karşı emniyet valfi."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:179
+msgid "Kapsam ve iş akışı"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:197
+msgid "Yalnızca gerçekten tıbbi içerik barındıran türleri seçin. Sinyalin seyrelmemesi için kapsamı dar tutmak kasıtlıdır."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:204
+msgid "İnceleme kaydında onay dayanağı zorunlu olsun"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:205
+msgid "Doktor sisteme girmediğinde kaydın tek dayanağı kaydeden kişinin beyanıdır. Kısa bir referans (\"12.03.2026 tarihli e-posta onayı\") o beyanı denetlenebilir kılar. Ekip doldurmayacaksa kapatın — çöp dolan zorunlu alan hiç olmamasından kötüdür."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:210
+msgid "Vurgu rengi"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:212
+msgid "Kutunun kenar cizgisi ve baglanti rengi. Bos birakirsaniz varsayilan kullanilir. Temanizin ana rengini girerek kutuyu siteye uydurabilirsiniz."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:217
+msgid "Guncelleme tarihi"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:219
+msgid "Kutuda \"Son guncelleme\" tarihini goster"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:220
+msgid "Sayfanin WordPress guncelleme tarihinden otomatik gelir; hicbir veri girisi gerektirmez. Bu bir TIBBI INCELEME tarihi degildir ve kutuda ayri bir satirda, kendi etiketiyle gosterilir."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:225
+msgid "Tibbi inceleme tarihi"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:227
+msgid "Kayitli tibbi inceleme tarihini goster"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:228
+msgid "Varsayilan kapali. Yalnizca yetkili bir kullanicinin kaydettigi GERCEK inceleme varsa gorunur; sistem bu tarihi asla kendisi uretmez. Guncelleme tarihinden tamamen bagimsizdir."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:236
+msgid "Sayfada ve konuda uzman seçilmemişse Trust Box bu uzmanı gösterir; böylece her sayfayı tek tek doldurmanız gerekmez. Devralma sırası: sayfa → konu → site geneli. Bu bir yazarlık veya tıbbi inceleme iddiası DEĞİLDİR; yalnızca içeriğin tıbbi sorumlusunu bildirir ve hiçbir inceleme tarihi üretmez."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:245
+msgid "Uygun tıbbi içeriğin the_content çıktısına Trust Box ekle"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:246
+msgid "Varsayılan kapalıdır. Avada Global Layout içinde shortcode kullanılıyorsa kapalı bırakın; böylece çift kutu oluşmaz."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:251
+msgid "Otomatik yerleştirme konumu"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:254
+msgid "İçerikten sonra"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:255
+msgid "İçerikten önce"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:257
+msgid "Yalnızca otomatik yerleştirme açık olduğunda kullanılır."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:262
+msgid "Kaldırma davranışı"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:264
+msgid "Eklenti silindiğinde veriler korunsun"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:265
+msgid "Varsayılan açık. Küratörlü bir kaynak kütüphanesini kaza ile silmek geri alınamaz bir kayıptır."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:283
+msgid "Çeviri kimlik onarımı"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:287
+msgid "Bir çeviri grubundaki tüm konular aynı konu kimliğini, tüm uzmanlar aynı varlık kimliğini taşımalıdır. Bu araç ayrışmış grupları tarar, düzeltir ve değişen kimliklere yapılan atıfları yeniden yazar. Çalıştırmak güvenlidir: ikinci çalıştırma hiçbir şey değiştirmez."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:300
+msgid "Kimlikleri tara ve onar"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:309
+msgid "Taranan konu grubu"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:310
+msgid "Düzeltilen konu kimliği"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:311
+msgid "Taranan uzman grubu"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:312
+msgid "Düzeltilen uzman kimliği"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:313
+msgid "Taranan sayfa grubu"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:314
+msgid "Düzeltilen sayfa kimliği"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:315
+msgid "Yeniden yazılan atıf"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:319
+msgid "Onarım tamamlandı."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:331
+msgid "Kimlikler değiştiği için kütüphane sürümü artırıldı; çözümleme cache'i tembel olarak yeniden hesaplanacak."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:350
+msgid "Kurum logosu (ek ID)"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:354
+msgid "Klinigin LOGOSU. Trust Box icinde GOSTERILMEZ; yalnizca schema eklentisine kurum bilgisi olarak aktarilir. Doktor fotografi icin bu alani kullanmayin."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:364
+msgid "Girilen ek onizlemesi"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:369
+msgid "Bu ID bir gorsel ekine ait degil."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:377
+msgid "ek kaydini ac"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:391
+msgid "Trust Box portre onizlemesi"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:396
+msgid "Portre secilmedi; Trust Box fotosuz gorunecek."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:401
+msgid "Portre, Ayarlardaki kurum logosundan degil bu uzmanın “Uzman fotografi” alanindan gelir."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:403
+msgid "Uzman kaydini duzenle"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:418
+msgid "Baslangic kaynak kutuphanesi"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:422
+msgid "Kaynak secimi motoru calisiyor, ancak kutuphane bosken secebilecegi hicbir kayit yok. Bu arac, konularinizla eslesen GERCEK ve adresleri dogrulanmis mesleki kurulus (ASPS, ISAPS, NHS) ve klinik kurum (Cleveland Clinic) kaynaklarini olusturur."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:427
+msgid "Hakemli bilimsel yayin uretilmez."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:428
+msgid "Bir konuya gercekten uygun yayin secmek kuratorluk ister; DOI uydurmak sistemin amacini bozar. \"Bilimsel Yayin\" slotu bos kalir ve kutu onsuz gorunur."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:443
+msgid "Olusturulabilecek yeni kayit: %1$d · Yayim bekleyen aday: %2$d"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:463
+msgid "Eslesen yeni kaynak yok. Konulariniz katalogdaki anahtar kelimelerle eslesmiyorsa once Tibbi Konular olusturun."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:475
+msgid "Katalogu simdi eslestir ve yayimla"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:483
+msgid "Yalnizca aday olarak olustur"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:494
+msgid "Bekleyen %d adayi yayimla"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:505
+msgid "Adaylar yayimlanana kadar hicbir sayfada gorunmez. Once tek tek gozden gecirmek isterseniz:"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:507
+msgid "bekleyen kaynaklari ac"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:520
+msgid "%d aday kaynak olusturuldu."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:542
+msgid "%d kaynak yayimlandi ve secime hazir. Konusu eslesen sayfalarda kaynak bolumu artik dolu gelir."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:546
+msgid "Kayitlar \"aday\" durumundadir ve yayimlanana kadar hicbir sayfada gorunmez."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:585
+msgid "Bu islem icin yetkiniz yok."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:634
+msgid "Bu işlem için yetkiniz yok."
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:53
+msgid "Tur"
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:54
+msgid "Konu"
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:55
+msgid "Durum"
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:90
+msgid "kullanilabilir"
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:101
+msgid "%d eksik"
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:112
+msgid "Kaynak Bilgileri"
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:133
+msgid "Bir kaynagin sayfalarda gorunebilmesi icin DORT sey gerekir: kaynak turu (asagida), en az bir tanimlayici veya adres, sag sutundaki \"Tibbi Konular\" kutusundan en az bir konu, ve kaydin Yayimlanmis olmasi."
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:141
+msgid "Bu kaynak su haliyle hicbir sayfada gorunmez:"
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:160
+msgid "Kayit yayimlanmadi. Aday (beklemede) ve emekli kayitlar secime girmez."
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:180
+msgid "Kaynak turu secilmedi (Akademik / Otorite / Bilimsel Yayin)."
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:185
+msgid "Tibbi konu baglanmadi. Sag sutundaki \"Tibbi Konular\" kutusunu kullanin."
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:199
+msgid "DOI, PMC ID, yayinci adresi, kurum adresi veya PMID alanlarindan en az biri doldurulmali."
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:222
+msgid "Kimlikler ve bağlantılar"
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:225
+msgid "Kanonik atıf hedefi"
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:370
+msgid "DOI"
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:234
+msgid "Örn. 10.1097/PRS.0000000000009999 — tam URL yapıştırılırsa çıplak DOI'ye indirgenir. Bağlantı önceliğinde 1. sıra."
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:371
+msgid "PMC ID"
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:241
+msgid "Serbest tam metin kaydı. Örn. PMC1234567. Bağlantı önceliğinde 2. sıra."
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:246
+msgid "Yayıncı / dergi adresi"
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:248
+msgid "Makalenin yayıncı sitesindeki sayfası. Bağlantı önceliğinde 3. sıra."
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:255
+msgid "Üniversite, mesleki kuruluş veya kamu otoritesi sayfası. Akademik ve otorite kaynakları için normal yol. Bağlantı önceliğinde 4. sıra."
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:374
+msgid "PMID"
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:262
+msgid "Saklanır ama bağlantı için son çaredir. Phase 2 PubMed eşleştirmesinde anahtar olarak kullanılacak."
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:265
+msgid "Nitelik"
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:269
+msgid "Belge türü"
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:272
+msgid "Kanıt düzeyi skorlamada ağırlık taşır."
+msgstr ""
+
+#: src/Admin/TopicTermFields.php:121
+msgid "— belirtilmedi —"
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:278
+msgid "Hakem denetimi"
+msgstr "Begutachtung"
+
+#: src/Admin/SourceMetaBox.php:280
+msgid "Bağımsız uzmanlar denetledi"
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:281
+msgid "Kaynağın kategorisi değil, niteliğidir. Bir otorite kılavuzu da hakemli olabilir."
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:286
+msgid "Editör önceliği"
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:290
+msgid "Varsayılan 0 bırakın. Yükseltmek skoru artırır ve kaynağı öne çıkarır; ancak durum, slot uyumu ve minimum konu yakınlığı kısıtlarını hiçbir değerde atlayamaz."
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:293
+msgid "Künye (tamamı isteğe bağlı)"
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:297
+msgid "Bu bölümdeki hiçbir alan zorunlu değildir ve hiçbiri kaynağın yayımlanmasını engellemez. Boş bırakılan alanlar kutuda basitçe gösterilmez — bilmediğiniz bir yılı tahmin etmeyin."
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:300
+msgid "Yayıncı / kurum"
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:301
+msgid "Dergi"
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:302
+msgid "Yazarlar"
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:306
+msgid "Yayın yılı"
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:310
+msgid "Bilinmiyorsa 0 bırakın — zorunlu değildir. Kurum sayfalarının çoğunda yayın yılı yoktur; 0 ise kutuda tarih gösterilmez ve tazelik puanı hesaba katılmaz."
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:315
+msgid "Kaynağın dili"
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:317
+msgid "ISO 639-1, örn. \"en\" veya \"tr\". Sitenin dili değil, kaynağın kendi dili."
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:320
+msgid "İdari"
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:324
+msgid "Keşif kökeni"
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:327
+msgid "Kaynağı nerede bulduğunuz. Yalnızca idari kayıttır: sıralamayı ETKİLEMEZ ve ön yüzde gösterilmez. PubMed ve Scholar birer indekstir, kaynak değil."
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:333
+msgid "Kütüphaneye giriş tarihi"
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:335
+msgid "YYYY-AA-GG. Gelecek tarihler reddedilir."
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:340
+msgid "Son doğrulama tarihi"
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:342
+msgid "YYYY-AA-GG. Bağlantının elle kontrol edildiği tarih."
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:347
+msgid "İlgi notu"
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:349
+msgid "Bu kaynağın hangi konuya neden uygun olduğu. Yalnızca editör içindir."
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:354
+msgid "Kaynak kimliği"
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:356
+msgid "Kaynak seçiminin kararlılık anahtarı. Post ID değil bu kullanılır ki içerik taşımaları seçimleri kaydırmasın."
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:366
+msgid "Hiçbir kimlik veya adres girilmedi. Bu haliyle kaynak eksik sayılır ve M2'de seçime giremez."
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:372
+msgid "yayıncı adresi"
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:373
+msgid "kurum adresi"
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:378
+msgid "Bağlantı politikası uyarınca %s alanından üretildi."
+msgstr ""
+
+#: src/Admin/SourceMetaBox.php:476
+msgid "Bazı adresler bağlantı politikasını geçemedi ve kaydedilmedi:"
+msgstr ""
+
+#: src/Admin/TopicTermFields.php:64
+msgid "İnceleme politikası"
+msgstr ""
+
+#: src/Admin/TopicTermFields.php:44
+msgid "İçeriğin ne sıklıkla yeniden incelenmesi gerektiğini belirler."
+msgstr ""
+
+#: src/Admin/TopicTermFields.php:70
+msgid "Şu an geçerli: %1$d ay inceleme aralığı, %2$d yıl kaynak yaş sınırı."
+msgstr ""
+
+#: src/Admin/TopicTermFields.php:78
+msgid "Varsayılan uzman"
+msgstr ""
+
+#: src/Admin/TopicTermFields.php:110
+msgid "Sayfada uzman seçilmemişse devreye girer."
+msgstr ""
+
+#: src/Admin/TopicTermFields.php:115
+msgid "Schema tip ipucu"
+msgstr ""
+
+#: src/Admin/TopicTermFields.php:135
+msgid "Bu eklenti kullanmaz ve JSON-LD üretmez; yalnızca saklar ve kontrat üzerinden schema eklentisine sunar."
+msgstr ""
+
+#: src/Admin/TopicTermFields.php:140
+msgid "İlişkili konu kimlikleri"
+msgstr ""
+
+#: src/Admin/TopicTermFields.php:147
+msgid "Her satıra bir konu kimliği (top_xxxxxxxxxxxx). Küratörlü ilişki, otomatik üst konu yürüyüşünden daha yüksek yakınlık puanı alır."
+msgstr ""
+
+#: src/Admin/TopicTermFields.php:161
+msgid "Boş bırakılırsa global ayar devralınır (şu an %d). Kaynak havuzu geniş konularda yükseltmek çeşitliliği artırır."
+msgstr ""
+
+#: src/Admin/TopicTermFields.php:170
+msgid "üretilmedi"
+msgstr ""
+
+#: src/Admin/TopicTermFields.php:172
+msgid "Dil-nötr kalıcı kimlik. Kaynak çözümlemesi term_id yerine bunu kullanır."
+msgstr ""
+
+#: src/Admin/TopicTermFields.php:189
+msgid "%1$s — %2$d ay"
+msgstr ""
+
+#: src/Admin/UserProfileFields.php:42
+msgid "Medical Trust yetkileri"
+msgstr ""
+
+#: src/Admin/UserProfileFields.php:47
+msgid "Tıbbi inceleme kaydı"
+msgstr ""
+
+#: src/Admin/UserProfileFields.php:52
+msgid "Bu kullanıcı tıbbi inceleme kaydı oluşturabilir"
+msgstr ""
+
+#: src/Admin/UserProfileFields.php:57
+msgid "Bu yetki kasıtlı olarak hiçbir role toplu verilmez — Administrator dahil. Yalnızca doktorla gerçekten temas eden, onayı birinci elden alan kişilere verin. İçeriği yazan editörler bu yetkiye sahip olmamalıdır; aksi halde \"içerik editi\" ile \"tıbbi inceleme\" ayrımı ortadan kalkar."
+msgstr ""
+
+#: src/Capability/Capabilities.php:58
+msgid "Kaynak kütüphanesini yönet"
+msgstr ""
+
+#: src/Capability/Capabilities.php:59
+msgid "Uzman kayıtlarını yönet"
+msgstr ""
+
+#: src/Capability/Capabilities.php:60
+msgid "Sayfa tıbbi bilgilerini düzenle"
+msgstr ""
+
+#: src/Capability/Capabilities.php:61
+msgid "Tıbbi inceleme kaydı oluştur"
+msgstr ""
+
+#: src/Domain/Enum/AuthorMode.php:33
+msgid "Editoryal ekip hazırladı"
+msgstr ""
+
+#: src/Domain/Enum/AuthorMode.php:34
+msgid "Tıbbi uzman hazırladı"
+msgstr ""
+
+#: src/Domain/Enum/ChangeClassification.php:27
+msgid "Küçük düzeltme"
+msgstr ""
+
+#: src/Domain/Enum/ChangeClassification.php:28
+msgid "Tıbbi veya içerik güncellemesi"
+msgstr ""
+
+#: src/Domain/Enum/DiscoveredVia.php:51
+msgid "PubMed indeksi"
+msgstr ""
+
+#: src/Domain/Enum/DiscoveredVia.php:52
+msgid "PubMed Central"
+msgstr ""
+
+#: src/Domain/Enum/DiscoveredVia.php:53
+msgid "Google Scholar"
+msgstr ""
+
+#: src/Domain/Enum/DiscoveredVia.php:54
+msgid "DOI çözümlemesi"
+msgstr ""
+
+#: src/Domain/Enum/DiscoveredVia.php:55
+msgid "Yayıncı / dergi sitesi"
+msgstr ""
+
+#: src/Domain/Enum/DiscoveredVia.php:56
+msgid "Mesleki kuruluş"
+msgstr ""
+
+#: src/Domain/Enum/DiscoveredVia.php:57
+msgid "Üniversite / akademik kurum"
+msgstr ""
+
+#: src/Domain/Enum/DiscoveredVia.php:58
+msgid "Kamu sağlık otoritesi"
+msgstr ""
+
+#: src/Domain/Enum/DiscoveredVia.php:59
+msgid "Elle eklendi"
+msgstr ""
+
+#: src/Domain/Enum/PublicationType.php:38
+msgid "Sistematik derleme"
+msgstr ""
+
+#: src/Domain/Enum/PublicationType.php:39
+msgid "Meta-analiz"
+msgstr ""
+
+#: src/Domain/Enum/PublicationType.php:40
+msgid "Randomize kontrollü çalışma"
+msgstr ""
+
+#: src/Domain/Enum/PublicationType.php:41
+msgid "Klinik kılavuz"
+msgstr ""
+
+#: src/Domain/Enum/PublicationType.php:42
+msgid "Uzlaşı bildirisi"
+msgstr ""
+
+#: src/Domain/Enum/PublicationType.php:43
+msgid "Kohort / vaka-kontrol çalışması"
+msgstr ""
+
+#: src/Domain/Enum/PublicationType.php:44
+msgid "Ders kitabı / referans eser"
+msgstr ""
+
+#: src/Domain/Enum/PublicationType.php:45
+msgid "Derleme (sistematik olmayan)"
+msgstr ""
+
+#: src/Domain/Enum/PublicationType.php:46
+msgid "Vaka serisi / olgu sunumu"
+msgstr ""
+
+#: src/Domain/Enum/PublicationType.php:47
+msgid "Kurumsal bilgi sayfası"
+msgstr ""
+
+#: src/Domain/Enum/ReviewPolicy.php:31
+msgid "Stabil — yerleşik cerrahi bilgi"
+msgstr ""
+
+#: src/Domain/Enum/ReviewPolicy.php:32
+msgid "Standart — çoğu tedavi sayfası"
+msgstr ""
+
+#: src/Domain/Enum/ReviewPolicy.php:33
+msgid "Değişken — cihaz ve teknoloji tabanlı"
+msgstr ""
+
+#: src/Domain/Enum/ReviewStatus.php:32
+msgid "İncelenmedi"
+msgstr ""
+
+#: src/Domain/Enum/ReviewStatus.php:33
+msgid "Tıbbi inceleme bekliyor"
+msgstr ""
+
+#: src/Domain/Enum/ReviewStatus.php:34
+msgid "Tıbbi olarak incelendi"
+msgstr ""
+
+#: src/Domain/Enum/ReviewValidity.php:30
+msgid "Geçerli"
+msgstr ""
+
+#: src/Domain/Enum/ReviewValidity.php:31
+msgid "İçerik inceleme sonrası değişti"
+msgstr ""
+
+#: src/Domain/Enum/SchemaTypeHint.php:31
+msgid "MedicalProcedure — işlem / ameliyat"
+msgstr ""
+
+#: src/Domain/Enum/SchemaTypeHint.php:32
+msgid "MedicalCondition — durum / endikasyon"
+msgstr ""
+
+#: src/Domain/Enum/SchemaTypeHint.php:33
+msgid "MedicalTherapy — tedavi"
+msgstr ""
+
+#: src/Domain/Enum/SourceHealth.php:33
+msgid "Kontrol edilmedi"
+msgstr ""
+
+#: src/Domain/Enum/SourceHealth.php:34
+msgid "Erişilebilir"
+msgstr ""
+
+#: src/Domain/Enum/SourceHealth.php:35
+msgid "Yönlendiriliyor"
+msgstr ""
+
+#: src/Domain/Enum/SourceHealth.php:36
+msgid "Bozuk"
+msgstr ""
+
+#: src/Domain/Enum/SourceType.php:30
+msgid "Akademik / Bilimsel Kaynak"
+msgstr "Akademische / wissenschaftliche Quelle"
+
+#: src/Domain/Enum/SourceType.php:31
+msgid "Tıbbi Otorite / Mesleki Kuruluş"
+msgstr "Medizinische Fachgesellschaft / Gesundheitsbehörde"
+
+#: src/Domain/Enum/SourceType.php:32
+msgid "Bilimsel Yayın"
+msgstr "Wissenschaftliche Publikation"
+
+#: src/Domain/Enum/SourceType.php:44
+msgid "Üniversite ve akademik kurum yayınları, ders kitabı, referans eser, tıp fakültesi materyali."
+msgstr ""
+
+#: src/Domain/Enum/SourceType.php:45
+msgid "Mesleki kuruluş veya sağlık otoritesi: ASPS, ISAPS, EURAPS, TPRECD, NHS, FDA, NICE, TİTCK."
+msgstr ""
+
+#: src/Domain/Enum/SourceType.php:46
+msgid "Hakemli dergi makalesi, sistematik derleme, meta-analiz, klinik çalışma."
+msgstr ""
+
+#: src/PostTypes/ExpertPostType.php:142
+msgid "Tıbbi Uzmanlar"
+msgstr ""
+
+#: src/PostTypes/ExpertPostType.php:143
+msgid "Tıbbi Uzman"
+msgstr ""
+
+#: src/PostTypes/SourcePostType.php:39
+msgid "Yeni ekle"
+msgstr ""
+
+#: src/PostTypes/ExpertPostType.php:145
+msgid "Yeni uzman ekle"
+msgstr ""
+
+#: src/PostTypes/ExpertPostType.php:146
+msgid "Uzmanı düzenle"
+msgstr ""
+
+#: src/PostTypes/ExpertPostType.php:147
+msgid "Yeni uzman"
+msgstr ""
+
+#: src/PostTypes/ExpertPostType.php:148
+msgid "Uzmanı görüntüle"
+msgstr ""
+
+#: src/PostTypes/ExpertPostType.php:149
+msgid "Uzman ara"
+msgstr ""
+
+#: src/PostTypes/ExpertPostType.php:150
+msgid "Uzman bulunamadı."
+msgstr ""
+
+#: src/PostTypes/ExpertPostType.php:151
+msgid "Çöpte uzman yok."
+msgstr ""
+
+#: src/PostTypes/ExpertPostType.php:152
+msgid "Medical Trust"
+msgstr ""
+
+#: src/PostTypes/SourcePostType.php:47
+msgid "Kaynaklar"
+msgstr ""
+
+#: src/PostTypes/SourcePostType.php:40
+msgid "Yeni kaynak ekle"
+msgstr ""
+
+#: src/PostTypes/SourcePostType.php:41
+msgid "Kaynağı düzenle"
+msgstr ""
+
+#: src/PostTypes/SourcePostType.php:42
+msgid "Yeni kaynak"
+msgstr ""
+
+#: src/PostTypes/SourcePostType.php:43
+msgid "Kaynağı görüntüle"
+msgstr ""
+
+#: src/PostTypes/SourcePostType.php:44
+msgid "Kaynak ara"
+msgstr ""
+
+#: src/PostTypes/SourcePostType.php:45
+msgid "Kaynak bulunamadı."
+msgstr ""
+
+#: src/PostTypes/SourcePostType.php:46
+msgid "Çöpte kaynak yok."
+msgstr ""
+
+#: src/Support/UrlPolicy.php:120
+msgid "Bağlantı boş."
+msgstr ""
+
+#: src/Support/UrlPolicy.php:121
+msgid "Bağlantı çözümlenemedi."
+msgstr ""
+
+#: src/Support/UrlPolicy.php:122
+msgid "Yalnızca http ve https bağlantıları kabul edilir."
+msgstr ""
+
+#: src/Support/UrlPolicy.php:123
+msgid "Google Scholar bağlantı hedefi olamaz; kalıcı kanonik URL sunmaz. Yayının DOI, PMC veya yayıncı adresini kullanın. Scholar yalnızca \"keşif kökeni\" olarak kaydedilebilir."
+msgstr ""
+
+#: src/Support/UrlPolicy.php:124
+msgid "Kısaltılmış bağlantılar kabul edilmez; hedefi gizler ve sessizce değiştirilebilir."
+msgstr ""
+
+#: src/Support/UrlPolicy.php:125
+msgid "Arama sonucu adresi atıf hedefi olamaz. Kanonik yayın adresini kullanın."
+msgstr ""
+
+#: src/Support/UrlPolicy.php:126
+msgid "Bu adrese izin verilmiyor."
+msgstr ""
+
+#: src/Support/UrlPolicy.php:129
+msgid "Bağlantı reddedildi."
+msgstr ""
+
+#: src/Taxonomies/MedicalTopicTaxonomy.php:69
+msgid "Tıbbi Konular"
+msgstr ""
+
+#: src/Taxonomies/MedicalTopicTaxonomy.php:60
+msgid "Tıbbi Konu"
+msgstr ""
+
+#: src/Taxonomies/MedicalTopicTaxonomy.php:61
+msgid "Konu ara"
+msgstr ""
+
+#: src/Taxonomies/MedicalTopicTaxonomy.php:62
+msgid "Tüm konular"
+msgstr ""
+
+#: src/Taxonomies/MedicalTopicTaxonomy.php:63
+msgid "Üst konu"
+msgstr ""
+
+#: src/Taxonomies/MedicalTopicTaxonomy.php:64
+msgid "Üst konu:"
+msgstr ""
+
+#: src/Taxonomies/MedicalTopicTaxonomy.php:65
+msgid "Konuyu düzenle"
+msgstr ""
+
+#: src/Taxonomies/MedicalTopicTaxonomy.php:66
+msgid "Konuyu güncelle"
+msgstr ""
+
+#: src/Taxonomies/MedicalTopicTaxonomy.php:67
+msgid "Yeni konu ekle"
+msgstr ""
+
+#: src/Taxonomies/MedicalTopicTaxonomy.php:68
+msgid "Yeni konu adı"
+msgstr ""
+
+#: src/Taxonomies/SourceTypeTaxonomy.php:45
+msgid "Kaynak Türleri"
+msgstr ""
+
+#: src/Taxonomies/SourceTypeTaxonomy.php:42
+msgid "Kaynak Türü"
+msgstr ""
+
+#: src/Taxonomies/SourceTypeTaxonomy.php:43
+msgid "Tüm türler"
+msgstr ""
+
+#: src/Taxonomies/SourceTypeTaxonomy.php:44
+msgid "Türü düzenle"
+msgstr ""
+
+#: src/Upgrade/Provisioner.php:160
+msgid "Yönetici rolüne gerekli yetkiler verilemedi. \"Medical Trust\" menüsü görünmeyecektir. Bir rol yönetimi eklentisi yetkileri kilitliyor olabilir; eklentiyi devre dışı bırakıp yeniden etkinleştirmeyi deneyin."
+msgstr ""
+
+#: src/Upgrade/Provisioner.php:172
+msgid "Eksik yönetici yetkileri tamamlandı. \"Medical Trust\" menüsü artık görünür olmalı. Bu, eklentinin yeniden etkinleştirilmeden güncellendiği kurulumlarda beklenen bir onarımdır; hiçbir veri değiştirilmedi."
+msgstr ""
+
+#: templates/trust-block.php:38
+msgid "İçerik Sorumlusu ve Tıbbi Denetim"
+msgstr "Inhaltsverantwortung und medizinische Prüfung"
+
+#: templates/trust-block.php:50
+msgid "Tıbbi uzman"
+msgstr "Medizinische Fachperson"
+
+#: templates/trust-block.php:63
+msgid "Hakkımda"
+msgstr "Über mich"
+
+#: templates/trust-block.php:70
+msgid "İçeriği hazırlayan ve tıbbi olarak inceleyen: %s"
+msgstr "Erstellt und medizinisch geprüft von: %s"
+
+#: templates/trust-block.php:72
+msgid "İçeriği hazırlayan: %s"
+msgstr "Erstellt von: %s"
+
+#: templates/trust-block.php:73
+msgid "Tıbbi olarak inceleyen: %s"
+msgstr "Medizinisch geprüft von: %s"
+
+#: templates/trust-block.php:88
+msgid "%1$s içeriğinin tıbbi sorumlusu: %2$s"
+msgstr "Medizinisch verantwortlich für %1$s: %2$s"
+
+#: templates/trust-block.php:94
+msgid "Bu sayfanın tıbbi içerik sorumlusu: %s"
+msgstr "Medizinisch verantwortlich für diese Seite: %s"
+
+#: templates/trust-block.php:101
+msgid "Tıbbi inceleme tarihi:"
+msgstr "Datum der letzten medizinischen Prüfung:"
+
+#: templates/trust-block.php:102
+msgid "Tıbbi incelemenin güncellenmesi planlanmıştır."
+msgstr "Eine Aktualisierung der medizinischen Prüfung ist vorgesehen."
+
+#: templates/trust-block.php:111
+msgid "Son güncelleme:"
+msgstr "Zuletzt aktualisiert:"
+
+#: templates/trust-block.php:116
+msgid "Uzman değerlendirmesi"
+msgstr "Fachliche Einschätzung"
+
+#: templates/trust-block.php:123
+msgid "Seçilmiş tıbbi kaynaklar"
+msgstr "Ausgewählte medizinische Quellen"
+
+#: templates/trust-block.php:137
+msgid "Bu bölüm, içeriğin tıbbi sorumluluk ve inceleme bilgilerini sunar; kişisel tıbbi değerlendirme yerine geçmez."
+msgstr "Dieser Abschnitt enthält Angaben zur medizinischen Verantwortung und Prüfung und ersetzt keine individuelle medizinische Beratung."
