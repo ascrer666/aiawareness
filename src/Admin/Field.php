@@ -200,6 +200,56 @@ final class Field {
 		);
 	}
 
+	/**
+	 * Aramali icerik secici.
+	 *
+	 * post_select() ile arasindaki fark: liste onceden basilmaz, yazdikca
+	 * AJAX ile aranir. Boylece binlerce kayitli sitelerde de hedef bulunur
+	 * ve sayfa sisirilmez.
+	 */
+	public static function post_search( string $id, string $label, int $value, string $description = '' ): void {
+		self::open_row( $id, $label );
+
+		$current = PostSearch::label_for( $value );
+
+		// Stil tek seferlik ve yerinde: bu alan icin ayri bir CSS dosyasi
+		// yuklemek, kazanci kadar bakim maliyeti getirirdi.
+		static $styled = false;
+
+		if ( ! $styled ) {
+			$styled = true;
+			echo '<style>'
+				. '.dla-mt-postsearch__results{margin:6px 0 0;padding:0;list-style:none;max-height:260px;overflow-y:auto;'
+				. 'border:1px solid #c3c4c7;border-radius:4px;background:#fff;max-width:32rem}'
+				. '.dla-mt-postsearch__results li{margin:0;border-bottom:1px solid #f0f0f1}'
+				. '.dla-mt-postsearch__results li:last-child{border-bottom:0}'
+				. '.dla-mt-postsearch__results button{display:block;width:100%;padding:7px 10px;text-align:start;text-decoration:none}'
+				. '.dla-mt-postsearch__results button:hover{background:#f6f7f7}'
+				. '.dla-mt-postsearch__empty{padding:7px 10px;color:#646970;font-style:italic}'
+				. '.dla-mt-postsearch__current{margin:0 0 6px}'
+				. '</style>';
+		}
+
+		printf(
+			'<div class="dla-mt-postsearch" data-target="%1$s">'
+			. '<input type="hidden" id="%1$s" name="%1$s" value="%2$s">'
+			. '<p class="dla-mt-postsearch__current"%3$s><strong>%4$s</strong> <span>%5$s</span> '
+			. '<button type="button" class="button-link dla-mt-postsearch__clear">%6$s</button></p>'
+			. '<input type="search" class="regular-text dla-mt-postsearch__input" autocomplete="off" placeholder="%7$s">'
+			. '<ul class="dla-mt-postsearch__results" hidden></ul>'
+			. '</div>',
+			esc_attr( $id ),
+			esc_attr( (string) $value ),
+			'' !== $current ? '' : ' hidden',
+			esc_html__( 'Seçili:', 'dla-medical-trust' ),
+			esc_html( $current ),
+			esc_html__( 'kaldır', 'dla-medical-trust' ),
+			esc_attr__( 'Sayfa adının bir kısmını yazın (en az 2 harf)…', 'dla-medical-trust' )
+		);
+
+		self::close_row( $description );
+	}
+
 	public static function readonly_row( string $label, string $value, string $description = '' ): void {
 		printf( '<tr><th scope="row">%s</th><td>', esc_html( $label ) );
 		printf( '<code>%s</code>', esc_html( $value ) );

@@ -21,6 +21,7 @@ use DLA\MedicalTrust\Admin\ResolverExplanationPanel;
 use DLA\MedicalTrust\Admin\ReadinessPanel;
 use DLA\MedicalTrust\Admin\ReviewWorkflowMetaBox;
 use DLA\MedicalTrust\Admin\SettingsPage;
+use DLA\MedicalTrust\Admin\PostSearch;
 use DLA\MedicalTrust\Admin\SourceMetaBox;
 use DLA\MedicalTrust\Admin\TopicTermFields;
 use DLA\MedicalTrust\Admin\UserProfileFields;
@@ -95,6 +96,7 @@ final class Plugin {
 			// güncellenen kurulumlarda menü bu yüzden kayboluyordu.
 			( new Provisioner() )->register();
 
+			( new PostSearch() )->register();
 			( new ExpertMetaBox() )->register();
 			( new SourceMetaBox() )->register();
 			( new TopicTermFields() )->register();

@@ -61,6 +61,18 @@ final class ExpertMetaBox {
 				'button' => __( 'Bu gorseli kullan', 'dla-medical-trust' ),
 			]
 		);
+
+		wp_localize_script(
+			'dla-mt-admin-media',
+			'dlaMtPostSearch',
+			[
+				'ajaxUrl'   => admin_url( 'admin-ajax.php' ),
+				'action'    => PostSearch::ACTION,
+				'nonce'     => wp_create_nonce( PostSearch::ACTION ),
+				'noResults' => __( 'Eslesen icerik bulunamadi.', 'dla-medical-trust' ),
+				'error'     => __( 'Arama basarisiz oldu; sayfayi yenileyip tekrar deneyin.', 'dla-medical-trust' ),
+			]
+		);
 	}
 
 	public function add_meta_box(): void {
@@ -109,12 +121,11 @@ final class ExpertMetaBox {
 			4
 		);
 
-		Field::post_select(
+		Field::post_search(
 			'dla_mt_profile_page_id',
 			__( 'Kanonik profil sayfası', 'dla-medical-trust' ),
 			$profile_id,
-			Settings::eligible_post_types(),
-			__( 'URL değil post ID saklanır; slug değişirse bağlantı kırılmaz.', 'dla-medical-trust' )
+			__( 'Sayfa, yazı, portfolyo, hizmet — arayüzü olan HER içerik türü aranır; Ayarlardaki kapsam listesiyle sınırlı değildir. URL değil post ID saklanır, slug değişirse bağlantı kırılmaz. Seçilen kayıt yayımlanmamışsa ön yüzde bağlantı çıkmaz.', 'dla-medical-trust' )
 		);
 
 		Field::textarea(

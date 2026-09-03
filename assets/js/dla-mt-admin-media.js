@@ -98,3 +98,150 @@
 		}
 	} );
 }( window.wp, document ) );
+
+/*
+ * Aramali icerik secici.
+ *
+ * Sabit <select> hem kapsam disi turleri (portfolio, hizmet) gizliyordu
+ * hem de 300 kayittan sonrasini erisilemez kiliyordu. Burada yazdikca
+ * sunucuda aranir; tur kisiti yoktur.
+ */
+( function ( document ) {
+	'use strict';
+
+	var cfg = window.dlaMtPostSearch;
+
+	if ( ! cfg || ! cfg.ajaxUrl ) {
+		return;
+	}
+
+	function setup( box ) {
+		var hidden  = document.getElementById( box.getAttribute( 'data-target' ) );
+		var input   = box.querySelector( '.dla-mt-postsearch__input' );
+		var list    = box.querySelector( '.dla-mt-postsearch__results' );
+		var current = box.querySelector( '.dla-mt-postsearch__current' );
+		var clear   = box.querySelector( '.dla-mt-postsearch__clear' );
+		var timer   = null;
+		var seq     = 0;
+
+		if ( ! hidden || ! input || ! list ) {
+			return;
+		}
+
+		function message( text ) {
+			list.innerHTML = '';
+			var li = document.createElement( 'li' );
+			li.className = 'dla-mt-postsearch__empty';
+			li.textContent = text;
+			list.appendChild( li );
+			list.hidden = false;
+		}
+
+		function choose( id, label ) {
+			hidden.value = String( id );
+
+			if ( current ) {
+				var span = current.querySelector( 'span' );
+
+				if ( span ) {
+					span.textContent = label;
+				}
+
+				current.hidden = false;
+			}
+
+			input.value = '';
+			list.hidden = true;
+			list.innerHTML = '';
+		}
+
+		function render( items ) {
+			list.innerHTML = '';
+
+			if ( ! items.length ) {
+				message( cfg.noResults );
+
+				return;
+			}
+
+			items.forEach( function ( item ) {
+				var li = document.createElement( 'li' );
+				var btn = document.createElement( 'button' );
+				btn.type = 'button';
+				btn.className = 'button-link';
+				btn.textContent = item.label;
+				btn.addEventListener( 'click', function () {
+					choose( item.id, item.label );
+				} );
+				li.appendChild( btn );
+				list.appendChild( li );
+			} );
+
+			list.hidden = false;
+		}
+
+		function search( term ) {
+			var mine = ++seq;
+			var url = cfg.ajaxUrl
+				+ '?action=' + encodeURIComponent( cfg.action )
+				+ '&nonce=' + encodeURIComponent( cfg.nonce )
+				+ '&term=' + encodeURIComponent( term );
+
+			fetch( url, { credentials: 'same-origin' } )
+				.then( function ( r ) { return r.json(); } )
+				.then( function ( payload ) {
+					// Gec donen eski istek yeni sonucu ezmesin.
+					if ( mine !== seq ) {
+						return;
+					}
+
+					render( payload && payload.success && payload.data ? payload.data : [] );
+				} )
+				.catch( function () {
+					if ( mine === seq ) {
+						message( cfg.error );
+					}
+				} );
+		}
+
+		input.addEventListener( 'input', function () {
+			var term = input.value.trim();
+
+			window.clearTimeout( timer );
+
+			if ( term.length < 2 ) {
+				list.hidden = true;
+				list.innerHTML = '';
+
+				return;
+			}
+
+			timer = window.setTimeout( function () { search( term ); }, 250 );
+		} );
+
+		// Enter arama kutusunda formu gondermemeli.
+		input.addEventListener( 'keydown', function ( event ) {
+			if ( 'Enter' === event.key ) {
+				event.preventDefault();
+			}
+		} );
+
+		if ( clear ) {
+			clear.addEventListener( 'click', function ( event ) {
+				event.preventDefault();
+				hidden.value = '';
+
+				if ( current ) {
+					current.hidden = true;
+				}
+			} );
+		}
+	}
+
+	document.addEventListener( 'DOMContentLoaded', function () {
+		Array.prototype.forEach.call(
+			document.querySelectorAll( '.dla-mt-postsearch' ),
+			setup
+		);
+	} );
+}( document ) );
