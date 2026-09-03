@@ -232,19 +232,24 @@ final class Field {
 
 		printf(
 			'<div class="dla-mt-postsearch" data-target="%1$s">'
-			. '<input type="hidden" id="%1$s" name="%1$s" value="%2$s">'
 			. '<p class="dla-mt-postsearch__current"%3$s><strong>%4$s</strong> <span>%5$s</span> '
 			. '<button type="button" class="button-link dla-mt-postsearch__clear">%6$s</button></p>'
 			. '<input type="search" class="regular-text dla-mt-postsearch__input" autocomplete="off" placeholder="%7$s">'
 			. '<ul class="dla-mt-postsearch__results" hidden></ul>'
+			// Kimlik alani GORUNUR bir sayi kutusu: JS calismazsa (onbellekte
+			// kalmis eski dosya, baska bir eklentinin JS hatasi) alan sessizce
+			// olu kalmasin, ID elle de girilebilsin.
+			. '<p class="dla-mt-postsearch__manual"><label for="%1$s">%8$s</label> '
+			. '<input type="number" id="%1$s" name="%1$s" value="%2$s" min="0" step="1" class="small-text"></p>'
 			. '</div>',
 			esc_attr( $id ),
-			esc_attr( (string) $value ),
+			esc_attr( $value > 0 ? (string) $value : '' ),
 			'' !== $current ? '' : ' hidden',
 			esc_html__( 'Seçili:', 'dla-medical-trust' ),
 			esc_html( $current ),
 			esc_html__( 'kaldır', 'dla-medical-trust' ),
-			esc_attr__( 'Sayfa adının bir kısmını yazın (en az 2 harf)…', 'dla-medical-trust' )
+			esc_attr__( 'Sayfa adının bir kısmını yazın (en az 2 harf)…', 'dla-medical-trust' ),
+			esc_html__( 'veya post ID:', 'dla-medical-trust' )
 		);
 
 		self::close_row( $description );

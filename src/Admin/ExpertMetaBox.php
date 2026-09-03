@@ -45,11 +45,18 @@ final class ExpertMetaBox {
 
 		wp_enqueue_media();
 
+		// Surum damgasi DOSYA ZAMANI, eklenti surumu DEGIL.
+		// VERSION iki yayin arasinda sabit kalabiliyor; o durumda dosya
+		// degisse bile tarayici eski kopyayi sunuyor ve yeni davranis hic
+		// calismiyordu — hata gibi gorunen ama aslinda onbellek olan bir
+		// sinif. AssetManager on yuz stilinde ayni deseni kullaniyor.
+		$script_path = DLA_MT_DIR . 'assets/js/dla-mt-admin-media.js';
+
 		wp_enqueue_script(
 			'dla-mt-admin-media',
 			DLA_MT_URL . 'assets/js/dla-mt-admin-media.js',
 			[],
-			\DLA\MedicalTrust\VERSION,
+			is_file( $script_path ) ? (string) filemtime( $script_path ) : \DLA\MedicalTrust\VERSION,
 			true
 		);
 
