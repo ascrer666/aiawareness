@@ -189,6 +189,34 @@ final class Sanitizer {
 	}
 
 	/**
+	 * Post ID listesi.
+	 *
+	 * Girdi hem dizi (JS destekli secici) hem de virgul/satir ile ayrilmis
+	 * metin (JS calismadiginda elle yazilan liste) olabilir. Sifir ve
+	 * tekrarlar elenir, sira korunur.
+	 *
+	 * SAF.
+	 *
+	 * @return int[]
+	 */
+	public static function id_list( $value ): array {
+		if ( ! is_array( $value ) ) {
+			$value = preg_split( '/[^0-9]+/', (string) $value ) ?: [];
+		}
+
+		$out = [];
+
+		foreach ( $value as $item ) {
+			$id = absint( $item );
+			if ( $id > 0 ) {
+				$out[] = $id;
+			}
+		}
+
+		return array_values( array_unique( $out ) );
+	}
+
+	/**
 	 * Doğrulanmış URL listesi. Politikayı geçemeyenler sessizce elenir.
 	 *
 	 * @return string[]

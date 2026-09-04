@@ -74,6 +74,8 @@ final class SettingsPage {
 				'nonce'     => wp_create_nonce( PostSearch::ACTION ),
 				'noResults' => __( 'Eşleşen içerik bulunamadı.', 'dla-medical-trust' ),
 				'error'     => __( 'Arama başarısız oldu; sayfayı yenileyip tekrar deneyin.', 'dla-medical-trust' ),
+				'removeLabel' => __( 'listeden çıkar', 'dla-medical-trust' ),
+				'confirmClear' => __( 'Listedeki bütün içerikler kaldırılsın mı?', 'dla-medical-trust' ),
 			]
 		);
 	}
@@ -108,12 +110,14 @@ final class SettingsPage {
 			);
 		}
 
+		$this->render_section_nav();
+
 		printf( '<form method="post" action="%s">', esc_url( admin_url( 'admin-post.php' ) ) );
 		wp_nonce_field( self::NONCE_ACTION, self::NONCE_NAME );
 		echo '<input type="hidden" name="action" value="dla_mt_save_settings">';
 
 		/* ------------------------------------------------ Organizasyon */
-		printf( '<h2>%s</h2>', esc_html__( 'Organizasyon', 'dla-medical-trust' ) );
+		printf( '<h2 id="dla-mt-organization">%s</h2>', esc_html__( 'Organizasyon', 'dla-medical-trust' ) );
 		printf(
 			'<p class="description" style="max-width:70ch">%s</p>',
 			esc_html__( 'Bu bolum KLINIGI tanimlar, doktoru DEGIL. Icerigi editoryal ekip hazirladiginda yazar olarak bu kurum bildirilir. Doktorun adi, unvani ve FOTOGRAFI ayri yerdedir: Medical Trust -> Tibbi Uzmanlar.', 'dla-medical-trust' )
@@ -140,7 +144,7 @@ final class SettingsPage {
 		echo '</tbody></table>';
 
 		/* --------------------------------------------------- Politika */
-		printf( '<h2>%s</h2>', esc_html__( 'İnceleme politikaları', 'dla-medical-trust' ) );
+		printf( '<h2 id="dla-mt-policies">%s</h2>', esc_html__( 'İnceleme politikaları', 'dla-medical-trust' ) );
 		printf(
 			'<p class="description">%s</p>',
 			esc_html__( 'Konular bu politikalardan birine bağlanır. Konu başına serbest sayı girmek yerine adlandırılmış politika kullanılır; böylece tutarlılık korunur.', 'dla-medical-trust' )
@@ -173,7 +177,7 @@ final class SettingsPage {
 		echo '</tbody></table>';
 
 		/* -------------------------------------------------- Çözümleme */
-		printf( '<h2>%s</h2>', esc_html__( 'Kaynak çözümleme', 'dla-medical-trust' ) );
+		printf( '<h2 id="dla-mt-resolver">%s</h2>', esc_html__( 'Kaynak çözümleme', 'dla-medical-trust' ) );
 		printf(
 			'<p class="description">%s</p>',
 			esc_html__( 'Bu değerler M2\'deki çözümleyici tarafından kullanılacak. M1\'de yalnızca saklanır.', 'dla-medical-trust' )
@@ -211,7 +215,11 @@ final class SettingsPage {
 		echo '</tbody></table>';
 
 		/* ------------------------------------------------------ Kapsam */
-		printf( '<h2>%s</h2>', esc_html__( 'Kapsam ve iş akışı', 'dla-medical-trust' ) );
+		printf( '<h2 id="dla-mt-scope">%s</h2>', esc_html__( 'Kapsam ve iş akışı', 'dla-medical-trust' ) );
+		printf(
+			'<p class="description" style="max-width:70ch">%s</p>',
+			esc_html__( 'Eklentinin hangi içeriklerle ilgileneceğini bu bölüm belirler. Aşağıdaki bütün bölümler bu kapsamın içinde çalışır.', 'dla-medical-trust' )
+		);
 
 		echo '<table class="form-table" role="presentation"><tbody>';
 
@@ -239,6 +247,17 @@ final class SettingsPage {
 			__( 'İnceleme kaydında onay dayanağı zorunlu olsun', 'dla-medical-trust' ),
 			__( 'Doktor sisteme girmediğinde kaydın tek dayanağı kaydeden kişinin beyanıdır. Kısa bir referans ("12.03.2026 tarihli e-posta onayı") o beyanı denetlenebilir kılar. Ekip doldurmayacaksa kapatın — çöp dolan zorunlu alan hiç olmamasından kötüdür.', 'dla-medical-trust' )
 		);
+
+		echo '</tbody></table>';
+
+		/* ------------------------------------------- Trust Box görünümü */
+		printf( '<h2 id="dla-mt-trustbox">%s</h2>', esc_html__( 'Trust Box görünümü', 'dla-medical-trust' ) );
+		printf(
+			'<p class="description" style="max-width:70ch">%s</p>',
+			esc_html__( 'Kutunun İÇİNDE ne göründüğü. Kutunun sayfaya nasıl girdiği bir alttaki bölümde ayarlanır.', 'dla-medical-trust' )
+		);
+
+		echo '<table class="form-table" role="presentation"><tbody>';
 
 		Field::color(
 			'accent_color',
@@ -280,6 +299,17 @@ final class SettingsPage {
 			__( 'Trust Box altındaki editoryal bilgilendirme bandında bağlantı olarak gösterilir. Sayfa adıyla arayın veya post ID girin. Polylang çevirisi varsa ziyaretçinin dilindeki sayfaya otomatik gider; seçilmezse bant gösterilmez.', 'dla-medical-trust' )
 		);
 
+		echo '</tbody></table>';
+
+		/* ----------------------------------------- Trust Box yerleştirme */
+		printf( '<h2 id="dla-mt-placement">%s</h2>', esc_html__( 'Trust Box yerleştirme', 'dla-medical-trust' ) );
+		printf(
+			'<p class="description" style="max-width:70ch">%s</p>',
+			esc_html__( 'Kutunun sayfaya kendiliğinden mi gireceği, yoksa shortcode ile mi yerleştirileceği. Bu iki ayar YALNIZCA Trust Box içindir; özet çubuğunu etkilemez.', 'dla-medical-trust' )
+		);
+
+		echo '<table class="form-table" role="presentation"><tbody>';
+
 		Field::checkbox(
 			'automatic_injection',
 			__( 'Otomatik Trust Box yerleştirme', 'dla-medical-trust' ),
@@ -288,12 +318,146 @@ final class SettingsPage {
 			__( 'Varsayılan kapalıdır. Avada Global Layout içinde shortcode kullanılıyorsa kapalı bırakın; böylece çift kutu oluşmaz.', 'dla-medical-trust' )
 		);
 
+		Field::select(
+			'injection_position',
+			__( 'Otomatik yerleştirme konumu', 'dla-medical-trust' ),
+			(string) ( $settings['injection_position'] ?? 'after' ),
+			[
+				'after'  => __( 'İçerikten sonra', 'dla-medical-trust' ),
+				'before' => __( 'İçerikten önce', 'dla-medical-trust' ),
+			],
+			__( 'Yalnızca otomatik yerleştirme açık olduğunda kullanılır.', 'dla-medical-trust' )
+		);
+
+		echo '</tbody></table>';
+
+		/* --------------------------------------- Yapay zekâ özet çubuğu */
+		$this->render_summary_bar_section( $settings );
+
+		/* -------------------------------------------- Bakım ve kaldırma */
+		printf( '<h2 id="dla-mt-maintenance">%s</h2>', esc_html__( 'Bakım ve kaldırma', 'dla-medical-trust' ) );
+
+		echo '<table class="form-table" role="presentation"><tbody>';
+
+		Field::checkbox(
+			'retain_data_on_uninstall',
+			__( 'Kaldırma davranışı', 'dla-medical-trust' ),
+			(bool) $settings['retain_data_on_uninstall'],
+			__( 'Eklenti silindiğinde veriler korunsun', 'dla-medical-trust' ),
+			__( 'Varsayılan açık. Küratörlü bir kaynak kütüphanesini kaza ile silmek geri alınamaz bir kayıptır.', 'dla-medical-trust' )
+		);
+
+		echo '</tbody></table>';
+		submit_button();
+		echo '</form>';
+
+		$this->render_seed_section();
+		$this->render_repair_section();
+
+		echo '</div>';
+	}
+
+	/**
+	 * Bolum gezinmesi.
+	 *
+	 * Ayar sayfasi tek bir uzun forma dondu ve "hangi alan hangi ozellik
+	 * icin" sorusu ekranda kayboluyordu. Bolumler artik adlandirilmis;
+	 * bu serit onlara dogrudan atlar.
+	 */
+	private function render_section_nav(): void {
+		$sections = [
+			'dla-mt-organization' => __( 'Organizasyon', 'dla-medical-trust' ),
+			'dla-mt-policies'     => __( 'İnceleme politikaları', 'dla-medical-trust' ),
+			'dla-mt-resolver'     => __( 'Kaynak çözümleme', 'dla-medical-trust' ),
+			'dla-mt-scope'        => __( 'Kapsam ve iş akışı', 'dla-medical-trust' ),
+			'dla-mt-trustbox'     => __( 'Trust Box görünümü', 'dla-medical-trust' ),
+			'dla-mt-placement'    => __( 'Trust Box yerleştirme', 'dla-medical-trust' ),
+			'dla-mt-summary'      => __( 'Yapay zekâ özet çubuğu', 'dla-medical-trust' ),
+			'dla-mt-maintenance'  => __( 'Bakım ve kaldırma', 'dla-medical-trust' ),
+		];
+
+		printf(
+			'<nav class="dla-mt-settings-nav" aria-label="%s" style="margin:12px 0 4px;display:flex;flex-wrap:wrap;gap:6px">',
+			esc_attr__( 'Ayar bölümleri', 'dla-medical-trust' )
+		);
+
+		foreach ( $sections as $anchor => $label ) {
+			printf(
+				'<a class="button button-small" href="#%1$s">%2$s</a>',
+				esc_attr( $anchor ),
+				esc_html( (string) $label )
+			);
+		}
+
+		echo '</nav>';
+	}
+
+	/**
+	 * Ozet cubugu bolumu.
+	 *
+	 * Ozet cubugu ve Google dugmesi tek bir bilesen gibi davranir: ayni
+	 * yerde, ayni kosullarla cikarlar. Bu nedenle tur ve haric tutma
+	 * ayarlari IKISI ICIN birden gecerlidir ve ayni bolumde durur.
+	 *
+	 * @param array<string,mixed> $settings
+	 */
+	private function render_summary_bar_section( array $settings ): void {
+		printf( '<h2 id="dla-mt-summary">%s</h2>', esc_html__( 'Yapay zekâ özet çubuğu', 'dla-medical-trust' ) );
+		printf(
+			'<p class="description" style="max-width:70ch">%s</p>',
+			esc_html__( 'İçeriğin başında görünen ayrı bir bileşendir; Trust Box ile ilgisi yoktur. Özet çubuğu ile Google düğmesi birlikte çıkar, bu yüzden aşağıdaki tür ve hariç tutma ayarları ikisi için birden geçerlidir.', 'dla-medical-trust' )
+		);
+
+		echo '<table class="form-table" role="presentation"><tbody>';
+
 		Field::checkbox(
 			'article_summary_links_enabled',
 			__( 'Yapay zekâ ile makale özeti', 'dla-medical-trust' ),
 			(bool) ( $settings['article_summary_links_enabled'] ?? false ),
 			__( 'Makale başlığının altında özet bağlantılarını göster', 'dla-medical-trust' ),
 			__( 'Varsayılan kapalıdır. Açıldığında kapsamda seçili tekil sayfa, yazı ve portfolio içeriklerinde; içerikten önce minimal bir ChatGPT, Grok, Perplexity, Claude ve Gemini çubuğu görünür.', 'dla-medical-trust' )
+		);
+
+		printf( '<tr><th scope="row">%s</th><td><fieldset>', esc_html__( 'Özetin görüneceği türler', 'dla-medical-trust' ) );
+
+		$chosen_types  = (array) ( $settings['summary_links_post_types'] ?? [] );
+		$type_labels   = Settings::selectable_post_types();
+		$scope_types   = Settings::eligible_post_types();
+
+		if ( [] === $scope_types ) {
+			printf( '<em>%s</em>', esc_html__( 'Kapsamda hiçbir içerik türü seçili değil.', 'dla-medical-trust' ) );
+		}
+
+		foreach ( $scope_types as $type ) {
+			printf(
+				'<label style="display:block;margin-bottom:4px"><input type="checkbox" name="summary_links_post_types[]" value="%1$s"%2$s> %3$s</label>',
+				esc_attr( $type ),
+				checked( in_array( $type, $chosen_types, true ), true, false ),
+				esc_html( (string) ( $type_labels[ $type ] ?? $type ) )
+			);
+		}
+
+		printf(
+			'</fieldset><p class="description">%s</p></td></tr>',
+			esc_html__( 'Hiçbiri seçili değilse kapsamdaki bütün türlerde görünür. Yalnızca yazılarda çıkmasını istiyorsanız burada sadece "Yazı" türünü işaretleyin; sayfa türü tamamen dışarıda kalır.', 'dla-medical-trust' )
+		);
+
+		Field::checkbox(
+			'summary_links_skip_front_page',
+			__( 'Ana sayfa', 'dla-medical-trust' ),
+			(bool) ( $settings['summary_links_skip_front_page'] ?? true ),
+			__( 'Ana sayfada özet çubuğunu gösterme', 'dla-medical-trust' ),
+			__( 'Varsayılan açık. Ana sayfanın özetlenecek bir makale metni yoktur. Bu kural her dil için ayrı ayrı geçerlidir; ana sayfaların ID’lerini tek tek yazmanız gerekmez.', 'dla-medical-trust' )
+		);
+
+		Field::post_search_multi(
+			'summary_links_excluded_ids',
+			__( 'Hariç tutulan içerikler', 'dla-medical-trust' ),
+			(array) ( $settings['summary_links_excluded_ids'] ?? [] ),
+			__( 'Burada seçilen içeriklerde ne özet çubuğu ne de Google düğmesi görünür. İletişim, hakkımızda, galeri gibi makale olmayan sayfalar için kullanın. Toplu seçim: bir kelime yazıp Enter’a basın ya da "Hepsini listele" ile bütün kayıtları açın, işaretleyip tek hamlede ekleyin; liste en fazla 300 kayıt getirir. Bir sayfayı seçmek çevirilerini de kapsar: "İletişim" işaretlendiğinde "Contact" da kapanır, hepsini tek tek eklemeniz gerekmez.', 'dla-medical-trust' ),
+			// Listeleme kapsamdaki turlerle sinirli: sayfa olusturucu
+			// layout kayitlari bu listeyi kirletmemeli.
+			Settings::eligible_post_types()
 		);
 
 		Field::checkbox(
@@ -314,36 +478,8 @@ final class SettingsPage {
 			]
 		);
 
-		Field::select(
-			'injection_position',
-			__( 'Otomatik yerleştirme konumu', 'dla-medical-trust' ),
-			(string) ( $settings['injection_position'] ?? 'after' ),
-			[
-				'after'  => __( 'İçerikten sonra', 'dla-medical-trust' ),
-				'before' => __( 'İçerikten önce', 'dla-medical-trust' ),
-			],
-			__( 'Yalnızca otomatik yerleştirme açık olduğunda kullanılır.', 'dla-medical-trust' )
-		);
-
-		Field::checkbox(
-			'retain_data_on_uninstall',
-			__( 'Kaldırma davranışı', 'dla-medical-trust' ),
-			(bool) $settings['retain_data_on_uninstall'],
-			__( 'Eklenti silindiğinde veriler korunsun', 'dla-medical-trust' ),
-			__( 'Varsayılan açık. Küratörlü bir kaynak kütüphanesini kaza ile silmek geri alınamaz bir kayıptır.', 'dla-medical-trust' )
-		);
-
 		echo '</tbody></table>';
-
-		submit_button();
-		echo '</form>';
-
-		$this->render_seed_section();
-		$this->render_repair_section();
-
-		echo '</div>';
 	}
-
 	/**
 	 * Kimlik onarımı — çeviri gruplarında ayrışmış UID'leri düzeltir.
 	 */
@@ -734,6 +870,9 @@ final class SettingsPage {
 				'automatic_injection'       => isset( $_POST['automatic_injection'] ),
 				'injection_position'        => wp_unslash( $_POST['injection_position'] ?? 'after' ),
 				'article_summary_links_enabled' => isset( $_POST['article_summary_links_enabled'] ),
+				'summary_links_post_types'  => (array) ( $_POST['summary_links_post_types'] ?? [] ),
+				'summary_links_excluded_ids' => wp_unslash( $_POST['summary_links_excluded_ids'] ?? '' ),
+				'summary_links_skip_front_page' => isset( $_POST['summary_links_skip_front_page'] ),
 				'google_preferred_source_enabled' => isset( $_POST['google_preferred_source_enabled'] ),
 				'google_preferred_source_position' => wp_unslash( $_POST['google_preferred_source_position'] ?? 'above_summary' ),
 				'retain_data_on_uninstall'  => isset( $_POST['retain_data_on_uninstall'] ),

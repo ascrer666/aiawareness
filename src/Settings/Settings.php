@@ -52,6 +52,13 @@ final class Settings {
 			'automatic_injection'       => false,
 			'injection_position'        => 'after',
 			'article_summary_links_enabled' => false,
+			// Bos liste = kapsamdaki tum turler. Ozet cubugu icin ayri bir tur
+			// listesi tutulur; kapsam ayari Trust Box icindir ve daraltilmasi
+			// gerekmez.
+			'summary_links_post_types'  => [],
+			'summary_links_excluded_ids' => [],
+			// Ana sayfa bir "makale" degildir; ozetlenecek bir metni yoktur.
+			'summary_links_skip_front_page' => true,
 			'google_preferred_source_enabled' => false,
 			'google_preferred_source_position' => 'above_summary',
 			'retain_data_on_uninstall'  => true,
@@ -253,6 +260,28 @@ final class Settings {
 			$out['article_summary_links_enabled'] = (bool) $input['article_summary_links_enabled'];
 		}
 
+		if ( isset( $input['summary_links_post_types'] ) ) {
+			$types     = (array) $input['summary_links_post_types'];
+			$available = self::selectable_post_types();
+			$clean     = [];
+
+			foreach ( $types as $type ) {
+				$type = sanitize_key( (string) $type );
+				if ( isset( $available[ $type ] ) ) {
+					$clean[] = $type;
+				}
+			}
+
+			$out['summary_links_post_types'] = array_values( array_unique( $clean ) );
+		}
+
+		if ( array_key_exists( 'summary_links_excluded_ids', $input ) ) {
+			$out['summary_links_excluded_ids'] = Sanitizer::id_list( $input['summary_links_excluded_ids'] );
+		}
+
+		if ( array_key_exists( 'summary_links_skip_front_page', $input ) ) {
+			$out['summary_links_skip_front_page'] = (bool) $input['summary_links_skip_front_page'];
+		}
 		if ( array_key_exists( 'google_preferred_source_enabled', $input ) ) {
 			$out['google_preferred_source_enabled'] = (bool) $input['google_preferred_source_enabled'];
 		}
@@ -373,6 +402,40 @@ final class Settings {
 		return (bool) self::get( 'article_summary_links_enabled', false );
 	}
 
+	/**
+	 * Ozet cubugunun gorunecegi icerik turleri.
+	 *
+	 * Kapsam ayarinin ALT KUMESIDIR: kapsam disina cikan bir tur burada
+	 * secili kalsa bile gecerli degildir. Bos liste "kapsamdaki tum turler"
+	 * demektir; boylece ayar hic dokunulmadiginda davranis degismez.
+	 *
+	 * @return string[]
+	 */
+	public static function summary_links_post_types(): array {
+		$eligible = self::eligible_post_types();
+		$chosen   = self::get( 'summary_links_post_types', [] );
+
+		if ( ! is_array( $chosen ) || [] === $chosen ) {
+			return $eligible;
+		}
+
+		$chosen = array_values( array_intersect( array_map( 'strval', $chosen ), $eligible ) );
+
+		return [] === $chosen ? $eligible : $chosen;
+	}
+
+	/**
+	 * Ozet cubugundan haric tutulan icerikler.
+	 *
+	 * @return int[]
+	 */
+	public static function summary_links_excluded_ids(): array {
+		return Sanitizer::id_list( self::get( 'summary_links_excluded_ids', [] ) );
+	}
+
+	public static function summary_links_skip_front_page(): bool {
+		return (bool) self::get( 'summary_links_skip_front_page', true );
+	}
 	public static function google_preferred_source_enabled(): bool {
 		return (bool) self::get( 'google_preferred_source_enabled', false );
 	}

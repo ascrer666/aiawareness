@@ -9,7 +9,9 @@ declare( strict_types = 1 );
 
 namespace DLA\MedicalTrust\Integration;
 
+use DLA\MedicalTrust\Frontend\AiProviderIcons;
 use DLA\MedicalTrust\Frontend\AssetManager;
+use DLA\MedicalTrust\I18n\Languages;
 use DLA\MedicalTrust\Settings\Settings;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -36,6 +38,23 @@ final class ArticleSummaryLinks {
 	public function enqueue_if_expected(): void {
 		if ( $this->target_post_id() > 0 ) {
 			$this->assets->enqueue();
+
+			// Canli sitede gorunen yan panel rozeti statik bir deeplink; Google'in
+			// interaktif publisher.js kutuphanesini yuklemiyor. Bu hedef divin
+			// gercek dugmeye donusmesi icin resmi betigi yalnizca ayar acikken ve
+			// ilgili makale sayfasinda bir kez ekle.
+			if ( Settings::google_preferred_source_enabled() ) {
+				wp_enqueue_script(
+					'dla-mt-google-preferred-source',
+					'https://news.google.com/swg/js/v1/publisher.js',
+					[],
+					null,
+					[
+						'in_footer' => false,
+						'strategy'  => 'async',
+					]
+				);
+			}
 		}
 	}
 
@@ -70,7 +89,12 @@ final class ArticleSummaryLinks {
 
 		$this->rendered[ $post_id ] = true;
 
-		return $html . $content;
+		// Bos satirla ayir. Icerigin ilk satiri ciplak bir video adresi
+		// olabilir ve WordPress boyle bir adresi yalnizca SATIR BASINDA
+		// gordugunde oynaticiya cevirir (WP_Embed::autoembed, oncelik 8).
+		// Bileseni bosluksuz yapistirmak o satiri satir basi olmaktan
+		// cikariyor, gomulu video ham baglantiya donuyordu.
+		return $html . "\n\n" . $content;
 	}
 
 	public function render( int $post_id ): string {
@@ -84,12 +108,14 @@ final class ArticleSummaryLinks {
 			__( 'Bu makaleyi özetle ve yalnızca güvenilir kaynakları kullan: %s', 'dla-medical-trust' ),
 			$url
 		);
+		// Anahtar hem CSS degistiricisi hem de isaret kimligidir; etiket
+		// gorunen metindir ve marka adi oldugu icin cevrilmez.
 		$providers = [
-			'ChatGPT'    => 'https://chatgpt.com/?q=',
-			'Grok'       => 'https://grok.com/?q=',
-			'Perplexity' => 'https://www.perplexity.ai/search?q=',
-			'Claude'     => 'https://claude.ai/new?q=',
-			'Gemini'     => 'https://gemini.google.com/app?q=',
+			'chatgpt'    => [ 'label' => 'ChatGPT', 'url' => 'https://chatgpt.com/?q=' ],
+			'grok'       => [ 'label' => 'Grok', 'url' => 'https://grok.com/?q=' ],
+			'perplexity' => [ 'label' => 'Perplexity', 'url' => 'https://www.perplexity.ai/search?q=' ],
+			'claude'     => [ 'label' => 'Claude', 'url' => 'https://claude.ai/new?q=' ],
+			'gemini'     => [ 'label' => 'Gemini', 'url' => 'https://gemini.google.com/app?q=' ],
 		];
 		$preferred_source = Settings::google_preferred_source_enabled()
 			? '<div class="dla-mt-preferred-source"><div google-add-preferred-source-btn></div></div>'
@@ -103,8 +129,8 @@ final class ArticleSummaryLinks {
 		<aside class="dla-mt-summary-links" aria-label="<?php echo esc_attr__( 'Yapay zekâ ile makale özeti', 'dla-medical-trust' ); ?>">
 			<p class="dla-mt-summary-links__title"><span aria-hidden="true">✦</span> <?php echo esc_html__( 'Bu içeriği yapay zekâ ile özetle', 'dla-medical-trust' ); ?></p>
 			<div class="dla-mt-summary-links__actions">
-				<?php foreach ( $providers as $name => $base_url ) : ?>
-					<a class="dla-mt-summary-links__button" href="<?php echo esc_url( $base_url . rawurlencode( $prompt ) ); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html( $name ); ?><span class="screen-reader-text"> <?php echo esc_html__( '(yeni pencerede açılır)', 'dla-medical-trust' ); ?></span></a>
+				<?php foreach ( $providers as $slug => $provider ) : ?>
+					<a class="dla-mt-summary-links__button dla-mt-summary-links__button--<?php echo esc_attr( $slug ); ?>" href="<?php echo esc_url( $provider['url'] . rawurlencode( $prompt ) ); ?>" target="_blank" rel="noopener noreferrer"><?php echo AiProviderIcons::markup( $slug ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sabit, degiskensiz SVG isaret. ?><span class="dla-mt-summary-links__label"><?php echo esc_html( $provider['label'] ); ?></span><span class="screen-reader-text"> <?php echo esc_html__( '(yeni pencerede açılır)', 'dla-medical-trust' ); ?></span></a>
 				<?php endforeach; ?>
 			</div>
 		</aside>
@@ -113,7 +139,9 @@ final class ArticleSummaryLinks {
 		<?php endif; ?>
 		<?php
 
-		return (string) ob_get_clean();
+		// Sablonun kendi girintisi cikti degildir; disari temiz bir
+		// isaretleme birakilir.
+		return trim( (string) ob_get_clean() );
 	}
 
 	private function target_post_id(): int {
@@ -123,10 +151,50 @@ final class ArticleSummaryLinks {
 
 		$post_id = (int) get_queried_object_id();
 		$post    = get_post( $post_id );
-		if ( ! $post instanceof \WP_Post || ! in_array( $post->post_type, Settings::eligible_post_types(), true ) ) {
+		if ( ! $post instanceof \WP_Post || ! in_array( $post->post_type, Settings::summary_links_post_types(), true ) ) {
+			return 0;
+		}
+
+		if ( $this->is_excluded( $post_id ) ) {
 			return 0;
 		}
 
 		return $post_id;
+	}
+
+	/**
+	 * Ozet cubugu bu icerikte bastirilmis mi?
+	 *
+	 * Kapsamdaki "sayfa" turu yalnizca tedavi anlatan makaleleri degil, ana
+	 * sayfa ve iletisim gibi metinsiz sayfalari da icerir. Ozetlenecek bir
+	 * makale olmayan bu sayfalarda hem ozet cubugu hem de onunla birlikte
+	 * gelen Google dugmesi anlamsizdir; ikisi ayni kapidan gecer.
+	 */
+	private function is_excluded( int $post_id ): bool {
+		// Ana sayfa her dilde ayri bir kayittir; is_front_page() ucunu de
+		// tek kuralla yakalar, ID listesine dil dil eklemek gerekmez.
+		if ( Settings::summary_links_skip_front_page() && is_front_page() ) {
+			return true;
+		}
+
+		$excluded = Settings::summary_links_excluded_ids();
+
+		if ( [] === $excluded ) {
+			return false;
+		}
+
+		if ( in_array( $post_id, $excluded, true ) ) {
+			return true;
+		}
+
+		// Bir sayfayi haric tutmak ceviri kardeslerini de kapsar: yonetici
+		// "Iletisim" sayfasini bir kez isaretler, "Contact" da kapanir.
+		foreach ( Languages::adapter()->post_translations( $post_id ) as $translated_id ) {
+			if ( in_array( (int) $translated_id, $excluded, true ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

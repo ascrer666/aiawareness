@@ -32,6 +32,10 @@ final class PostSearch {
 
 	private const LIMIT = 20;
 
+	// Gozatma modunda amac daraltmak degil, tek ekranda toplu isaretlemektir;
+	// bu nedenle sinir belirgin sekilde yuksek tutulur.
+	private const BROWSE_LIMIT = 300;
+
 	public function register(): void {
 		add_action( 'wp_ajax_' . self::ACTION, [ $this, 'handle' ] );
 	}
@@ -77,6 +81,27 @@ final class PostSearch {
 		return $title . ' · ' . $label . ' (#' . $post->ID . ')' . $suffix;
 	}
 
+	/**
+	 * Istekte bildirilen turleri gecerli kumeye indirger.
+	 *
+	 * Cagiran taraf turleri daraltabilir (ozet cubugu haric tutma listesi
+	 * yalnizca sayfa/yazi gosterir) ama genisletemez: sonuc her zaman
+	 * profile_post_types() icindedir.
+	 *
+	 * @return string[]
+	 */
+	public static function requested_post_types( string $raw ): array {
+		$allowed = self::profile_post_types();
+
+		if ( '' === trim( $raw ) ) {
+			return $allowed;
+		}
+
+		$requested = array_filter( array_map( 'sanitize_key', explode( ',', $raw ) ) );
+		$filtered  = array_values( array_intersect( $requested, $allowed ) );
+
+		return [] === $filtered ? $allowed : $filtered;
+	}
 	public function handle(): void {
 		if ( ! current_user_can( Capabilities::MANAGE_EXPERTS ) ) {
 			wp_send_json_error( [ 'message' => __( 'Yetkiniz yok.', 'dla-medical-trust' ) ], 403 );
@@ -84,35 +109,43 @@ final class PostSearch {
 
 		check_ajax_referer( self::ACTION, 'nonce' );
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- check_ajax_referer dogruladi.
-		$term = isset( $_GET['term'] ) ? sanitize_text_field( wp_unslash( (string) $_GET['term'] ) ) : '';
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- check_ajax_referer dogruladi.
+		$term   = isset( $_GET['term'] ) ? sanitize_text_field( wp_unslash( (string) $_GET['term'] ) ) : '';
+		$browse = isset( $_GET['browse'] ) && '1' === $_GET['browse'];
+		$types  = self::requested_post_types( isset( $_GET['types'] ) ? wp_unslash( (string) $_GET['types'] ) : '' );
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
-		if ( mb_strlen( $term ) < 2 ) {
+		// Gozatmada terim zorunlu degildir: kullanici hicbir sey yazmadan da
+		// listeyi acip toplu isaretleyebilmeli.
+		if ( ! $browse && mb_strlen( $term ) < 2 ) {
 			wp_send_json_success( [] );
 		}
 
-		$query = new \WP_Query(
-			[
-				// Polylang'in o anki yonetici dili filtresi, ayarlarda secilecek
-				// ana sayfayi gizlememeli. "lang" WordPress tarafinda zararsiz
-				// bir ek sorgu degiskenidir; Polylang etkinken tum dilleri ister.
-				'lang'                   => '',
-				'post_type'              => self::profile_post_types(),
-				'post_status'            => [ 'publish', 'draft', 'private' ],
-				's'                      => $term,
-				// Genel metin aramasi, header/footer icinde uzman adi gecen yuzlerce
-				// alakasiz sayfayi getiriyordu. Secilecek hedef adi ile bulunur;
-				// bu nedenle yalnizca baslikta ara.
-				'search_columns'         => [ 'post_title' ],
-				'posts_per_page'         => self::LIMIT,
-				'orderby'                => 'title',
-				'order'                  => 'ASC',
-				'ignore_sticky_posts'    => true,
-				'no_found_rows'          => true,
-				'update_post_meta_cache' => false,
-				'update_post_term_cache' => false,
-			]
-		);
+		$args = [
+			// Polylang'in o anki yonetici dili filtresi, ayarlarda secilecek
+			// ana sayfayi gizlememeli. "lang" WordPress tarafinda zararsiz
+			// bir ek sorgu degiskenidir; Polylang etkinken tum dilleri ister.
+			'lang'                   => '',
+			'post_type'              => $types,
+			'post_status'            => [ 'publish', 'draft', 'private' ],
+			'posts_per_page'         => $browse ? self::BROWSE_LIMIT : self::LIMIT,
+			'orderby'                => 'title',
+			'order'                  => 'ASC',
+			'ignore_sticky_posts'    => true,
+			'no_found_rows'          => true,
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+		];
+
+		if ( '' !== $term ) {
+			$args['s'] = $term;
+			// Genel metin aramasi, header/footer icinde uzman adi gecen yuzlerce
+			// alakasiz sayfayi getiriyordu. Secilecek hedef adi ile bulunur;
+			// bu nedenle yalnizca baslikta ara.
+			$args['search_columns'] = [ 'post_title' ];
+		}
+
+		$query = new \WP_Query( $args );
 
 		$results = [];
 

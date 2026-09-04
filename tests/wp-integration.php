@@ -414,15 +414,85 @@ $check( 'GP Google tercih edilen kaynak varsayilan kapali', ! \DLA\MedicalTrust\
 \DLA\MedicalTrust\Settings\Settings::update( array_merge( \DLA\MedicalTrust\Settings\Settings::all(), [ 'article_summary_links_enabled' => true ] ) );
 $summary_html = ( new \DLA\MedicalTrust\Integration\ArticleSummaryLinks() )->render( $page_id );
 $check( 'AS etkinlestirilen ozet baglantilari tum saglayicilari ve sayfa URLsini tasir', str_contains( $summary_html, 'dla-mt-summary-links' ) && str_contains( $summary_html, 'ChatGPT' ) && str_contains( $summary_html, 'Perplexity' ) && str_contains( $summary_html, rawurlencode( get_permalink( $page_id ) ) ) );
+$check( 'AS her saglayici butonu kendi marka isaretini tasir', 5 === substr_count( $summary_html, 'dla-mt-summary-links__icon' ) && str_contains( $summary_html, 'dla-mt-summary-links__button--claude' ) && str_contains( $summary_html, 'dla-mt-icon-gemini' ) );
 $summary_in_content = $with_main_query( $page_id, static fn() => ( new \DLA\MedicalTrust\Integration\ArticleSummaryLinks() )->prepend( (string) get_post_field( 'post_content', $page_id ) ) );
 $summary_in_layout  = $with_main_query( $page_id, static fn() => ( new \DLA\MedicalTrust\Integration\ArticleSummaryLinks() )->prepend( '[fusion_builder_container]Global Layout[/fusion_builder_container]' ) );
-$check( 'AS yalnizca sorgulanan sayfanin kendi iceriginden once eklenir', str_starts_with( $summary_in_content, '<aside class="dla-mt-summary-links"' ) && ! str_contains( $summary_in_layout, 'dla-mt-summary-links' ) );
+// Icerigi ciplak bir video adresiyle baslayan sayfa: WordPress'in kendi
+// autoembed kurali, bilesen eklendikten SONRA da eslesmeye devam etmeli.
+// Google dugmesi ozet cubugunun ALTINDA iken bilesen icerige bitisik
+// bitiyordu ve gomulu video ham baglantiya donuyordu; bu yuzden kural her
+// iki yerlesimde de sinanir.
+$embed_page = wp_insert_post( [ 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Autoembed Page', 'post_content' => "https://youtu.be/6PwGvLJ-IGk?si=hQsFtRxRJ51fiYsu\n\nSayfa metni." ] );
+$fake_oembed = static fn() => '<iframe src="https://www.youtube.com/embed/6PwGvLJ-IGk"></iframe>';
+$embed_case = static function ( array $values ) use ( $embed_page, $with_main_query, $fake_oembed ): array {
+	\DLA\MedicalTrust\Settings\Settings::update( array_merge( \DLA\MedicalTrust\Settings\Settings::all(), $values ) );
+	$prepended = $with_main_query(
+		$embed_page,
+		static fn() => ( new \DLA\MedicalTrust\Integration\ArticleSummaryLinks() )->prepend( (string) get_post_field( 'post_content', $embed_page ) )
+	);
+	// Ag cagrisi sahte; olculen sey autoembed'in satiri yakalayip yakalamadigi.
+	add_filter( 'pre_oembed_result', $fake_oembed );
+	$embedded = $GLOBALS['wp_embed']->autoembed( $prepended );
+	remove_filter( 'pre_oembed_result', $fake_oembed );
+
+	return [ $prepended, $embedded ];
+};
+[ $embed_plain, $embedded_plain ] = $embed_case( [ 'google_preferred_source_enabled' => false ] );
+[ $embed_below, $embedded_below ] = $embed_case( [ 'google_preferred_source_enabled' => true, 'google_preferred_source_position' => 'below_summary' ] );
+$check( 'AS bilesen eklenince ciplak video adresi satir basinda kalir', str_contains( $embed_below, 'dla-mt-summary-links' ) && str_contains( $embed_below, 'google-add-preferred-source-btn' ) && 1 === preg_match( '|^(\s*)(https?://[^\s<>"]+)(\s*)$|im', $embed_below ) );
+$check( 'AS video adresi Google dugmesi kapaliyken oynaticiya donusur', str_contains( $embedded_plain, 'youtube.com/embed/6PwGvLJ-IGk' ) && ! str_contains( $embedded_plain, 'youtu.be/6PwGvLJ-IGk?si' ) );
+$check( 'AS video adresi Google dugmesi ozetin altindayken de oynaticiya donusur', str_contains( $embedded_below, 'youtube.com/embed/6PwGvLJ-IGk' ) && ! str_contains( $embedded_below, 'youtu.be/6PwGvLJ-IGk?si' ) );
+$check( 'AS bilesen kendi girintisini icerige sizdirmaz', $embed_below === trim( $embed_below ) && $summary_html === trim( $summary_html ) );
+\DLA\MedicalTrust\Settings\Settings::update( array_merge( \DLA\MedicalTrust\Settings\Settings::all(), [ 'google_preferred_source_enabled' => false, 'google_preferred_source_position' => 'above_summary' ] ) );
+$check( 'AS yalnizca sorgulanan sayfanin kendi iceriginden once eklenir', str_starts_with( ltrim( $summary_in_content ), '<aside class="dla-mt-summary-links"' ) && ! str_contains( $summary_in_layout, 'dla-mt-summary-links' ) );
 \DLA\MedicalTrust\Settings\Settings::update( array_merge( \DLA\MedicalTrust\Settings\Settings::all(), [ 'google_preferred_source_enabled' => true, 'google_preferred_source_position' => 'above_summary' ] ) );
 $preferred_above = ( new \DLA\MedicalTrust\Integration\ArticleSummaryLinks() )->render( $page_id );
 $check( 'GP Google hedefi ozetin ustunde render edilir', str_contains( $preferred_above, 'google-add-preferred-source-btn' ) && strpos( $preferred_above, 'dla-mt-preferred-source' ) < strpos( $preferred_above, 'dla-mt-summary-links' ) );
+$with_main_query( $page_id, static fn() => ( new \DLA\MedicalTrust\Integration\ArticleSummaryLinks() )->enqueue_if_expected() );
+$check( 'GP etkinlestirildiginde resmi Google publisher betigi yalnizca sayfada kuyruga alinir', wp_script_is( 'dla-mt-google-preferred-source', 'enqueued' ) );
 \DLA\MedicalTrust\Settings\Settings::update( array_merge( \DLA\MedicalTrust\Settings\Settings::all(), [ 'google_preferred_source_position' => 'below_summary' ] ) );
 $preferred_below = ( new \DLA\MedicalTrust\Integration\ArticleSummaryLinks() )->render( $page_id );
 $check( 'GP Google hedefi ozetin altinda render edilir', strpos( $preferred_below, 'dla-mt-preferred-source' ) > strpos( $preferred_below, 'dla-mt-summary-links' ) );
+
+/* --- Ozet cubugu kapsami ve haric tutma --- */
+$summary_settings = static function ( array $values ): void {
+	\DLA\MedicalTrust\Settings\Settings::update( array_merge( \DLA\MedicalTrust\Settings\Settings::all(), $values ) );
+};
+$summary_output = static fn( int $post_id ) => $with_main_query(
+	$post_id,
+	static fn() => ( new \DLA\MedicalTrust\Integration\ArticleSummaryLinks() )->prepend( (string) get_post_field( 'post_content', $post_id ) )
+);
+$check( 'AS ID listesi metinden de okunur', [ 12, 34 ] === \DLA\MedicalTrust\Support\Sanitizer::id_list( '12, 34, 12, 0' ) );
+$check( 'AS tur listesi bos birakildiginda kapsami izler', \DLA\MedicalTrust\Settings\Settings::summary_links_post_types() === \DLA\MedicalTrust\Settings\Settings::eligible_post_types() );
+$summary_settings( [ 'summary_links_post_types' => [ 'post' ] ] );
+$check( 'AS tur kisiti kapsam disina cikan sayfayi bastirir', ! str_contains( $summary_output( $page_id ), 'dla-mt-summary-links' ) && [ 'post' ] === \DLA\MedicalTrust\Settings\Settings::summary_links_post_types() );
+$summary_settings( [ 'summary_links_post_types' => [], 'summary_links_excluded_ids' => (string) $page_id ] );
+$excluded_output = $summary_output( $page_id );
+$check( 'AS haric tutulan sayfada ne ozet ne Google dugmesi kalir', ! str_contains( $excluded_output, 'dla-mt-summary-links' ) && ! str_contains( $excluded_output, 'google-add-preferred-source-btn' ) );
+$check( 'AS haric tutma ceviri kardesini de kapsar', ! str_contains( $summary_output( $page_en_id ), 'dla-mt-summary-links' ) );
+$summary_settings( [ 'summary_links_excluded_ids' => [] ] );
+$check( 'AS haric tutma kaldirilinca cubuk geri gelir', str_contains( $summary_output( $page_en_id ), 'dla-mt-summary-links' ) );
+$check( 'AS ana sayfa varsayilan olarak disarida', \DLA\MedicalTrust\Settings\Settings::summary_links_skip_front_page() );
+update_option( 'show_on_front', 'page' );
+update_option( 'page_on_front', $page_id );
+$check( 'AS ana sayfada ozet cubugu gorunmez', ! str_contains( $summary_output( $page_id ), 'dla-mt-summary-links' ) );
+$summary_settings( [ 'summary_links_skip_front_page' => false ] );
+$check( 'AS ana sayfa kurali kapatilabilir', str_contains( $summary_output( $page_id ), 'dla-mt-summary-links' ) );
+$summary_settings( [ 'summary_links_skip_front_page' => true ] );
+update_option( 'show_on_front', 'posts' );
+update_option( 'page_on_front', 0 );
+$previous_user = get_current_user_id();
+wp_set_current_user( $admin_id );
+ob_start();
+( new \DLA\MedicalTrust\Admin\SettingsPage() )->render();
+$settings_html = (string) ob_get_clean();
+wp_set_current_user( $previous_user );
+$check( 'UI ayar sayfasi adlandirilmis bolumlere ayrilir', str_contains( $settings_html, 'id="dla-mt-trustbox"' ) && str_contains( $settings_html, 'id="dla-mt-placement"' ) && str_contains( $settings_html, 'id="dla-mt-summary"' ) && str_contains( $settings_html, 'id="dla-mt-maintenance"' ) );
+$check( 'PS listeleme turleri bos istekte kapsami korur', \DLA\MedicalTrust\Admin\PostSearch::requested_post_types( '' ) === \DLA\MedicalTrust\Admin\PostSearch::profile_post_types() );
+$check( 'PS listeleme turleri daraltilabilir', [ 'page' ] === \DLA\MedicalTrust\Admin\PostSearch::requested_post_types( 'page' ) );
+$check( 'PS listeleme turleri genisletilemez', \DLA\MedicalTrust\Admin\PostSearch::requested_post_types( 'dla_expert,attachment' ) === \DLA\MedicalTrust\Admin\PostSearch::profile_post_types() );
+$check( 'UI haric tutma alani toplu secim kontrolleri tasir', str_contains( $settings_html, 'dla-mt-postsearch__browse' ) && str_contains( $settings_html, 'dla-mt-postsearch__add' ) && str_contains( $settings_html, 'dla-mt-postsearch__clear-all' ) && str_contains( $settings_html, 'data-types="page,post"' ) );
+$check( 'UI ozet bolumu tur ve haric tutma alanlarini tasir', str_contains( $settings_html, 'name="summary_links_post_types[]"' ) && str_contains( $settings_html, 'name="summary_links_excluded_ids"' ) && str_contains( $settings_html, 'dla-mt-postsearch--multi' ) && str_contains( $settings_html, 'name="summary_links_skip_front_page"' ) );
 
 update_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_AUTHOR_MODE, 'organization' );
 $editorial_html = $component->render_for_post( $page_id );

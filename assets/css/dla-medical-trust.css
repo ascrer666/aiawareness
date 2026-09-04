@@ -315,6 +315,7 @@
 .dla-mt-summary-links__button {
   display: inline-flex;
   align-items: center;
+  gap: .45rem;
   min-height: 2.25rem;
   padding: .35rem .8rem;
   border: 1px solid #e5e7eb;
@@ -335,6 +336,19 @@
   text-decoration: none;
 }
 
+/* Marka isaretleri yalnizca kendi renklerini tasir; buton metni
+   temanin koyu rengiyle okunur kalir. Grok in isareti tek renkli
+   tasarlanmistir ve metin rengini devralir. */
+.dla-mt-summary-links__icon {
+  flex: none;
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+.dla-mt-summary-links__button--chatgpt .dla-mt-summary-links__icon { color: #0d8a6a; }
+.dla-mt-summary-links__button--perplexity .dla-mt-summary-links__icon { color: #1d7f8c; }
+.dla-mt-summary-links__button--claude .dla-mt-summary-links__icon { color: #c1613f; }
+
 .dla-mt-preferred-source {
   display: flex;
   align-items: center;
@@ -342,7 +356,20 @@
   margin: 0 0 .7rem;
 }
 
-.dla-mt-summary-links + .dla-mt-preferred-source { margin: .7rem 0 1.35rem; }
+.dla-mt-summary-links + /* Marka isaretleri yalnizca kendi renklerini tasir; buton metni
+   temanin koyu rengiyle okunur kalir. Grok in isareti tek renkli
+   tasarlanmistir ve metin rengini devralir. */
+.dla-mt-summary-links__icon {
+  flex: none;
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+.dla-mt-summary-links__button--chatgpt .dla-mt-summary-links__icon { color: #0d8a6a; }
+.dla-mt-summary-links__button--perplexity .dla-mt-summary-links__icon { color: #1d7f8c; }
+.dla-mt-summary-links__button--claude .dla-mt-summary-links__icon { color: #c1613f; }
+
+.dla-mt-preferred-source { margin: .7rem 0 1.35rem; }
 
 /* ---------------------------------------------------------- compact */
 

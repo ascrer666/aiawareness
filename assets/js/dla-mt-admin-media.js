@@ -105,6 +105,10 @@
  * Sabit <select> hem kapsam disi turleri (portfolio, hizmet) gizliyordu
  * hem de 300 kayittan sonrasini erisilemez kiliyordu. Burada yazdikca
  * sunucuda aranir; tur kisiti yoktur.
+ *
+ * Coklu modda (--multi) sonuclar onay kutuludur. Ayni sayfanin bes ceviri
+ * kopyasini tek tek tiklamak dayanilmazdi: liste toplu isaretlenir,
+ * "Hepsini listele" ise hic arama yazmadan tum kayitlari getirir.
  */
 ( function ( document ) {
 	'use strict';
@@ -116,16 +120,32 @@
 	}
 
 	function setup( box ) {
-		var hidden  = document.getElementById( box.getAttribute( 'data-target' ) );
-		var input   = box.querySelector( '.dla-mt-postsearch__input' );
-		var list    = box.querySelector( '.dla-mt-postsearch__results' );
-		var current = box.querySelector( '.dla-mt-postsearch__current' );
-		var clear   = box.querySelector( '.dla-mt-postsearch__clear' );
-		var timer   = null;
-		var seq     = 0;
+		var hidden   = document.getElementById( box.getAttribute( 'data-target' ) );
+		var input    = box.querySelector( '.dla-mt-postsearch__input' );
+		var list     = box.querySelector( '.dla-mt-postsearch__results' );
+		var current  = box.querySelector( '.dla-mt-postsearch__current' );
+		var clear    = box.querySelector( '.dla-mt-postsearch__clear' );
+		var chips    = box.querySelector( '.dla-mt-postsearch__chips' );
+		var chipsBar = box.querySelector( '.dla-mt-postsearch__chipsbar' );
+		var bulk     = box.querySelector( '.dla-mt-postsearch__bulk' );
+		var browse   = box.querySelector( '.dla-mt-postsearch__browse' );
+		var clearAll = box.querySelector( '.dla-mt-postsearch__clear-all' );
+		var types    = box.getAttribute( 'data-types' ) || '';
+		var multi    = -1 !== box.className.indexOf( 'dla-mt-postsearch--multi' ) && !! chips;
+		var timer    = null;
+		var seq      = 0;
 
 		if ( ! hidden || ! input || ! list ) {
 			return;
+		}
+
+		function closeResults() {
+			list.hidden = true;
+			list.innerHTML = '';
+
+			if ( bulk ) {
+				bulk.hidden = true;
+			}
 		}
 
 		function message( text ) {
@@ -135,9 +155,124 @@
 			li.textContent = text;
 			list.appendChild( li );
 			list.hidden = false;
+
+			if ( bulk ) {
+				bulk.hidden = true;
+			}
+		}
+
+		/*
+		 * Coklu modda tek dogru kaynak gorunur metin kutusudur; rozetler
+		 * yalnizca onun okunabilir yuzudur. Boylece JS yarim kalsa bile
+		 * form dogru degeri gonderir.
+		 */
+		function selectedIds() {
+			return hidden.value.split( /[^0-9]+/ ).filter( function ( part ) {
+				return '' !== part;
+			} );
+		}
+
+		function writeIds( ids ) {
+			hidden.value = ids.join( ', ' );
+			chips.hidden = ! ids.length;
+
+			if ( chipsBar ) {
+				chipsBar.hidden = ! ids.length;
+			}
+		}
+
+		function appendChip( id, label ) {
+			var li = document.createElement( 'li' );
+			var text = document.createElement( 'span' );
+			var remove = document.createElement( 'button' );
+
+			li.setAttribute( 'data-id', String( id ) );
+			text.textContent = label;
+			remove.type = 'button';
+			remove.className = 'button-link dla-mt-postsearch__remove';
+			remove.textContent = '×';
+			remove.setAttribute( 'aria-label', cfg.removeLabel || '' );
+
+			li.appendChild( text );
+			li.appendChild( remove );
+			chips.appendChild( li );
+		}
+
+		function syncChips() {
+			var known = {};
+
+			Array.prototype.forEach.call( chips.children, function ( li ) {
+				var span = li.querySelector( 'span' );
+				known[ li.getAttribute( 'data-id' ) ] = span ? span.textContent : '';
+			} );
+
+			chips.innerHTML = '';
+
+			selectedIds().forEach( function ( id ) {
+				appendChip( id, known[ id ] || '#' + id );
+			} );
+
+			writeIds( selectedIds() );
+		}
+
+		// Eklenen satir listede kalir ama isaretli ve pasif olur: kullanici
+		// neyin zaten kapsandigini gorur, ikinci kez eklemeye calismaz.
+		function markAdded( checkbox ) {
+			checkbox.checked = true;
+			checkbox.disabled = true;
+
+			if ( checkbox.parentNode ) {
+				checkbox.parentNode.className = 'is-added';
+			}
+		}
+
+		function addChecked() {
+			var ids = selectedIds();
+
+			Array.prototype.forEach.call( list.querySelectorAll( 'input[type="checkbox"]' ), function ( checkbox ) {
+				if ( ! checkbox.checked || checkbox.disabled ) {
+					return;
+				}
+
+				if ( -1 === ids.indexOf( checkbox.value ) ) {
+					ids.push( checkbox.value );
+					appendChip( checkbox.value, checkbox.getAttribute( 'data-label' ) || ( '#' + checkbox.value ) );
+				}
+
+				markAdded( checkbox );
+			} );
+
+			writeIds( ids );
+		}
+
+		function markAll( checked ) {
+			Array.prototype.forEach.call( list.querySelectorAll( 'input[type="checkbox"]' ), function ( checkbox ) {
+				if ( ! checkbox.disabled ) {
+					checkbox.checked = checked;
+				}
+			} );
+		}
+
+		function collect( id, label ) {
+			var ids = selectedIds();
+
+			if ( -1 === ids.indexOf( String( id ) ) ) {
+				ids.push( String( id ) );
+				appendChip( id, label );
+				writeIds( ids );
+			}
+
+			input.value = '';
+			closeResults();
 		}
 
 		function choose( id, label ) {
+			if ( multi ) {
+				collect( id, label );
+
+				return;
+			}
+
 			hidden.value = String( id );
 
 			if ( current ) {
@@ -151,19 +286,10 @@
 			}
 
 			input.value = '';
-			list.hidden = true;
-			list.innerHTML = '';
+			closeResults();
 		}
 
-		function render( items ) {
-			list.innerHTML = '';
-
-			if ( ! items.length ) {
-				message( cfg.noResults );
-
-				return;
-			}
-
+		function renderSingle( items ) {
 			items.forEach( function ( item ) {
 				var li = document.createElement( 'li' );
 				var btn = document.createElement( 'button' );
@@ -176,16 +302,68 @@
 				li.appendChild( btn );
 				list.appendChild( li );
 			} );
+		}
+
+		function renderMulti( items ) {
+			var chosen = selectedIds();
+
+			items.forEach( function ( item ) {
+				var li = document.createElement( 'li' );
+				var label = document.createElement( 'label' );
+				var checkbox = document.createElement( 'input' );
+				var added = -1 !== chosen.indexOf( String( item.id ) );
+
+				checkbox.type = 'checkbox';
+				checkbox.value = String( item.id );
+				checkbox.setAttribute( 'data-label', item.label );
+				checkbox.checked = added;
+				checkbox.disabled = added;
+
+				label.appendChild( checkbox );
+				label.appendChild( document.createTextNode( ' ' + item.label ) );
+
+				if ( added ) {
+					label.className = 'is-added';
+				}
+
+				li.appendChild( label );
+				list.appendChild( li );
+			} );
+
+			if ( bulk ) {
+				bulk.hidden = false;
+			}
+		}
+
+		function render( items ) {
+			list.innerHTML = '';
+
+			if ( ! items.length ) {
+				message( cfg.noResults );
+
+				return;
+			}
+
+			if ( multi ) {
+				renderMulti( items );
+			} else {
+				renderSingle( items );
+			}
 
 			list.hidden = false;
 		}
 
-		function search( term ) {
+		function search( term, all ) {
 			var mine = ++seq;
 			var url = cfg.ajaxUrl
 				+ '?action=' + encodeURIComponent( cfg.action )
 				+ '&nonce=' + encodeURIComponent( cfg.nonce )
+				+ '&types=' + encodeURIComponent( types )
 				+ '&term=' + encodeURIComponent( term );
+
+			if ( all ) {
+				url += '&browse=1';
+			}
 
 			fetch( url, { credentials: 'same-origin' } )
 				.then( function ( r ) { return r.json(); } )
@@ -210,21 +388,95 @@
 			window.clearTimeout( timer );
 
 			if ( term.length < 2 ) {
-				list.hidden = true;
-				list.innerHTML = '';
+				closeResults();
 
 				return;
 			}
 
-			timer = window.setTimeout( function () { search( term ); }, 250 );
+			timer = window.setTimeout( function () { search( term, false ); }, 250 );
 		} );
 
 		// Enter arama kutusunda formu gondermemeli.
 		input.addEventListener( 'keydown', function ( event ) {
 			if ( 'Enter' === event.key ) {
 				event.preventDefault();
+
+				if ( multi ) {
+					search( input.value.trim(), true );
+				}
 			}
 		} );
+
+		if ( browse ) {
+			browse.addEventListener( 'click', function ( event ) {
+				event.preventDefault();
+				window.clearTimeout( timer );
+				search( input.value.trim(), true );
+			} );
+		}
+
+		if ( multi ) {
+			chips.addEventListener( 'click', function ( event ) {
+				var button = event.target;
+
+				if ( ! button || -1 === String( button.className ).indexOf( 'dla-mt-postsearch__remove' ) ) {
+					return;
+				}
+
+				event.preventDefault();
+
+				var removed = button.parentNode.getAttribute( 'data-id' );
+
+				button.parentNode.remove();
+				writeIds( selectedIds().filter( function ( id ) {
+					return id !== removed;
+				} ) );
+
+				// Ayni kayit listede aciksa yeniden eklenebilir olsun.
+				Array.prototype.forEach.call( list.querySelectorAll( 'input[type="checkbox"]' ), function ( checkbox ) {
+					if ( checkbox.value === removed ) {
+						checkbox.disabled = false;
+						checkbox.checked = false;
+						checkbox.parentNode.className = '';
+					}
+				} );
+			} );
+
+			// ID listesi elle de duzenlenebilir; rozetler o listeyi izler.
+			hidden.addEventListener( 'change', syncChips );
+		}
+
+		if ( bulk ) {
+			bulk.addEventListener( 'click', function ( event ) {
+				var button = event.target;
+				var name = button ? String( button.className ) : '';
+
+				if ( -1 !== name.indexOf( 'dla-mt-postsearch__add' ) ) {
+					event.preventDefault();
+					addChecked();
+				} else if ( -1 !== name.indexOf( 'dla-mt-postsearch__all' ) ) {
+					event.preventDefault();
+					markAll( true );
+				} else if ( -1 !== name.indexOf( 'dla-mt-postsearch__none' ) ) {
+					event.preventDefault();
+					markAll( false );
+				}
+			} );
+		}
+
+		if ( clearAll ) {
+			clearAll.addEventListener( 'click', function ( event ) {
+				event.preventDefault();
+
+				if ( cfg.confirmClear && ! window.confirm( cfg.confirmClear ) ) {
+					return;
+				}
+
+				chips.innerHTML = '';
+				writeIds( [] );
+				closeResults();
+			} );
+		}
 
 		if ( clear ) {
 			clear.addEventListener( 'click', function ( event ) {
