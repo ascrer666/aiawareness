@@ -39,7 +39,8 @@ final class PostSearch {
 	/**
 	 * Profil hedefi olabilecek icerik turleri.
 	 *
-	 * Eklentinin kendi turleri ve ekler haric, arayuzu olan her tur.
+	 * Eklentinin kendi turleri ve ekler haric, herkese acik veya yonetim
+	 * arayuzu olan her tur. Buna Avada portfolio/hizmet turleri de dahildir.
 	 *
 	 * @return string[]
 	 */
@@ -99,6 +100,10 @@ final class PostSearch {
 				'post_type'              => self::profile_post_types(),
 				'post_status'            => [ 'publish', 'draft', 'private' ],
 				's'                      => $term,
+				// Genel metin aramasi, header/footer icinde uzman adi gecen yuzlerce
+				// alakasiz sayfayi getiriyordu. Secilecek hedef adi ile bulunur;
+				// bu nedenle yalnizca baslikta ara.
+				'search_columns'         => [ 'post_title' ],
 				'posts_per_page'         => self::LIMIT,
 				'orderby'                => 'title',
 				'order'                  => 'ASC',

@@ -968,12 +968,12 @@ $check( 'AC turetilen biyografide sayfa olusturucu kisa kodu kalmaz', ! str_cont
 // Profil sayfasi Avada portfolyosu ya da bir hizmet kaydi olabilir; eski
 // secici yalnizca Ayarlardaki kapsam turlerini (page, post) listeledigi
 // icin bu kayitlar hic gorunmuyordu.
-register_post_type( 'avada_portfolio', [ 'public' => true, 'show_ui' => true, 'label' => 'Portfolyo' ] );
+register_post_type( 'avada_portfolio', [ 'public' => true, 'show_ui' => false, 'label' => 'Portfolyo' ] );
 register_post_type( 'dla_private_type', [ 'public' => false, 'show_ui' => false, 'label' => 'Gizli' ] );
 \DLA\MedicalTrust\Settings\Settings::update( [ 'eligible_post_types' => [ 'page' ] ] );
 \DLA\MedicalTrust\Settings\Settings::flush_cache();
 $ps_types = \DLA\MedicalTrust\Admin\PostSearch::profile_post_types();
-$check( 'PS profil secici ozel turleri kapsar', in_array( 'avada_portfolio', $ps_types, true ) );
+$check( 'PS profil secici arayuzu kapali herkese acik ozel turleri kapsar', in_array( 'avada_portfolio', $ps_types, true ) );
 $check( 'PS profil secici kapsam ayarina bagli degil', in_array( 'post', $ps_types, true ) );
 $check( 'PS profil secici eklentinin kendi turlerini disarida birakir', ! in_array( 'dla_expert', $ps_types, true ) && ! in_array( 'dla_source', $ps_types, true ) );
 $check( 'PS profil secici ekleri disarida birakir', ! in_array( 'attachment', $ps_types, true ) );

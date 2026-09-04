@@ -262,7 +262,19 @@ final class Settings {
 		$out     = [];
 		$exclude = [ 'dla_expert', 'dla_source', 'attachment' ];
 
-		foreach ( get_post_types( [ 'show_ui' => true ], 'objects' ) as $type ) {
+		// Avada'daki portfolio/hizmet gibi bazi gercek on-yuz turleri yonetim
+		// arayuzunu kapatir. Herkese acik VEYA yonetim arayuzu olan turleri
+		// dahil et; aksi halde bu kayitlar secici ve kapsamdan kaybolur.
+		$types = array_merge(
+			get_post_types( [ 'public' => true ], 'objects' ),
+			get_post_types( [ 'show_ui' => true ], 'objects' )
+		);
+
+		foreach ( $types as $type ) {
+			if ( ! $type instanceof \WP_Post_Type ) {
+				continue;
+			}
+
 			if ( in_array( $type->name, $exclude, true ) ) {
 				continue;
 			}
