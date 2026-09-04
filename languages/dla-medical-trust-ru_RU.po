@@ -1966,10 +1966,14 @@ msgstr "Последнее обновление:"
 msgid "Uzman değerlendirmesi"
 msgstr "Комментарий эксперта"
 
-#: templates/trust-block.php:147
+#: templates/trust-block.php:157
 msgid "Editoryal bilgilendirme"
 msgstr "Редакционная информация"
 
-#: templates/trust-block.php:148
+#: templates/trust-block.php:162
+msgid "Yayın Kurulu"
+msgstr "Редакционная коллегия"
+
+#: templates/trust-block.php:163
 msgid "Bu içeriğin geliştirilmesine %s katkı sağlamıştır. Sayfa içeriği sadece bilgilendirme amaçlıdır. Tanı ve tedavi için mutlaka hekiminize başvurunuz."
 msgstr "%s участвовал в подготовке этого материала. Страница носит исключительно информационный характер. Для диагностики и лечения обязательно обратитесь к врачу."

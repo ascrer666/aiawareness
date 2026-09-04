@@ -36,11 +36,46 @@ final class SettingsPage {
 
 	public function register(): void {
 		add_action( 'admin_menu', [ $this, 'add_page' ] );
+		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue' ] );
 		add_action( 'admin_post_dla_mt_save_settings', [ $this, 'handle_save' ] );
 		add_action( 'admin_post_' . self::REPAIR_ACTION, [ $this, 'handle_repair' ] );
 		add_action( 'admin_post_' . self::SEED_ACTION, [ $this, 'handle_seed' ] );
 		add_action( 'admin_post_' . self::PUBLISH_ACTION, [ $this, 'handle_publish_pending' ] );
 		add_action( 'admin_post_' . self::SEED_PUBLISH_ACTION, [ $this, 'handle_seed_and_publish' ] );
+	}
+
+	/**
+	 * Ayarlar sayfasindaki aranabilir icerik secicisini yukler.
+	 *
+	 * Bu kontrol uzman ekraninda da kullanilir; ayni dosya orada medya
+	 * secicisini, burada ise yalnizca post aramasini baslatir.
+	 */
+	public function enqueue( string $hook ): void {
+		if ( false === strpos( $hook, self::SLUG ) ) {
+			return;
+		}
+
+		$script_path = DLA_MT_DIR . 'assets/js/dla-mt-admin-media.js';
+
+		wp_enqueue_script(
+			'dla-mt-admin-media',
+			DLA_MT_URL . 'assets/js/dla-mt-admin-media.js',
+			[],
+			is_file( $script_path ) ? (string) filemtime( $script_path ) : \DLA\MedicalTrust\VERSION,
+			true
+		);
+
+		wp_localize_script(
+			'dla-mt-admin-media',
+			'dlaMtPostSearch',
+			[
+				'ajaxUrl'   => admin_url( 'admin-ajax.php' ),
+				'action'    => PostSearch::ACTION,
+				'nonce'     => wp_create_nonce( PostSearch::ACTION ),
+				'noResults' => __( 'Eşleşen içerik bulunamadı.', 'dla-medical-trust' ),
+				'error'     => __( 'Arama başarısız oldu; sayfayı yenileyip tekrar deneyin.', 'dla-medical-trust' ),
+			]
+		);
 	}
 
 	public function add_page(): void {
@@ -238,12 +273,11 @@ final class SettingsPage {
 
 		$this->render_default_expert_portrait( (int) ( $settings['default_expert_id'] ?? 0 ) );
 
-		Field::post_select(
+		Field::post_search(
 			'editorial_board_page_id',
 			__( 'Yayın kurulu sayfası', 'dla-medical-trust' ),
 			(int) ( $settings['editorial_board_page_id'] ?? 0 ),
-			array_keys( Settings::selectable_post_types() ),
-			__( 'Trust Box altındaki editoryal bilgilendirme bandında bağlantı olarak gösterilir. Polylang çevirisi varsa ziyaretçinin dilindeki sayfaya otomatik gider; seçilmezse bant gösterilmez.', 'dla-medical-trust' )
+			__( 'Trust Box altındaki editoryal bilgilendirme bandında bağlantı olarak gösterilir. Sayfa adıyla arayın veya post ID girin. Polylang çevirisi varsa ziyaretçinin dilindeki sayfaya otomatik gider; seçilmezse bant gösterilmez.', 'dla-medical-trust' )
 		);
 
 		Field::checkbox(

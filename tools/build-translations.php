@@ -31,6 +31,7 @@ $catalogs = [
 		'Son güncelleme:' => 'Last updated:', 'Uzman değerlendirmesi' => 'Expert commentary',
 		'Kaynaklar' => 'Sources',
 		'Editoryal bilgilendirme' => 'Editorial information',
+		'Yayın Kurulu' => 'Editorial Board',
 		'Bu içeriğin geliştirilmesine %s katkı sağlamıştır. Sayfa içeriği sadece bilgilendirme amaçlıdır. Tanı ve tedavi için mutlaka hekiminize başvurunuz.' => 'The %s has contributed to the development of this content. This page is for informational purposes only. Please consult your physician for diagnosis and treatment.',
 		'Bu bölüm, içeriğin tıbbi sorumluluk ve inceleme bilgilerini sunar; kişisel tıbbi değerlendirme yerine geçmez.' => 'This section presents the content responsibility and medical review information; it does not replace individual medical advice.',
 		'Akademik / Bilimsel Kaynak' => 'Academic / Scientific Source', 'Tıbbi Otorite / Mesleki Kuruluş' => 'Medical Authority / Professional Organisation',
@@ -47,6 +48,7 @@ $catalogs = [
 		'Son güncelleme:' => 'Zuletzt aktualisiert:', 'Uzman değerlendirmesi' => 'Fachliche Einschätzung',
 		'Kaynaklar' => 'Quellen',
 		'Editoryal bilgilendirme' => 'Redaktioneller Hinweis',
+		'Yayın Kurulu' => 'Redaktionsbeirat',
 		'Bu içeriğin geliştirilmesine %s katkı sağlamıştır. Sayfa içeriği sadece bilgilendirme amaçlıdır. Tanı ve tedavi için mutlaka hekiminize başvurunuz.' => 'Der %s hat zur Erstellung dieses Inhalts beigetragen. Diese Seite dient ausschließlich der Information. Für Diagnose und Behandlung wenden Sie sich bitte an Ihre Ärztin oder Ihren Arzt.',
 		'Bu bölüm, içeriğin tıbbi sorumluluk ve inceleme bilgilerini sunar; kişisel tıbbi değerlendirme yerine geçmez.' => 'Dieser Abschnitt enthält Angaben zur medizinischen Verantwortung und Prüfung und ersetzt keine individuelle medizinische Beratung.',
 		'Akademik / Bilimsel Kaynak' => 'Akademische / wissenschaftliche Quelle', 'Tıbbi Otorite / Mesleki Kuruluş' => 'Medizinische Fachgesellschaft / Gesundheitsbehörde',
@@ -63,6 +65,7 @@ $catalogs = [
 		'Son güncelleme:' => 'Dernière mise à jour :', 'Uzman değerlendirmesi' => 'Avis de l’expert',
 		'Kaynaklar' => 'Sources',
 		'Editoryal bilgilendirme' => 'Information éditoriale',
+		'Yayın Kurulu' => 'Comité éditorial',
 		'Bu içeriğin geliştirilmesine %s katkı sağlamıştır. Sayfa içeriği sadece bilgilendirme amaçlıdır. Tanı ve tedavi için mutlaka hekiminize başvurunuz.' => 'Le %s a contribué à l’élaboration de ce contenu. Cette page est fournie à titre informatif uniquement. Pour tout diagnostic ou traitement, consultez votre médecin.',
 		'Bu bölüm, içeriğin tıbbi sorumluluk ve inceleme bilgilerini sunar; kişisel tıbbi değerlendirme yerine geçmez.' => 'Cette section présente les informations de responsabilité et de revue médicale ; elle ne remplace pas un avis médical personnalisé.',
 		'Akademik / Bilimsel Kaynak' => 'Source académique / scientifique', 'Tıbbi Otorite / Mesleki Kuruluş' => 'Autorité médicale / organisme professionnel',
@@ -79,6 +82,7 @@ $catalogs = [
 		'Son güncelleme:' => 'Последнее обновление:', 'Uzman değerlendirmesi' => 'Комментарий эксперта',
 		'Kaynaklar' => 'Источники',
 		'Editoryal bilgilendirme' => 'Редакционная информация',
+		'Yayın Kurulu' => 'Редакционная коллегия',
 		'Bu içeriğin geliştirilmesine %s katkı sağlamıştır. Sayfa içeriği sadece bilgilendirme amaçlıdır. Tanı ve tedavi için mutlaka hekiminize başvurunuz.' => '%s участвовал в подготовке этого материала. Страница носит исключительно информационный характер. Для диагностики и лечения обязательно обратитесь к врачу.',
 		'Bu bölüm, içeriğin tıbbi sorumluluk ve inceleme bilgilerini sunar; kişisel tıbbi değerlendirme yerine geçmez.' => 'Этот раздел содержит сведения о медицинской ответственности и проверке материала и не заменяет персональную медицинскую консультацию.',
 		'Akademik / Bilimsel Kaynak' => 'Академический / научный источник', 'Tıbbi Otorite / Mesleki Kuruluş' => 'Медицинский орган / профессиональная организация',
@@ -88,6 +92,62 @@ $catalogs = [
 
 $po_quote = static function ( string $value ): string {
 	return '"' . addcslashes( $value, "\\\"\n\r\t" ) . '"';
+};
+
+/**
+ * Compile the non-empty catalog entries into a standard GNU MO file.
+ *
+ * This keeps release localization reproducible without requiring gettext or
+ * WP-CLI to be installed on the workstation that prepares the ZIP.
+ *
+ * @param array<string,string> $translations
+ */
+$write_mo = static function ( string $locale, array $translations ) use ( $root ): void {
+	$header = "Project-Id-Version: DLA Medical Trust 0.6.1\\n"
+		. "Language: {$locale}\\n"
+		. "Content-Type: text/plain; charset=UTF-8\\n"
+		. "Content-Transfer-Encoding: 8bit\\n"
+		. "Plural-Forms: nplurals=2; plural=(n != 1);\\n";
+	$messages = [ '' => $header ];
+
+	foreach ( $translations as $original => $translated ) {
+		if ( '' !== $translated ) {
+			$messages[ $original ] = $translated;
+		}
+	}
+
+	ksort( $messages, SORT_STRING );
+	$count            = count( $messages );
+	$originals_offset = 28;
+	// Each original/translation index is a length and an offset: two 32-bit
+	// integers, or eight bytes per message.
+	$translated_offset = $originals_offset + ( 8 * $count );
+	$strings_offset    = $translated_offset + ( 8 * $count );
+	$original_data     = '';
+	$translated_data   = '';
+	$original_table    = '';
+	$translated_table  = '';
+	$offset            = $strings_offset;
+
+	foreach ( $messages as $original => $translated ) {
+		$original_table .= pack( 'VV', strlen( $original ), $offset );
+		$original_data  .= $original . "\0";
+		$offset         += strlen( $original ) + 1;
+	}
+
+	$offset = $strings_offset + strlen( $original_data );
+	foreach ( $messages as $translated ) {
+		$translated_table .= pack( 'VV', strlen( $translated ), $offset );
+		$translated_data  .= $translated . "\0";
+		$offset           += strlen( $translated ) + 1;
+	}
+
+	// WordPress' MO reader uses hash_addr as the start of the string data even
+	// when the optional hash table is empty, so it must point just after both
+	// index tables rather than be zero.
+	$mo = pack( 'V7', 0x950412de, 0, $count, $originals_offset, $translated_offset, 0, $strings_offset )
+		. $original_table . $translated_table . $original_data . $translated_data;
+	file_put_contents( $root . '/languages/dla-medical-trust-' . $locale . '.mo', $mo );
 };
 
 $entries = preg_split( '/(?=^#:)/m', (string) file_get_contents( $pot ) );
@@ -103,4 +163,5 @@ foreach ( $catalogs as $locale => $translations ) {
 		$out .= $refs . 'msgid ' . $po_quote( $msgid ) . "\nmsgstr " . $po_quote( $translation ) . "\n\n";
 	}
 	file_put_contents( $root . '/languages/dla-medical-trust-' . $locale . '.po', rtrim( $out ) . "\n" );
+	$write_mo( $locale, $translations );
 }

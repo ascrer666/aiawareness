@@ -33,12 +33,22 @@ $to_label   = static function ( ?string $iso ) use ( $format ): string {
 $date_label    = $to_label( $trust_data->review_date );
 $updated_label = $to_label( $trust_data->updated_date );
 $board_page_id = \DLA\MedicalTrust\Settings\Settings::editorial_board_page_id();
+$board_page    = null;
+
 if ( $board_page_id > 0 ) {
-	$language    = \DLA\MedicalTrust\I18n\Languages::adapter()->post_language( $trust_data->post_id );
+	$language     = \DLA\MedicalTrust\I18n\Languages::adapter()->post_language( $trust_data->post_id );
 	$translations = \DLA\MedicalTrust\I18n\Languages::adapter()->post_translations( $board_page_id );
-	$board_page_id = (int) ( $translations[ $language ] ?? $board_page_id );
+	$localized_id  = (int) ( $translations[ $language ] ?? 0 );
+	$candidate     = $localized_id > 0 ? get_post( $localized_id ) : null;
+
+	// Bir EN/DE/... sayfada o dilde yayin kurulu cevirisi yoksa ziyaretciyi
+	// Turkce (veya baska dildeki) sayfaya gondermeyin. Not yine gorunur,
+	// ancak yerellestirilmis genel "Yayin Kurulu" ifadesi link olmaz.
+	if ( $candidate instanceof \WP_Post && 'publish' === $candidate->post_status ) {
+		$board_page    = $candidate;
+		$board_page_id = $localized_id;
+	}
 }
-$board_page = $board_page_id > 0 ? get_post( $board_page_id ) : null;
 ?>
 <section class="dla-mt dla-mt--<?php echo esc_attr( $display ); ?>"<?php if ( isset( $accent ) && '' !== $accent ) : ?> style="--dla-mt-accent: <?php echo esc_attr( $accent ); ?>"<?php endif; ?> data-dla-mt-post="<?php echo esc_attr( (string) $trust_data->post_id ); ?>" aria-labelledby="<?php echo esc_attr( $component_id ); ?>-heading">
 	<header class="dla-mt__header">
@@ -143,8 +153,13 @@ $board_page = $board_page_id > 0 ? get_post( $board_page_id ) : null;
 
 </section>
 
-<?php if ( $board_page instanceof \WP_Post && 'publish' === $board_page->post_status ) : ?>
+<?php if ( \DLA\MedicalTrust\Settings\Settings::editorial_board_page_id() > 0 ) : ?>
 	<aside class="dla-mt-editorial-note" aria-label="<?php echo esc_attr__( 'Editoryal bilgilendirme', 'dla-medical-trust' ); ?>">
-		<p><?php printf( esc_html__( 'Bu içeriğin geliştirilmesine %s katkı sağlamıştır. Sayfa içeriği sadece bilgilendirme amaçlıdır. Tanı ve tedavi için mutlaka hekiminize başvurunuz.', 'dla-medical-trust' ), sprintf( '<a href="%1$s">%2$s</a>', esc_url( (string) get_permalink( $board_page_id ) ), esc_html( (string) $board_page->post_title ) ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- link URL and title are escaped. ?></p>
+		<p><?php
+		$board_label = $board_page instanceof \WP_Post
+			? sprintf( '<a href="%1$s">%2$s</a>', esc_url( (string) get_permalink( $board_page_id ) ), esc_html( (string) $board_page->post_title ) )
+			: esc_html__( 'Yayın Kurulu', 'dla-medical-trust' );
+		printf( esc_html__( 'Bu içeriğin geliştirilmesine %s katkı sağlamıştır. Sayfa içeriği sadece bilgilendirme amaçlıdır. Tanı ve tedavi için mutlaka hekiminize başvurunuz.', 'dla-medical-trust' ), $board_label ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- link URL and title are escaped when present.
+		?></p>
 	</aside>
 <?php endif; ?>

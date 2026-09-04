@@ -92,6 +92,10 @@ final class PostSearch {
 
 		$query = new \WP_Query(
 			[
+				// Polylang'in o anki yonetici dili filtresi, ayarlarda secilecek
+				// ana sayfayi gizlememeli. "lang" WordPress tarafinda zararsiz
+				// bir ek sorgu degiskenidir; Polylang etkinken tum dilleri ister.
+				'lang'                   => '',
 				'post_type'              => self::profile_post_types(),
 				'post_status'            => [ 'publish', 'draft', 'private' ],
 				's'                      => $term,
