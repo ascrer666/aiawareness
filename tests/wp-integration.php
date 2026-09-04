@@ -99,8 +99,8 @@ if ( ! function_exists( 'pll_default_language' ) ) {
 	}
 
 	function pll_get_post_language( int $post_id, string $field = 'slug' ): string {
-		unset( $post_id, $field );
-		return 'tr';
+		unset( $field );
+		return $GLOBALS['dla_mt_test_post_languages'][ $post_id ] ?? 'tr';
 	}
 
 	function pll_get_term_language( int $term_id, string $field = 'slug' ): string {
@@ -305,6 +305,11 @@ $check( 'due review remains valid and retains its historical date', 'due' === $f
 // inceleme GORUNUMUNU test ettigi icin bu bolum boyunca acik tutulur.
 \DLA\MedicalTrust\Settings\Settings::update( [ 'show_review_date' => true ] );
 $profile_id = wp_insert_post( [ 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Dr. Leyla Arvas' ] );
+$profile_en_id = wp_insert_post( [ 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Dr. Leyla Arvas EN' ] );
+$GLOBALS['dla_mt_test_post_translations'][ $profile_id ] = [ 'tr' => $profile_id, 'en' => $profile_en_id ];
+$GLOBALS['dla_mt_test_post_translations'][ $profile_en_id ] = [ 'tr' => $profile_id, 'en' => $profile_en_id ];
+$GLOBALS['dla_mt_test_post_languages'][ $profile_id ] = 'tr';
+$GLOBALS['dla_mt_test_post_languages'][ $profile_en_id ] = 'en';
 $image_id   = wp_insert_attachment( [ 'post_mime_type' => 'image/jpeg', 'post_status' => 'inherit', 'post_title' => 'Doctor portrait', 'guid' => 'http://example.test/doctor.jpg' ] );
 update_post_meta( $image_id, '_wp_attachment_metadata', [ 'width' => 600, 'height' => 600, 'file' => '2026/09/doctor.jpg', 'sizes' => [] ] );
 // REGRESYON — canlida portrenin hic gorunmemesinin sebebi buydu:
@@ -328,8 +333,23 @@ $check(
 update_post_meta( $expert_tr, \DLA\MedicalTrust\Meta\MetaRegistry::EXPERT_HONORIFIC, 'Op. Dr.' );
 update_post_meta( $expert_tr, \DLA\MedicalTrust\Meta\MetaRegistry::EXPERT_JOB_TITLE, 'Plastik, Rekonstrüktif ve Estetik Cerrahi Uzmanı' );
 update_post_meta( $expert_tr, \DLA\MedicalTrust\Meta\MetaRegistry::EXPERT_PROFILE_PAGE, $profile_id );
+update_post_meta( $expert_en, \DLA\MedicalTrust\Meta\MetaRegistry::EXPERT_PROFILE_PAGE, $profile_en_id );
+update_post_meta( $expert_en, \DLA\MedicalTrust\Meta\MetaRegistry::EXPERT_HONORIFIC, 'Dr.' );
+update_post_meta( $expert_en, \DLA\MedicalTrust\Meta\MetaRegistry::EXPERT_JOB_TITLE, 'Plastic and Reconstructive Surgeon' );
+update_post_meta( $expert_en, \DLA\MedicalTrust\Meta\MetaRegistry::EXPERT_SHORT_BIO, 'English expert biography.' );
 update_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_AUTHOR_MODE, 'expert' );
 update_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_EXPERT_ID, $expert_tr );
+// Polylang may copy this raw ID from the Turkish page. Presentation must
+// resolve the English expert and its English profile automatically.
+$page_en_id = wp_insert_post( [ 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Medical Page EN' ] );
+$GLOBALS['dla_mt_test_post_translations'][ $page_id ] = [ 'tr' => $page_id, 'en' => $page_en_id ];
+$GLOBALS['dla_mt_test_post_translations'][ $page_en_id ] = [ 'tr' => $page_id, 'en' => $page_en_id ];
+$GLOBALS['dla_mt_test_post_languages'][ $page_id ] = 'tr';
+$GLOBALS['dla_mt_test_post_languages'][ $page_en_id ] = 'en';
+wp_set_object_terms( $page_en_id, [ $topic_en_id ], \DLA\MedicalTrust\Taxonomies\MedicalTopicTaxonomy::SLUG );
+update_post_meta( $page_en_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_PRIMARY_TOPIC_UID, $topic_uid );
+update_post_meta( $page_en_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_AUTHOR_MODE, 'expert' );
+update_post_meta( $page_en_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_EXPERT_ID, $expert_tr );
 update_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_COMMENTARY, '<p>Uzman <strong>değerlendirmesi</strong>.</p>' );
 
 $make_source = static function ( string $slot, string $title, string $doi ) use ( $topic_tr_id ): int {
@@ -374,6 +394,8 @@ add_filter( 'image_downsize', $image_downsize, 10, 3 );
 $component    = new \DLA\MedicalTrust\Integration\TrustComponent();
 $default_html = $component->render_for_post( $page_id );
 $compact_html = $component->render_for_post( $page_id, [ 'display' => 'compact' ] );
+$english_expert_html = $component->render_for_post( $page_en_id );
+$check( 'M4 Polylang expert and canonical profile follow the page language', str_contains( $english_expert_html, 'Dr. Test Doctor EN' ) && str_contains( $english_expert_html, 'Plastic and Reconstructive Surgeon' ) && str_contains( $english_expert_html, get_permalink( $profile_en_id ) ) && ! str_contains( $english_expert_html, get_permalink( $profile_id ) ) );
 $check( 'M4 default premium render has full fixture', str_contains( $default_html, 'dla-mt--default' ) && str_contains( $default_html, 'Op. Dr. Test Doctor TR' ) && str_contains( $default_html, 'Uzman değerlendirmesi' ) && str_contains( $default_html, 'Academic Evidence' ) );
 $check( 'M4 compact render uses the same fixture', str_contains( $compact_html, 'dla-mt--compact' ) && ! str_contains( $compact_html, 'dla-mt__portrait' ) );
 $check( 'M4 default and compact retain trust-fact parity', str_contains( $default_html, 'datetime="2024-08-31"' ) && str_contains( $compact_html, 'datetime="2024-08-31"' ) && str_contains( $default_html, '10.1000/m4-academic' ) && str_contains( $compact_html, '10.1000/m4-academic' ) );

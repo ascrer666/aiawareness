@@ -16,6 +16,7 @@ use DLA\MedicalTrust\Domain\Enum\ReviewValidity;
 use DLA\MedicalTrust\Domain\Enum\SourceType;
 use DLA\MedicalTrust\Domain\ReviewVisibility;
 use DLA\MedicalTrust\Domain\TrustData;
+use DLA\MedicalTrust\I18n\Languages;
 use DLA\MedicalTrust\Meta\MetaRegistry;
 use DLA\MedicalTrust\PostTypes\ExpertPostType;
 use DLA\MedicalTrust\Review\ReviewService;
@@ -95,13 +96,13 @@ final class TrustDataRepository {
 
 		$author_mode = AuthorMode::coerce( get_post_meta( $post_id, MetaRegistry::PAGE_AUTHOR_MODE, true ) ) ?? AuthorMode::ORGANIZATION;
 		$author      = AuthorMode::EXPERT === $author_mode
-			? $this->expert( (int) get_post_meta( $post_id, MetaRegistry::PAGE_EXPERT_ID, true ) )
+			? $this->expert_for_page( (int) get_post_meta( $post_id, MetaRegistry::PAGE_EXPERT_ID, true ), $post_id )
 			: null;
 		$status      = (string) get_post_meta( $post_id, MetaRegistry::PAGE_REVIEW_STATUS, true );
 		$validity    = (string) get_post_meta( $post_id, MetaRegistry::PAGE_REVIEW_VALIDITY, true );
 		$valid_review = ReviewStatus::REVIEWED === $status && ReviewValidity::VALID === $validity;
 		$reviewer    = $valid_review
-			? $this->expert( (int) get_post_meta( $post_id, MetaRegistry::PAGE_REVIEWER_EXPERT_ID, true ) )
+			? $this->expert_for_page( (int) get_post_meta( $post_id, MetaRegistry::PAGE_REVIEWER_EXPERT_ID, true ), $post_id )
 			: null;
 		$review_date = $valid_review ? MetaRegistry::sanitize_past_date( get_post_meta( $post_id, MetaRegistry::PAGE_REVIEW_DATE, true ) ) : '';
 
@@ -134,13 +135,13 @@ final class TrustDataRepository {
 		$primary_source = null !== $reviewer ? 'reviewer' : ( null !== $author ? 'author' : '' );
 
 		if ( null === $primary ) {
-			$topic_expert = $this->expert( $this->topic_default_expert_id( $post_id ) );
+			$topic_expert = $this->expert_for_page( $this->topic_default_expert_id( $post_id ), $post_id );
 
 			if ( null !== $topic_expert ) {
 				$primary        = $topic_expert;
 				$primary_source = 'topic';
 			} else {
-				$site_expert = $this->expert( Settings::default_expert_id() );
+				$site_expert = $this->expert_for_page( Settings::default_expert_id(), $post_id );
 
 				if ( null !== $site_expert ) {
 					$primary        = $site_expert;
@@ -217,12 +218,29 @@ final class TrustDataRepository {
 	}
 
 	/** @return array<string,mixed>|null */
-	private function expert( int $expert_id ): ?array {
+	private function expert_for_page( int $expert_id, int $page_id ): ?array {
+		if ( ! ExpertPostType::is_valid_published_expert( $expert_id ) ) {
+			return null;
+		}
+
+		$language = Languages::adapter()->post_language( $page_id );
+		$members  = Languages::adapter()->post_translations( $expert_id );
+		$localized_expert_id = (int) ( $members[ $language ] ?? $expert_id );
+
+		return $this->expert( $localized_expert_id, $language );
+	}
+
+	/** @return array<string,mixed>|null */
+	private function expert( int $expert_id, string $language = '' ): ?array {
 		if ( ! ExpertPostType::is_valid_published_expert( $expert_id ) ) {
 			return null;
 		}
 		$expert = get_post( $expert_id );
 		$profile_id = (int) get_post_meta( $expert_id, MetaRegistry::EXPERT_PROFILE_PAGE, true );
+		if ( '' !== $language && $profile_id > 0 ) {
+			$profile_members = Languages::adapter()->post_translations( $profile_id );
+			$profile_id      = (int) ( $profile_members[ $language ] ?? $profile_id );
+		}
 		$profile    = get_post( $profile_id );
 		$profile_url = $profile instanceof \WP_Post && 'publish' === $profile->post_status ? (string) get_permalink( $profile_id ) : '';
 		$name = ExpertPostType::compose_name(
