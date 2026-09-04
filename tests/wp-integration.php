@@ -391,11 +391,14 @@ $image_downsize = static function ( $downsize, int $attachment_id, $size ) use (
 	return $image_id === $attachment_id ? [ 'http://example.test/doctor.jpg', 600, 600, true ] : $downsize;
 };
 add_filter( 'image_downsize', $image_downsize, 10, 3 );
+$current_settings = \DLA\MedicalTrust\Settings\Settings::all();
+\DLA\MedicalTrust\Settings\Settings::update( array_merge( $current_settings, [ 'editorial_board_page_id' => $profile_id ] ) );
 $component    = new \DLA\MedicalTrust\Integration\TrustComponent();
 $default_html = $component->render_for_post( $page_id );
 $compact_html = $component->render_for_post( $page_id, [ 'display' => 'compact' ] );
 $english_expert_html = $component->render_for_post( $page_en_id );
 $check( 'M4 Polylang expert and canonical profile follow the page language', str_contains( $english_expert_html, 'Dr. Test Doctor EN' ) && str_contains( $english_expert_html, 'Plastic and Reconstructive Surgeon' ) && str_contains( $english_expert_html, get_permalink( $profile_en_id ) ) && ! str_contains( $english_expert_html, get_permalink( $profile_id ) ) );
+$check( 'M4 editorial note uses the board page translation', str_contains( $english_expert_html, 'dla-mt-editorial-note' ) && str_contains( $english_expert_html, get_permalink( $profile_en_id ) ) && str_contains( $english_expert_html, 'Dr. Leyla Arvas EN' ) );
 $check( 'M4 default premium render has full fixture', str_contains( $default_html, 'dla-mt--default' ) && str_contains( $default_html, 'Op. Dr. Test Doctor TR' ) && str_contains( $default_html, 'Uzman değerlendirmesi' ) && str_contains( $default_html, 'Academic Evidence' ) );
 $check( 'M4 compact render uses the same fixture', str_contains( $compact_html, 'dla-mt--compact' ) && ! str_contains( $compact_html, 'dla-mt__portrait' ) );
 $check( 'M4 default and compact retain trust-fact parity', str_contains( $default_html, 'datetime="2024-08-31"' ) && str_contains( $compact_html, 'datetime="2024-08-31"' ) && str_contains( $default_html, '10.1000/m4-academic' ) && str_contains( $compact_html, '10.1000/m4-academic' ) );

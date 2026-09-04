@@ -238,6 +238,14 @@ final class SettingsPage {
 
 		$this->render_default_expert_portrait( (int) ( $settings['default_expert_id'] ?? 0 ) );
 
+		Field::post_select(
+			'editorial_board_page_id',
+			__( 'Yayın kurulu sayfası', 'dla-medical-trust' ),
+			(int) ( $settings['editorial_board_page_id'] ?? 0 ),
+			array_keys( Settings::selectable_post_types() ),
+			__( 'Trust Box altındaki editoryal bilgilendirme bandında bağlantı olarak gösterilir. Polylang çevirisi varsa ziyaretçinin dilindeki sayfaya otomatik gider; seçilmezse bant gösterilmez.', 'dla-medical-trust' )
+		);
+
 		Field::checkbox(
 			'automatic_injection',
 			__( 'Otomatik Trust Box yerleştirme', 'dla-medical-trust' ),
@@ -659,6 +667,7 @@ final class SettingsPage {
 				'eligible_post_types'       => (array) ( $_POST['eligible_post_types'] ?? [] ),
 				'require_signoff_reference' => isset( $_POST['require_signoff_reference'] ),
 				'default_expert_id'         => $_POST['default_expert_id'] ?? 0,
+				'editorial_board_page_id'  => $_POST['editorial_board_page_id'] ?? 0,
 				'accent_color'              => wp_unslash( $_POST['accent_color'] ?? '' ),
 				'show_updated_date'         => isset( $_POST['show_updated_date'] ),
 				'show_review_date'          => isset( $_POST['show_review_date'] ),

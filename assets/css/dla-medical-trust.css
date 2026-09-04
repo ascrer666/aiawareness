@@ -273,6 +273,21 @@
 
 .dla-mt .dla-mt__footer p { margin: 0; }
 
+.dla-mt-editorial-note {
+  box-sizing: border-box;
+  margin: 1.25rem 0 0;
+  padding: 1.35rem 2.5rem;
+  border-inline-start: 3px solid var(--dla-mt-accent, #ff6b1a);
+  background: #f2f2f2;
+  color: #555;
+  font-size: .95rem;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.dla-mt-editorial-note p { margin: 0; }
+.dla-mt-editorial-note a { color: inherit; text-decoration: underline; text-underline-offset: .16em; }
+
 /* ---------------------------------------------------------- compact */
 
 .dla-mt--compact {

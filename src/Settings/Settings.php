@@ -45,6 +45,7 @@ final class Settings {
 			'require_signoff_reference' => true,
 			'eligible_post_types'       => [ 'page', 'post' ],
 			'default_expert_id'         => 0,
+			'editorial_board_page_id'  => 0,
 			'accent_color'              => '',
 			'show_updated_date'         => true,
 			'show_review_date'          => false,
@@ -221,6 +222,13 @@ final class Settings {
 			);
 		}
 
+		if ( array_key_exists( 'editorial_board_page_id', $input ) ) {
+			$out['editorial_board_page_id'] = Sanitizer::content_post_id(
+				$input['editorial_board_page_id'],
+				array_keys( self::selectable_post_types() )
+			);
+		}
+
 		if ( array_key_exists( 'accent_color', $input ) ) {
 			$hex = sanitize_hex_color( trim( (string) $input['accent_color'] ) );
 			$out['accent_color'] = is_string( $hex ) ? $hex : '';
@@ -288,6 +296,11 @@ final class Settings {
 	 */
 	public static function default_expert_id(): int {
 		return (int) self::get( 'default_expert_id', 0 );
+	}
+
+	/** Globally configured editorial-board page; translated at render time. */
+	public static function editorial_board_page_id(): int {
+		return (int) self::get( 'editorial_board_page_id', 0 );
 	}
 
 	/**

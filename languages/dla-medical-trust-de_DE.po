@@ -78,7 +78,7 @@ msgstr ""
 msgid "Seçilmemiş. Ayarlar → Varsayılan içerik sorumlusu alanından bir uzman seçerseniz her sayfada tek tek uzman seçmeniz gerekmez."
 msgstr ""
 
-#: src/Admin/SettingsPage.php:243
+#: src/Admin/SettingsPage.php:251
 msgid "Otomatik Trust Box yerleştirme"
 msgstr ""
 
@@ -1066,187 +1066,195 @@ msgstr ""
 msgid "Sayfada ve konuda uzman seçilmemişse Trust Box bu uzmanı gösterir; böylece her sayfayı tek tek doldurmanız gerekmez. Devralma sırası: sayfa → konu → site geneli. Bu bir yazarlık veya tıbbi inceleme iddiası DEĞİLDİR; yalnızca içeriğin tıbbi sorumlusunu bildirir ve hiçbir inceleme tarihi üretmez."
 msgstr ""
 
-#: src/Admin/SettingsPage.php:245
-msgid "Uygun tıbbi içeriğin the_content çıktısına Trust Box ekle"
+#: src/Admin/SettingsPage.php:243
+msgid "Yayın kurulu sayfası"
 msgstr ""
 
 #: src/Admin/SettingsPage.php:246
-msgid "Varsayılan kapalıdır. Avada Global Layout içinde shortcode kullanılıyorsa kapalı bırakın; böylece çift kutu oluşmaz."
+msgid "Trust Box altındaki editoryal bilgilendirme bandında bağlantı olarak gösterilir. Polylang çevirisi varsa ziyaretçinin dilindeki sayfaya otomatik gider; seçilmezse bant gösterilmez."
 msgstr ""
 
-#: src/Admin/SettingsPage.php:251
-msgid "Otomatik yerleştirme konumu"
+#: src/Admin/SettingsPage.php:253
+msgid "Uygun tıbbi içeriğin the_content çıktısına Trust Box ekle"
 msgstr ""
 
 #: src/Admin/SettingsPage.php:254
-msgid "İçerikten sonra"
+msgid "Varsayılan kapalıdır. Avada Global Layout içinde shortcode kullanılıyorsa kapalı bırakın; böylece çift kutu oluşmaz."
 msgstr ""
 
-#: src/Admin/SettingsPage.php:255
-msgid "İçerikten önce"
-msgstr ""
-
-#: src/Admin/SettingsPage.php:257
-msgid "Yalnızca otomatik yerleştirme açık olduğunda kullanılır."
+#: src/Admin/SettingsPage.php:259
+msgid "Otomatik yerleştirme konumu"
 msgstr ""
 
 #: src/Admin/SettingsPage.php:262
-msgid "Kaldırma davranışı"
+msgid "İçerikten sonra"
 msgstr ""
 
-#: src/Admin/SettingsPage.php:264
-msgid "Eklenti silindiğinde veriler korunsun"
+#: src/Admin/SettingsPage.php:263
+msgid "İçerikten önce"
 msgstr ""
 
 #: src/Admin/SettingsPage.php:265
+msgid "Yalnızca otomatik yerleştirme açık olduğunda kullanılır."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:270
+msgid "Kaldırma davranışı"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:272
+msgid "Eklenti silindiğinde veriler korunsun"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:273
 msgid "Varsayılan açık. Küratörlü bir kaynak kütüphanesini kaza ile silmek geri alınamaz bir kayıptır."
 msgstr ""
 
-#: src/Admin/SettingsPage.php:283
+#: src/Admin/SettingsPage.php:291
 msgid "Çeviri kimlik onarımı"
 msgstr ""
 
-#: src/Admin/SettingsPage.php:287
+#: src/Admin/SettingsPage.php:295
 msgid "Bir çeviri grubundaki tüm konular aynı konu kimliğini, tüm uzmanlar aynı varlık kimliğini taşımalıdır. Bu araç ayrışmış grupları tarar, düzeltir ve değişen kimliklere yapılan atıfları yeniden yazar. Çalıştırmak güvenlidir: ikinci çalıştırma hiçbir şey değiştirmez."
 msgstr ""
 
-#: src/Admin/SettingsPage.php:300
+#: src/Admin/SettingsPage.php:308
 msgid "Kimlikleri tara ve onar"
 msgstr ""
 
-#: src/Admin/SettingsPage.php:309
+#: src/Admin/SettingsPage.php:317
 msgid "Taranan konu grubu"
 msgstr ""
 
-#: src/Admin/SettingsPage.php:310
+#: src/Admin/SettingsPage.php:318
 msgid "Düzeltilen konu kimliği"
 msgstr ""
 
-#: src/Admin/SettingsPage.php:311
+#: src/Admin/SettingsPage.php:319
 msgid "Taranan uzman grubu"
 msgstr ""
 
-#: src/Admin/SettingsPage.php:312
+#: src/Admin/SettingsPage.php:320
 msgid "Düzeltilen uzman kimliği"
 msgstr ""
 
-#: src/Admin/SettingsPage.php:313
+#: src/Admin/SettingsPage.php:321
 msgid "Taranan sayfa grubu"
 msgstr ""
 
-#: src/Admin/SettingsPage.php:314
+#: src/Admin/SettingsPage.php:322
 msgid "Düzeltilen sayfa kimliği"
 msgstr ""
 
-#: src/Admin/SettingsPage.php:315
+#: src/Admin/SettingsPage.php:323
 msgid "Yeniden yazılan atıf"
 msgstr ""
 
-#: src/Admin/SettingsPage.php:319
+#: src/Admin/SettingsPage.php:327
 msgid "Onarım tamamlandı."
 msgstr ""
 
-#: src/Admin/SettingsPage.php:331
+#: src/Admin/SettingsPage.php:339
 msgid "Kimlikler değiştiği için kütüphane sürümü artırıldı; çözümleme cache'i tembel olarak yeniden hesaplanacak."
 msgstr ""
 
-#: src/Admin/SettingsPage.php:350
+#: src/Admin/SettingsPage.php:358
 msgid "Kurum logosu (ek ID)"
 msgstr ""
 
-#: src/Admin/SettingsPage.php:354
+#: src/Admin/SettingsPage.php:362
 msgid "Klinigin LOGOSU. Trust Box icinde GOSTERILMEZ; yalnizca schema eklentisine kurum bilgisi olarak aktarilir. Doktor fotografi icin bu alani kullanmayin."
 msgstr ""
 
-#: src/Admin/SettingsPage.php:364
+#: src/Admin/SettingsPage.php:372
 msgid "Girilen ek onizlemesi"
 msgstr ""
 
-#: src/Admin/SettingsPage.php:369
+#: src/Admin/SettingsPage.php:377
 msgid "Bu ID bir gorsel ekine ait degil."
 msgstr ""
 
-#: src/Admin/SettingsPage.php:377
+#: src/Admin/SettingsPage.php:385
 msgid "ek kaydini ac"
 msgstr ""
 
-#: src/Admin/SettingsPage.php:391
+#: src/Admin/SettingsPage.php:399
 msgid "Trust Box portre onizlemesi"
 msgstr ""
 
-#: src/Admin/SettingsPage.php:396
+#: src/Admin/SettingsPage.php:404
 msgid "Portre secilmedi; Trust Box fotosuz gorunecek."
 msgstr ""
 
-#: src/Admin/SettingsPage.php:401
+#: src/Admin/SettingsPage.php:409
 msgid "Portre, Ayarlardaki kurum logosundan degil bu uzmanın “Uzman fotografi” alanindan gelir."
 msgstr ""
 
-#: src/Admin/SettingsPage.php:403
+#: src/Admin/SettingsPage.php:411
 msgid "Uzman kaydini duzenle"
 msgstr ""
 
-#: src/Admin/SettingsPage.php:418
+#: src/Admin/SettingsPage.php:426
 msgid "Baslangic kaynak kutuphanesi"
 msgstr ""
 
-#: src/Admin/SettingsPage.php:422
+#: src/Admin/SettingsPage.php:430
 msgid "Kaynak secimi motoru calisiyor, ancak kutuphane bosken secebilecegi hicbir kayit yok. Bu arac, konularinizla eslesen GERCEK ve adresleri dogrulanmis mesleki kurulus (ASPS, ISAPS, NHS) ve klinik kurum (Cleveland Clinic) kaynaklarini olusturur."
 msgstr ""
 
-#: src/Admin/SettingsPage.php:427
+#: src/Admin/SettingsPage.php:435
 msgid "Hakemli bilimsel yayin uretilmez."
 msgstr ""
 
-#: src/Admin/SettingsPage.php:428
+#: src/Admin/SettingsPage.php:436
 msgid "Bir konuya gercekten uygun yayin secmek kuratorluk ister; DOI uydurmak sistemin amacini bozar. \"Bilimsel Yayin\" slotu bos kalir ve kutu onsuz gorunur."
 msgstr ""
 
-#: src/Admin/SettingsPage.php:443
+#: src/Admin/SettingsPage.php:451
 msgid "Olusturulabilecek yeni kayit: %1$d · Yayim bekleyen aday: %2$d"
 msgstr ""
 
-#: src/Admin/SettingsPage.php:463
+#: src/Admin/SettingsPage.php:471
 msgid "Eslesen yeni kaynak yok. Konulariniz katalogdaki anahtar kelimelerle eslesmiyorsa once Tibbi Konular olusturun."
 msgstr ""
 
-#: src/Admin/SettingsPage.php:475
+#: src/Admin/SettingsPage.php:483
 msgid "Katalogu simdi eslestir ve yayimla"
 msgstr ""
 
-#: src/Admin/SettingsPage.php:483
+#: src/Admin/SettingsPage.php:491
 msgid "Yalnizca aday olarak olustur"
 msgstr ""
 
-#: src/Admin/SettingsPage.php:494
+#: src/Admin/SettingsPage.php:502
 msgid "Bekleyen %d adayi yayimla"
 msgstr ""
 
-#: src/Admin/SettingsPage.php:505
+#: src/Admin/SettingsPage.php:513
 msgid "Adaylar yayimlanana kadar hicbir sayfada gorunmez. Once tek tek gozden gecirmek isterseniz:"
 msgstr ""
 
-#: src/Admin/SettingsPage.php:507
+#: src/Admin/SettingsPage.php:515
 msgid "bekleyen kaynaklari ac"
 msgstr ""
 
-#: src/Admin/SettingsPage.php:520
+#: src/Admin/SettingsPage.php:528
 msgid "%d aday kaynak olusturuldu."
 msgstr ""
 
-#: src/Admin/SettingsPage.php:542
+#: src/Admin/SettingsPage.php:550
 msgid "%d kaynak yayimlandi ve secime hazir. Konusu eslesen sayfalarda kaynak bolumu artik dolu gelir."
 msgstr ""
 
-#: src/Admin/SettingsPage.php:546
+#: src/Admin/SettingsPage.php:554
 msgid "Kayitlar \"aday\" durumundadir ve yayimlanana kadar hicbir sayfada gorunmez."
 msgstr ""
 
-#: src/Admin/SettingsPage.php:585
+#: src/Admin/SettingsPage.php:593
 msgid "Bu islem icin yetkiniz yok."
 msgstr ""
 
-#: src/Admin/SettingsPage.php:634
+#: src/Admin/SettingsPage.php:642
 msgid "Bu işlem için yetkiniz yok."
 msgstr ""
 
@@ -1782,7 +1790,7 @@ msgstr ""
 msgid "Medical Trust"
 msgstr ""
 
-#: templates/trust-block.php:123
+#: templates/trust-block.php:130
 msgid "Kaynaklar"
 msgstr "Quellen"
 
@@ -1910,50 +1918,58 @@ msgstr ""
 msgid "Eksik yönetici yetkileri tamamlandı. \"Medical Trust\" menüsü artık görünür olmalı. Bu, eklentinin yeniden etkinleştirilmeden güncellendiği kurulumlarda beklenen bir onarımdır; hiçbir veri değiştirilmedi."
 msgstr ""
 
-#: templates/trust-block.php:38
+#: templates/trust-block.php:45
 msgid "İçerik Sorumlusu ve Tıbbi Denetim"
 msgstr "Inhaltsverantwortung und medizinische Prüfung"
 
-#: templates/trust-block.php:50
+#: templates/trust-block.php:57
 msgid "Tıbbi uzman"
 msgstr "Medizinische Fachperson"
 
-#: templates/trust-block.php:63
+#: templates/trust-block.php:70
 msgid "Hakkımda"
 msgstr "Über mich"
 
-#: templates/trust-block.php:70
+#: templates/trust-block.php:77
 msgid "İçeriği hazırlayan ve tıbbi olarak inceleyen: %s"
 msgstr "Erstellt und medizinisch geprüft von: %s"
 
-#: templates/trust-block.php:72
+#: templates/trust-block.php:79
 msgid "İçeriği hazırlayan: %s"
 msgstr "Erstellt von: %s"
 
-#: templates/trust-block.php:73
+#: templates/trust-block.php:80
 msgid "Tıbbi olarak inceleyen: %s"
 msgstr "Medizinisch geprüft von: %s"
 
-#: templates/trust-block.php:88
+#: templates/trust-block.php:95
 msgid "%1$s içeriğinin tıbbi sorumlusu: %2$s"
 msgstr "Medizinisch verantwortlich für %1$s: %2$s"
 
-#: templates/trust-block.php:94
+#: templates/trust-block.php:101
 msgid "Bu sayfanın tıbbi içerik sorumlusu: %s"
 msgstr "Medizinisch verantwortlich für diese Seite: %s"
 
-#: templates/trust-block.php:101
+#: templates/trust-block.php:108
 msgid "Tıbbi inceleme tarihi:"
 msgstr "Datum der letzten medizinischen Prüfung:"
 
-#: templates/trust-block.php:102
+#: templates/trust-block.php:109
 msgid "Tıbbi incelemenin güncellenmesi planlanmıştır."
 msgstr "Eine Aktualisierung der medizinischen Prüfung ist vorgesehen."
 
-#: templates/trust-block.php:111
+#: templates/trust-block.php:118
 msgid "Son güncelleme:"
 msgstr "Zuletzt aktualisiert:"
 
-#: templates/trust-block.php:116
+#: templates/trust-block.php:123
 msgid "Uzman değerlendirmesi"
 msgstr "Fachliche Einschätzung"
+
+#: templates/trust-block.php:147
+msgid "Editoryal bilgilendirme"
+msgstr "Redaktioneller Hinweis"
+
+#: templates/trust-block.php:148
+msgid "Bu içeriğin geliştirilmesine %s katkı sağlamıştır. Sayfa içeriği sadece bilgilendirme amaçlıdır. Tanı ve tedavi için mutlaka hekiminize başvurunuz."
+msgstr "Der %s hat zur Erstellung dieses Inhalts beigetragen. Diese Seite dient ausschließlich der Information. Für Diagnose und Behandlung wenden Sie sich bitte an Ihre Ärztin oder Ihren Arzt."
