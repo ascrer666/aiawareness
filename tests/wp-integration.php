@@ -413,6 +413,9 @@ $check( 'AS makale ozeti varsayilan kapali', ! \DLA\MedicalTrust\Settings\Settin
 \DLA\MedicalTrust\Settings\Settings::update( array_merge( \DLA\MedicalTrust\Settings\Settings::all(), [ 'article_summary_links_enabled' => true ] ) );
 $summary_html = ( new \DLA\MedicalTrust\Integration\ArticleSummaryLinks() )->render( $page_id );
 $check( 'AS etkinlestirilen ozet baglantilari tum saglayicilari ve sayfa URLsini tasir', str_contains( $summary_html, 'dla-mt-summary-links' ) && str_contains( $summary_html, 'ChatGPT' ) && str_contains( $summary_html, 'Perplexity' ) && str_contains( $summary_html, rawurlencode( get_permalink( $page_id ) ) ) );
+$summary_in_content = $with_main_query( $page_id, static fn() => ( new \DLA\MedicalTrust\Integration\ArticleSummaryLinks() )->prepend( (string) get_post_field( 'post_content', $page_id ) ) );
+$summary_in_layout  = $with_main_query( $page_id, static fn() => ( new \DLA\MedicalTrust\Integration\ArticleSummaryLinks() )->prepend( '[fusion_builder_container]Global Layout[/fusion_builder_container]' ) );
+$check( 'AS yalnizca sorgulanan sayfanin kendi iceriginden once eklenir', str_starts_with( $summary_in_content, '<aside class="dla-mt-summary-links"' ) && ! str_contains( $summary_in_layout, 'dla-mt-summary-links' ) );
 
 update_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_AUTHOR_MODE, 'organization' );
 $editorial_html = $component->render_for_post( $page_id );

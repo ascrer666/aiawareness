@@ -28,7 +28,9 @@ final class ArticleSummaryLinks {
 	public function register(): void {
 		$this->assets->register();
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_if_expected' ], 20 );
-		add_filter( 'the_content', [ $this, 'prepend' ], 9 );
+		// Avada Global Layout'lari da bu filtreyi kullanir. Diger eklentilerin
+		// donusturmesinden once ham icerigi kontrol edebilmek icin erken calis.
+		add_filter( 'the_content', [ $this, 'prepend' ], 1 );
 	}
 
 	public function enqueue_if_expected(): void {
@@ -49,6 +51,15 @@ final class ArticleSummaryLinks {
 
 		$current_id = get_the_ID();
 		if ( false !== $current_id && (int) $current_id !== $post_id ) {
+			return $content;
+		}
+
+		$post = get_post( $post_id );
+		// Avada bir Global Layout'un header/footer icerigini islerken ana
+		// sorgudaki sayfayi "current post" olarak birakabiliyor. ID tek basina
+		// yeterli olmaz ve bilesen sitenin en ustune tasinir. Yalnizca
+		// sorgulanan sayfanin kendi ham icerigi filtrelenirken ekleme yap.
+		if ( ! $post instanceof \WP_Post || $content !== (string) $post->post_content ) {
 			return $content;
 		}
 
