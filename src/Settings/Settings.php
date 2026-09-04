@@ -52,6 +52,8 @@ final class Settings {
 			'automatic_injection'       => false,
 			'injection_position'        => 'after',
 			'article_summary_links_enabled' => false,
+			'google_preferred_source_enabled' => false,
+			'google_preferred_source_position' => 'above_summary',
 			'retain_data_on_uninstall'  => true,
 		];
 	}
@@ -251,6 +253,16 @@ final class Settings {
 			$out['article_summary_links_enabled'] = (bool) $input['article_summary_links_enabled'];
 		}
 
+		if ( array_key_exists( 'google_preferred_source_enabled', $input ) ) {
+			$out['google_preferred_source_enabled'] = (bool) $input['google_preferred_source_enabled'];
+		}
+
+		if ( array_key_exists( 'google_preferred_source_position', $input ) ) {
+			$out['google_preferred_source_position'] = 'below_summary' === $input['google_preferred_source_position']
+				? 'below_summary'
+				: 'above_summary';
+		}
+
 		if ( array_key_exists( 'injection_position', $input ) ) {
 			$out['injection_position'] = 'before' === $input['injection_position'] ? 'before' : 'after';
 		}
@@ -359,6 +371,17 @@ final class Settings {
 	 */
 	public static function article_summary_links_enabled(): bool {
 		return (bool) self::get( 'article_summary_links_enabled', false );
+	}
+
+	public static function google_preferred_source_enabled(): bool {
+		return (bool) self::get( 'google_preferred_source_enabled', false );
+	}
+
+	/** @return 'above_summary'|'below_summary' */
+	public static function google_preferred_source_position(): string {
+		return 'below_summary' === self::get( 'google_preferred_source_position', 'above_summary' )
+			? 'below_summary'
+			: 'above_summary';
 	}
 
 	public static function injection_position(): string {

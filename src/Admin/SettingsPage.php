@@ -296,6 +296,24 @@ final class SettingsPage {
 			__( 'Varsayılan kapalıdır. Açıldığında kapsamda seçili tekil sayfa, yazı ve portfolio içeriklerinde; içerikten önce minimal bir ChatGPT, Grok, Perplexity, Claude ve Gemini çubuğu görünür.', 'dla-medical-trust' )
 		);
 
+		Field::checkbox(
+			'google_preferred_source_enabled',
+			__( 'Google’da tercih edilen kaynak', 'dla-medical-trust' ),
+			(bool) ( $settings['google_preferred_source_enabled'] ?? false ),
+			__( 'Google tercih edilen kaynak düğmesini göster', 'dla-medical-trust' ),
+			__( 'Özet çubuğunun üstünde veya altında, Google’ın kendi yerelleştirilmiş düğmesini gösterir. Google publisher betiği tema veya başka bir eklenti tarafından zaten yüklenmiş olmalıdır.', 'dla-medical-trust' )
+		);
+
+		Field::select(
+			'google_preferred_source_position',
+			__( 'Google düğmesi konumu', 'dla-medical-trust' ),
+			(string) ( $settings['google_preferred_source_position'] ?? 'above_summary' ),
+			[
+				'above_summary' => __( 'Özet çubuğunun üstünde', 'dla-medical-trust' ),
+				'below_summary' => __( 'Özet çubuğunun altında', 'dla-medical-trust' ),
+			]
+		);
+
 		Field::select(
 			'injection_position',
 			__( 'Otomatik yerleştirme konumu', 'dla-medical-trust' ),
@@ -716,6 +734,8 @@ final class SettingsPage {
 				'automatic_injection'       => isset( $_POST['automatic_injection'] ),
 				'injection_position'        => wp_unslash( $_POST['injection_position'] ?? 'after' ),
 				'article_summary_links_enabled' => isset( $_POST['article_summary_links_enabled'] ),
+				'google_preferred_source_enabled' => isset( $_POST['google_preferred_source_enabled'] ),
+				'google_preferred_source_position' => wp_unslash( $_POST['google_preferred_source_position'] ?? 'above_summary' ),
 				'retain_data_on_uninstall'  => isset( $_POST['retain_data_on_uninstall'] ),
 			]
 		);

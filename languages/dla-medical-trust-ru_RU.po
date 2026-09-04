@@ -1993,3 +1993,27 @@ msgstr "Кратко изложите эту статью, используя т
 #: src/Integration/ArticleSummaryLinks.php:95
 msgid "(yeni pencerede açılır)"
 msgstr "(открывается в новом окне)"
+
+#: src/Admin/SettingsPage.php
+msgid "Google’da tercih edilen kaynak"
+msgstr "Предпочтительный источник в Google"
+
+#: src/Admin/SettingsPage.php
+msgid "Google tercih edilen kaynak düğmesini göster"
+msgstr "Показывать кнопку Google для предпочтительных источников"
+
+#: src/Admin/SettingsPage.php
+msgid "Özet çubuğunun üstünde veya altında, Google’ın kendi yerelleştirilmiş düğmesini gösterir. Google publisher betiği tema veya başka bir eklenti tarafından zaten yüklenmiş olmalıdır."
+msgstr "Показывает локализованную кнопку Google над или под панелью резюме. Скрипт Google Publisher должен быть уже загружен темой или другим плагином."
+
+#: src/Admin/SettingsPage.php
+msgid "Google düğmesi konumu"
+msgstr "Расположение кнопки Google"
+
+#: src/Admin/SettingsPage.php
+msgid "Özet çubuğunun üstünde"
+msgstr "Над панелью резюме"
+
+#: src/Admin/SettingsPage.php
+msgid "Özet çubuğunun altında"
+msgstr "Под панелью резюме"

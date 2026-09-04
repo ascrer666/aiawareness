@@ -1993,3 +1993,27 @@ msgstr "Fasse diesen Artikel zusammen und verwende nur zuverlässige Quellen: %s
 #: src/Integration/ArticleSummaryLinks.php:95
 msgid "(yeni pencerede açılır)"
 msgstr "(öffnet in einem neuen Fenster)"
+
+#: src/Admin/SettingsPage.php
+msgid "Google’da tercih edilen kaynak"
+msgstr "Bevorzugte Quelle bei Google"
+
+#: src/Admin/SettingsPage.php
+msgid "Google tercih edilen kaynak düğmesini göster"
+msgstr "Google-Schaltfläche für bevorzugte Quellen anzeigen"
+
+#: src/Admin/SettingsPage.php
+msgid "Özet çubuğunun üstünde veya altında, Google’ın kendi yerelleştirilmiş düğmesini gösterir. Google publisher betiği tema veya başka bir eklenti tarafından zaten yüklenmiş olmalıdır."
+msgstr "Zeigt die von Google lokalisierte Schaltfläche über oder unter der Zusammenfassungsleiste. Das Google-Publisher-Skript muss bereits durch das Theme oder ein anderes Plugin geladen sein."
+
+#: src/Admin/SettingsPage.php
+msgid "Google düğmesi konumu"
+msgstr "Position der Google-Schaltfläche"
+
+#: src/Admin/SettingsPage.php
+msgid "Özet çubuğunun üstünde"
+msgstr "Über der Zusammenfassungsleiste"
+
+#: src/Admin/SettingsPage.php
+msgid "Özet çubuğunun altında"
+msgstr "Unter der Zusammenfassungsleiste"

@@ -91,9 +91,15 @@ final class ArticleSummaryLinks {
 			'Claude'     => 'https://claude.ai/new?q=',
 			'Gemini'     => 'https://gemini.google.com/app?q=',
 		];
+		$preferred_source = Settings::google_preferred_source_enabled()
+			? '<div class="dla-mt-preferred-source"><div google-add-preferred-source-btn></div></div>'
+			: '';
 
 		ob_start();
 		?>
+		<?php if ( 'above_summary' === Settings::google_preferred_source_position() ) : ?>
+			<?php echo $preferred_source; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- fixed, attribute-only Google SDK target. ?>
+		<?php endif; ?>
 		<aside class="dla-mt-summary-links" aria-label="<?php echo esc_attr__( 'Yapay zekâ ile makale özeti', 'dla-medical-trust' ); ?>">
 			<p class="dla-mt-summary-links__title"><span aria-hidden="true">✦</span> <?php echo esc_html__( 'Bu içeriği yapay zekâ ile özetle', 'dla-medical-trust' ); ?></p>
 			<div class="dla-mt-summary-links__actions">
@@ -102,6 +108,9 @@ final class ArticleSummaryLinks {
 				<?php endforeach; ?>
 			</div>
 		</aside>
+		<?php if ( 'below_summary' === Settings::google_preferred_source_position() ) : ?>
+			<?php echo $preferred_source; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- fixed, attribute-only Google SDK target. ?>
+		<?php endif; ?>
 		<?php
 
 		return (string) ob_get_clean();

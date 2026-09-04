@@ -1993,3 +1993,27 @@ msgstr "Summarize this article and use only reliable sources: %s"
 #: src/Integration/ArticleSummaryLinks.php:95
 msgid "(yeni pencerede açılır)"
 msgstr "(opens in a new window)"
+
+#: src/Admin/SettingsPage.php
+msgid "Google’da tercih edilen kaynak"
+msgstr "Preferred source on Google"
+
+#: src/Admin/SettingsPage.php
+msgid "Google tercih edilen kaynak düğmesini göster"
+msgstr "Show the Google Preferred Source button"
+
+#: src/Admin/SettingsPage.php
+msgid "Özet çubuğunun üstünde veya altında, Google’ın kendi yerelleştirilmiş düğmesini gösterir. Google publisher betiği tema veya başka bir eklenti tarafından zaten yüklenmiş olmalıdır."
+msgstr "Shows Google’s own localized button above or below the summary bar. The Google publisher script must already be loaded by the theme or another plugin."
+
+#: src/Admin/SettingsPage.php
+msgid "Google düğmesi konumu"
+msgstr "Google button position"
+
+#: src/Admin/SettingsPage.php
+msgid "Özet çubuğunun üstünde"
+msgstr "Above the summary bar"
+
+#: src/Admin/SettingsPage.php
+msgid "Özet çubuğunun altında"
+msgstr "Below the summary bar"

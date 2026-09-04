@@ -335,6 +335,15 @@
   text-decoration: none;
 }
 
+.dla-mt-preferred-source {
+  display: flex;
+  align-items: center;
+  min-height: 2.25rem;
+  margin: 0 0 .7rem;
+}
+
+.dla-mt-summary-links + .dla-mt-preferred-source { margin: .7rem 0 1.35rem; }
+
 /* ---------------------------------------------------------- compact */
 
 .dla-mt--compact {

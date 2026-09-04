@@ -2084,3 +2084,27 @@ msgstr ""
 #: src/Integration/ArticleSummaryLinks.php:95
 msgid "(yeni pencerede açılır)"
 msgstr ""
+
+#: src/Admin/SettingsPage.php
+msgid "Google’da tercih edilen kaynak"
+msgstr ""
+
+#: src/Admin/SettingsPage.php
+msgid "Google tercih edilen kaynak düğmesini göster"
+msgstr ""
+
+#: src/Admin/SettingsPage.php
+msgid "Özet çubuğunun üstünde veya altında, Google’ın kendi yerelleştirilmiş düğmesini gösterir. Google publisher betiği tema veya başka bir eklenti tarafından zaten yüklenmiş olmalıdır."
+msgstr ""
+
+#: src/Admin/SettingsPage.php
+msgid "Google düğmesi konumu"
+msgstr ""
+
+#: src/Admin/SettingsPage.php
+msgid "Özet çubuğunun üstünde"
+msgstr ""
+
+#: src/Admin/SettingsPage.php
+msgid "Özet çubuğunun altında"
+msgstr ""
