@@ -28,6 +28,7 @@ use DLA\MedicalTrust\Admin\UserProfileFields;
 use DLA\MedicalTrust\Capability\Capabilities;
 use DLA\MedicalTrust\I18n\IdentitySync;
 use DLA\MedicalTrust\Identity\UidGenerator;
+use DLA\MedicalTrust\Integration\ArticleSummaryLinks;
 use DLA\MedicalTrust\Integration\TrustComponent;
 use DLA\MedicalTrust\Meta\MetaRegistry;
 use DLA\MedicalTrust\PostTypes\ExpertPostType;
@@ -75,6 +76,7 @@ final class Plugin {
 		( new IdentitySync() )->register();
 		( new ReviewMetaGuard() )->register();
 		( new TrustComponent() )->register();
+		( new ArticleSummaryLinks() )->register();
 		require_once DLA_MT_DIR . 'src/Integration/template-tags.php';
 		require_once DLA_MT_DIR . 'src/Contract/template-tags.php';
 

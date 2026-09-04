@@ -408,6 +408,12 @@ $check( 'M4 canonical citation URL is used with safe link relation', str_contain
 $check( 'M4 WordPress image API creates a responsive portrait', str_contains( $default_html, 'dla-mt__portrait-image' ) && str_contains( $default_html, 'src=' ) );
 remove_filter( 'image_downsize', $image_downsize, 10 );
 
+/* --- Makale basi yapay zeka ozet baglantilari --- */
+$check( 'AS makale ozeti varsayilan kapali', ! \DLA\MedicalTrust\Settings\Settings::article_summary_links_enabled() );
+\DLA\MedicalTrust\Settings\Settings::update( array_merge( \DLA\MedicalTrust\Settings\Settings::all(), [ 'article_summary_links_enabled' => true ] ) );
+$summary_html = ( new \DLA\MedicalTrust\Integration\ArticleSummaryLinks() )->render( $page_id );
+$check( 'AS etkinlestirilen ozet baglantilari tum saglayicilari ve sayfa URLsini tasir', str_contains( $summary_html, 'dla-mt-summary-links' ) && str_contains( $summary_html, 'ChatGPT' ) && str_contains( $summary_html, 'Perplexity' ) && str_contains( $summary_html, rawurlencode( get_permalink( $page_id ) ) ) );
+
 update_post_meta( $page_id, \DLA\MedicalTrust\Meta\MetaRegistry::PAGE_AUTHOR_MODE, 'organization' );
 $editorial_html = $component->render_for_post( $page_id );
 $check( 'M4 editorial-team reviewer wording does not imply authorship', str_contains( $editorial_html, 'Tıbbi olarak inceleyen:' ) && ! str_contains( $editorial_html, 'İçeriği hazırlayan ve tıbbi olarak inceleyen:' ) );

@@ -1977,3 +1977,19 @@ msgstr "Editorial Board"
 #: templates/trust-block.php:163
 msgid "Bu içeriğin geliştirilmesine %s katkı sağlamıştır. Sayfa içeriği sadece bilgilendirme amaçlıdır. Tanı ve tedavi için mutlaka hekiminize başvurunuz."
 msgstr "The %s has contributed to the development of this content. This page is for informational purposes only. Please consult your physician for diagnosis and treatment."
+
+#: src/Integration/ArticleSummaryLinks.php:91
+msgid "Yapay zekâ ile makale özeti"
+msgstr "AI article summary"
+
+#: src/Integration/ArticleSummaryLinks.php:92
+msgid "Bu içeriği yapay zekâ ile özetle"
+msgstr "Summarize this article with AI"
+
+#: src/Integration/ArticleSummaryLinks.php:81
+msgid "Bu makaleyi özetle ve yalnızca güvenilir kaynakları kullan: %s"
+msgstr "Summarize this article and use only reliable sources: %s"
+
+#: src/Integration/ArticleSummaryLinks.php:95
+msgid "(yeni pencerede açılır)"
+msgstr "(opens in a new window)"

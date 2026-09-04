@@ -288,6 +288,53 @@
 .dla-mt-editorial-note p { margin: 0; }
 .dla-mt-editorial-note a { color: inherit; text-decoration: underline; text-underline-offset: .16em; }
 
+/* ------------------------------------------- yapay zeka makale ozeti */
+
+.dla-mt-summary-links {
+  box-sizing: border-box;
+  display: flow-root;
+  margin: 0 0 1.35rem;
+  padding: 1.1rem 1.35rem;
+  border: 1px solid #a9a9a9;
+  border-radius: .5rem;
+  background: #fff;
+  color: #3b3b3b;
+}
+
+.dla-mt-summary-links__title {
+  margin: 0 0 .8rem;
+  color: #5b6572;
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.dla-mt-summary-links__title span { margin-inline-end: .25rem; color: #6b7280; }
+
+.dla-mt-summary-links__actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+
+.dla-mt-summary-links__button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.25rem;
+  padding: .35rem .8rem;
+  border: 1px solid #e5e7eb;
+  border-radius: .18rem;
+  background: #f7f7f8;
+  color: #1f2937;
+  font-size: .94rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.dla-mt-summary-links__button:hover,
+.dla-mt-summary-links__button:focus-visible {
+  border-color: #9ca3af;
+  background: #fff;
+  color: #111827;
+  text-decoration: none;
+}
+
 /* ---------------------------------------------------------- compact */
 
 .dla-mt--compact {

@@ -2067,3 +2067,20 @@ msgstr ""
 #, php-format
 msgid "Bu içeriğin geliştirilmesine %s katkı sağlamıştır. Sayfa içeriği sadece bilgilendirme amaçlıdır. Tanı ve tedavi için mutlaka hekiminize başvurunuz."
 msgstr ""
+
+#: src/Integration/ArticleSummaryLinks.php:91
+msgid "Yapay zekâ ile makale özeti"
+msgstr ""
+
+#: src/Integration/ArticleSummaryLinks.php:92
+msgid "Bu içeriği yapay zekâ ile özetle"
+msgstr ""
+
+#: src/Integration/ArticleSummaryLinks.php:81
+#, php-format
+msgid "Bu makaleyi özetle ve yalnızca güvenilir kaynakları kullan: %s"
+msgstr ""
+
+#: src/Integration/ArticleSummaryLinks.php:95
+msgid "(yeni pencerede açılır)"
+msgstr ""

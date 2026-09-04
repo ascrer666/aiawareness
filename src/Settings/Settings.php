@@ -51,6 +51,7 @@ final class Settings {
 			'show_review_date'          => false,
 			'automatic_injection'       => false,
 			'injection_position'        => 'after',
+			'article_summary_links_enabled' => false,
 			'retain_data_on_uninstall'  => true,
 		];
 	}
@@ -246,6 +247,10 @@ final class Settings {
 			$out['automatic_injection'] = (bool) $input['automatic_injection'];
 		}
 
+		if ( array_key_exists( 'article_summary_links_enabled', $input ) ) {
+			$out['article_summary_links_enabled'] = (bool) $input['article_summary_links_enabled'];
+		}
+
 		if ( array_key_exists( 'injection_position', $input ) ) {
 			$out['injection_position'] = 'before' === $input['injection_position'] ? 'before' : 'after';
 		}
@@ -345,6 +350,15 @@ final class Settings {
 
 	public static function automatic_injection_enabled(): bool {
 		return (bool) self::get( 'automatic_injection', false );
+	}
+
+	/**
+	 * Sayfa basligindan sonra gorunen, harici yapay zeka ozet baglantilari.
+	 * Varsayilan kapali: ziyaretciyi harici bir hizmete yonlendiren bir arayuz
+	 * yalnizca site yoneticisi bilincli olarak etkinlestirdiginde gorunur.
+	 */
+	public static function article_summary_links_enabled(): bool {
+		return (bool) self::get( 'article_summary_links_enabled', false );
 	}
 
 	public static function injection_position(): string {

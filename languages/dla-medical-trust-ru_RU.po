@@ -1977,3 +1977,19 @@ msgstr "Редакционная коллегия"
 #: templates/trust-block.php:163
 msgid "Bu içeriğin geliştirilmesine %s katkı sağlamıştır. Sayfa içeriği sadece bilgilendirme amaçlıdır. Tanı ve tedavi için mutlaka hekiminize başvurunuz."
 msgstr "%s участвовал в подготовке этого материала. Страница носит исключительно информационный характер. Для диагностики и лечения обязательно обратитесь к врачу."
+
+#: src/Integration/ArticleSummaryLinks.php:91
+msgid "Yapay zekâ ile makale özeti"
+msgstr "ИИ-резюме статьи"
+
+#: src/Integration/ArticleSummaryLinks.php:92
+msgid "Bu içeriği yapay zekâ ile özetle"
+msgstr "Кратко изложить эту статью с помощью ИИ"
+
+#: src/Integration/ArticleSummaryLinks.php:81
+msgid "Bu makaleyi özetle ve yalnızca güvenilir kaynakları kullan: %s"
+msgstr "Кратко изложите эту статью, используя только надежные источники: %s"
+
+#: src/Integration/ArticleSummaryLinks.php:95
+msgid "(yeni pencerede açılır)"
+msgstr "(открывается в новом окне)"

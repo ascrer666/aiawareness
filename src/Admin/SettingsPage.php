@@ -288,6 +288,14 @@ final class SettingsPage {
 			__( 'Varsayılan kapalıdır. Avada Global Layout içinde shortcode kullanılıyorsa kapalı bırakın; böylece çift kutu oluşmaz.', 'dla-medical-trust' )
 		);
 
+		Field::checkbox(
+			'article_summary_links_enabled',
+			__( 'Yapay zekâ ile makale özeti', 'dla-medical-trust' ),
+			(bool) ( $settings['article_summary_links_enabled'] ?? false ),
+			__( 'Makale başlığının altında özet bağlantılarını göster', 'dla-medical-trust' ),
+			__( 'Varsayılan kapalıdır. Açıldığında kapsamda seçili tekil sayfa, yazı ve portfolio içeriklerinde; içerikten önce minimal bir ChatGPT, Grok, Perplexity, Claude ve Gemini çubuğu görünür.', 'dla-medical-trust' )
+		);
+
 		Field::select(
 			'injection_position',
 			__( 'Otomatik yerleştirme konumu', 'dla-medical-trust' ),
@@ -707,6 +715,7 @@ final class SettingsPage {
 				'show_review_date'          => isset( $_POST['show_review_date'] ),
 				'automatic_injection'       => isset( $_POST['automatic_injection'] ),
 				'injection_position'        => wp_unslash( $_POST['injection_position'] ?? 'after' ),
+				'article_summary_links_enabled' => isset( $_POST['article_summary_links_enabled'] ),
 				'retain_data_on_uninstall'  => isset( $_POST['retain_data_on_uninstall'] ),
 			]
 		);

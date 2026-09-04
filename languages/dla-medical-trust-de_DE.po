@@ -1977,3 +1977,19 @@ msgstr "Redaktionsbeirat"
 #: templates/trust-block.php:163
 msgid "Bu içeriğin geliştirilmesine %s katkı sağlamıştır. Sayfa içeriği sadece bilgilendirme amaçlıdır. Tanı ve tedavi için mutlaka hekiminize başvurunuz."
 msgstr "Der %s hat zur Erstellung dieses Inhalts beigetragen. Diese Seite dient ausschließlich der Information. Für Diagnose und Behandlung wenden Sie sich bitte an Ihre Ärztin oder Ihren Arzt."
+
+#: src/Integration/ArticleSummaryLinks.php:91
+msgid "Yapay zekâ ile makale özeti"
+msgstr "KI-Zusammenfassung des Artikels"
+
+#: src/Integration/ArticleSummaryLinks.php:92
+msgid "Bu içeriği yapay zekâ ile özetle"
+msgstr "Diesen Artikel mit KI zusammenfassen"
+
+#: src/Integration/ArticleSummaryLinks.php:81
+msgid "Bu makaleyi özetle ve yalnızca güvenilir kaynakları kullan: %s"
+msgstr "Fasse diesen Artikel zusammen und verwende nur zuverlässige Quellen: %s"
+
+#: src/Integration/ArticleSummaryLinks.php:95
+msgid "(yeni pencerede açılır)"
+msgstr "(öffnet in einem neuen Fenster)"
